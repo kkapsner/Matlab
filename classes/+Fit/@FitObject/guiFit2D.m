@@ -88,7 +88,7 @@ function result = guiFit2D(this, zData, varargin)
             result.marker(3, i) = this(i).startY;
         end
         
-        if (tihs(i).endY == -Inf)
+        if (this(i).endY == -Inf)
             result.marker(4, i) = minY;
         elseif (this(i).endY == Inf)
             result.marker(4, i) = maxY;
@@ -112,7 +112,7 @@ function result = guiFit2D(this, zData, varargin)
 
     % remove toolbar buttons excep 'rotate'
     htb = findall(findall(f, 'type', 'uitoolbar'));
-    i = True(ones(size(htb)));
+    i = true(ones(size(htb')));
     i([1 9]) = 0;
     delete(htb(i));
     

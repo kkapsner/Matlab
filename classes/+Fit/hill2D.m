@@ -1,4 +1,4 @@
-function fit = hill()
+function fit = hill2D()
 %EXPONENTIAL creates a exponential fit object
     
     fit = Fit.FitObject(@(a, b, k1, n1, k2, n2, x1, x2)a./((k1./x1).^n1+1)./((k2./x2).^n2+1) + b);
