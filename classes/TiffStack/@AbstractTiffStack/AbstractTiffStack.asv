@@ -1,0 +1,59 @@
+classdef (Abstract) AbstractTiffStack  < handle & matlab.mixin.Heterogeneous
+    %TiffStack manages a file containing a tiff image stack
+    
+    properties
+        caching = true
+    end
+    properties(Access=private, Transient)
+        cachedIndex = []
+        cachedImage = []
+    end
+    
+    properties(Dependent)
+        size
+        imageSize
+    end
+    
+    methods (Abstract)
+        size = getSize(this);
+        imageSize = getImageSize(this);
+    end
+    
+    methods
+        
+        function size = get.size(this)
+            size = stack.getSize();
+        end
+        
+        function imageSize = get.imageSize(this)
+            imageSize = this.getImageSize();
+        end
+    end
+    
+    methods
+        function clearCache(this)
+            %STACK.CLEARCACHE() deletes the cache of the Tiff stack.
+            
+            this.cachedIndex = [];
+            this.cachedImage = [];
+        end
+        
+        [panel] = getDialogPanel(this, dm, changeCallback)
+        dm = dialog(this, waitForClose, segmenter)
+    end
+    
+    methods (Static)
+        stack = guiCreateStack(selectedFile)
+        [panel, getParameter] = getGUIParameterPanel(parent, file)
+        
+        function obj = loadobj(A)
+            if (strcmp(class(A), 'TiffStack'))
+                obj = TiffStack(A.file);
+                obj.caching = A.caching;
+            else
+                obj = A;
+            end
+        end
+    end
+end
+

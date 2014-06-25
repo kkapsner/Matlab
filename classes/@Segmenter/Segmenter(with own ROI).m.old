@@ -1,0 +1,260 @@
+classdef Segmenter < handle & Configable
+    %Segmenter is a class to provide image segmenting techniques
+    
+    properties
+        % whether the threshold should be computed for every image
+        % seperately with graythresh (Otzus method)
+        computeThreshold = true
+        
+        % if the threshold should not be computed the threshold to use
+        threshold = 0.5
+        
+        % whether a thinning algorithm should be performed on the binary
+        % image to make the white areas as big as possible
+        performThinning = true
+        
+        % whether a bridging algorithm should be performed on the binary
+        % image to close small gaps in area borders
+        performBridging = true
+        
+        % whether a filling algorithm should be performed on the binary
+        % image to remove single black pixels
+        performFilling = true
+        
+        % whether a watershed algorithm should be performed on the binary
+        % image to separate regions with an intersection
+        performWatershed = true
+        
+        % sigma for the gaussian filter that is performed before the
+        % watershed algorithm
+        watershedFilter = [8, 8]
+        
+        % whether white areas touching the border should be removed
+        clearBorder = true
+        
+        % range within the found segments have to be
+        areaRange = [-Inf, Inf]
+        
+        % if concave segments should be removed
+        removeConcave = true
+        
+        % limit factor by which the area of the convex image of the segment
+        % may be bigger than the original image
+        concaveLimitFactor = 1.1
+    end
+    
+    methods
+        function roi = segment(seg, image)
+            if (seg.computeThreshold)
+                thres = graythresh(image);
+            else
+                thres = seg.threshold;
+            end
+            
+            imageSize = size(image);
+            
+            % create index matrix
+            idxImage = reshape(1:numel(image), imageSize);
+            canvas = false(imageSize);
+            
+            % create bw image
+            binImage = im2bw(image, thres);
+            
+            if (seg.performFilling)
+                binImage = bwmorph(binImage, 'fill');
+            end
+            if (seg.performBridging)
+%                 binImage = ~bwmorph(~binImage, 'bridge');
+                binImage = ~Image.bridge(~binImage);
+            end
+            if (seg.performThinning)
+                binImage = ~bwmorph(~binImage, 'thin', Inf);
+            end
+            
+            if (seg.clearBorder)
+                binImage = imclearborder(binImage, 4);
+            end
+            
+            % get regions
+            roiOrig = bwconncomp(binImage, 4);
+            
+            
+            useROI = false;
+            
+            if (useROI)
+                roi = ROI(roiOrig.PixelIdxList, imageSize);
+                roi = roi.select('Area', seg.areaRange(1), true, seg.areaRange(2), true);
+                roi.initialiseProperties();
+                if (isempty(roi))
+                    return;
+                end
+            else
+                filter = true(roiOrig.NumObjects, 1);
+                for i = roiOrig.NumObjects:-1:1
+                    idxList = roiOrig.PixelIdxList{i};
+                    area = numel(idxList);
+                    if (area >= seg.areaRange(1) && area <= seg.areaRange(2))
+                        roi(i) = getRoiProperties(idxList);
+                    else
+                        filter(i) = false;
+                    end
+                end
+
+                if (~any(filter))
+                    roi = [];
+                    return;
+                end
+% 
+%                 area = cellfun(@numel, roiOrig.PixelIdxList);
+%                 filter = area >= seg.areaRange(1) & area <= seg.areaRange(2);
+% 
+%                 roiOrig.PixelIdxList = roiOrig.PixelIdxList(filter);
+%                 area = area(filter);
+%                 roiOrig.NumObjects = sum(filter(:));
+% 
+%                 roi = regionprops(roiOrig, ...
+%                     {'PixelIdxList', 'Area', 'EquivDiameter', 'Centroid', 'Eccentricity'});%, 'BoundingBox', 'Image', 'Perimeter'});
+%                 roiFilter = true(size(roi));%[roi.Eccentricity] < 0.5;
+%                 if (seg.removeConcave)
+%                     ConvexArea = cellfun(@Image.convexArea, {roi.Image});
+%                     roiFilter = roiFilter & ConvexArea < seg.concaveLimitFactor * area;
+%                 end
+% 
+                roi = roi(filter);
+            end
+            
+            roiFilter = true(size(roi));
+            if (seg.performWatershed)
+                newRoi = [];
+                for i = 1:numel(roi)
+                    r = roi(i);
+                    if (r.Eccentricity > 0.5)
+                        subIdxImage = idxImage(r.minY:r.maxY, r.minX:r.maxX);
+                        
+                        rImage = r.Image;
+
+%                         firstCol = 1:h;
+%                         lastRow = ((2:(w-1))*h);
+%                         rImage = rImage ~= imfill(rImage, [firstCol, lastRow, lastRow - h + 1, firstCol + (w-1)*h]', 8);
+                        rImage = rImage ~= Image.borderFill(rImage);
+    %                     rImage = ~imfill(rImage, 8, 'holes');
+
+                        dist = Filter.gauss2D(-bwdist(rImage), seg.watershedFilter, 1);
+                        dist(rImage) = Inf;
+                        imageSeg = watershed(dist, 4);
+                        imageSeg(rImage) = 0;
+                        maxId = max(imageSeg(:));
+                        if (maxId > 1)
+                            idxCell = cell(maxId, 1);
+                            waterFilter = true(maxId, 1);
+                            for j = 1:maxId
+                                subRImage = imageSeg == j;
+                                idxCell{j} = subIdxImage(subRImage);
+                                area = sum(subRImage(:));
+                                waterFilter(j) = area >= seg.areaRange(1) & area <= seg.areaRange(2);
+                            end
+                            if (sum(waterFilter(:)))
+                                if (useROI)
+                                    nRoi = ROI(idxCell(waterFilter), imageSize);
+                                    nRoi.initialiseProperties();
+                                else
+                                    nRoi = getRoiPropertiesCell(idxCell(waterFilter));
+                                end
+                                if (numel(newRoi))
+                                    newRoi = [newRoi, nRoi];
+                                else 
+                                    newRoi = nRoi;
+                                end
+                            end
+                            roiFilter(i) = 0;
+                        end
+                    end
+                end
+                if (numel(newRoi))
+                    roi = [roi(roiFilter), newRoi];
+                else 
+                    roi = roi(roiFilter);
+                end
+            end
+            
+            function roi = getRoiPropertiesCell(idxListCell)
+                for roiIdx = numel(idxListCell):-1:1
+                    roi(roiIdx) = getRoiProperties(idxListCell{roiIdx}); 
+                end
+            end
+            function roi = getRoiProperties(idxList)
+                roi.PixelIdxList = idxList;
+                roi.Area = numel(idxList);
+                roi.EquivDiameter = 2*sqrt(roi.Area / pi);
+                [roi.subY, roi.subX] = ind2sub2D(imageSize, idxList);
+                roi.Centroid = [sum(roi.subX(:)), sum(roi.subY(:))] / roi.Area;
+
+                % Eccentricity copied from regionprops
+                if (roi.Area == 0)
+                    roi.MajorAxisLength = 0;
+                    roi.MinorAxisLength = 0;
+                    roi.Eccentricity = 0;
+                    roi.Orientation = 0;
+
+                else
+                    % Assign X and Y variables so that we're measuring orientation
+                    % counterclockwise from the horizontal axis.
+
+                    xbar = roi.Centroid(1);
+                    ybar = roi.Centroid(2);
+
+                    x = roi.subX - xbar;
+                    y = -(roi.subY - ybar); % This is negative for the
+                    % orientation calculation (measured in the
+                    % counter-clockwise direction).
+
+                    N = length(x);
+
+                    % Calculate normalized second central moments for the region. 1/12 is
+                    % the normalized second central moment of a pixel with unit length.
+                    uxx = sum(x.^2)/N + 1/12;
+                    uyy = sum(y.^2)/N + 1/12;
+                    uxy = sum(x.*y)/N;
+
+                    % Calculate major axis length, minor axis length, and eccentricity.
+                    common = sqrt((uxx - uyy)^2 + 4*uxy^2);
+                    roi.MajorAxisLength = 2*sqrt(2)*sqrt(uxx + uyy + common);
+                    roi.MinorAxisLength = 2*sqrt(2)*sqrt(uxx + uyy - common);
+                    roi.Eccentricity = 2*sqrt((roi.MajorAxisLength/2)^2 - ...
+                        (roi.MinorAxisLength/2)^2) / ...
+                        roi.MajorAxisLength;
+
+                    % Calculate orientation.
+                    if (uyy > uxx)
+                        num = uyy - uxx + sqrt((uyy - uxx)^2 + 4*uxy^2);
+                        den = 2*uxy;
+                    else
+                        num = 2*uxy;
+                        den = uxx - uyy + sqrt((uxx - uyy)^2 + 4*uxy^2);
+                    end
+                    if (num == 0) && (den == 0)
+                        roi.Orientation = 0;
+                    else
+                        roi.Orientation = (180/pi) * atan(num/den);
+                    end
+                end
+                
+                % Image
+                
+                roi.minX = min(roi.subX);
+                roi.minY = min(roi.subY);
+                roi.maxX = max(roi.subX);
+                roi.maxY = max(roi.subY);
+
+                canvas(idxList) = true;
+                roi.Image = canvas(roi.minY:roi.maxY, roi.minX:roi.maxX);
+                canvas(idxList) = false;
+
+                % Perimeter
+                roi.Perimeter = Image.getPerimeter(roi.Image);
+            end
+        end
+    end
+    
+end
+

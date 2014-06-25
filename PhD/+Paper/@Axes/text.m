@@ -1,0 +1,9 @@
+function h = text(a, varargin)
+%TEXT like normal text(...)
+    h = text(varargin{:}, ...
+        'FontSize', a.textFontSize, ...14, ...
+        'Parent', a.ax ...
+    );
+
+end
+

@@ -1,0 +1,251 @@
+classdef ROI < Selectable & Binable & handle
+    %ROI is the class for a region of interest
+    
+    properties
+        segmentationStack
+        intensityStacks = {}
+    end
+    
+    properties (SetAccess=private)
+        PixelIdxList
+        width
+        height
+        
+        Intensity
+    end
+    
+    properties (SetAccess=private,Transient)
+        % area estimation of the ROI
+        Area
+        
+        %
+        subX
+        subY
+        minX
+        minY
+        maxX
+        maxY
+        Centroid
+    end
+    
+    properties (Dependent)
+        EquivDiameter
+        Image
+        ConcaveImage
+        Perimeter
+        MajorAxisLength
+        MinorAxisLength
+        Eccentricity
+        Orientation
+        Cyclicity
+        Concavity
+    end
+    properties (Access=private,Transient)
+        EquivDiameter_
+        Image_
+        ConcaveImage_
+        Perimeter_
+        MajorAxisLength_
+        MinorAxisLength_
+        Eccentricity_
+        Orientation_
+    end
+    
+    %constructor
+    methods
+        function this = ROI(PixelIdxList, width, height, stack)
+            if (nargin > 0)
+                if (nargin < 4)
+                    stack = height;
+                    height = width(1);
+                    width = width(2);
+                end
+                
+                if (iscell(PixelIdxList))
+                    numObj = numel(PixelIdxList);
+                    if (numObj)
+                        this(numObj) = ROI();
+                        [this.PixelIdxList] = deal(PixelIdxList{:});
+%                         [this.Area] = deal(cellfun(@numel, PixelIdxList, 'UniformOutput', false));
+%                         [this.width] = deal(width);
+%                         [this.height] = deal(height);
+                        for i = 1:numObj
+%                         for i=numObj:-1:1
+%                             this(i).PixelIdxList = PixelIdxList{i};
+                            this(i).Area = numel(PixelIdxList{i});
+                            this(i).width = width;
+                            this(i).height = height;
+                            this(i).segmentationStack = stack;
+                        end
+                    end
+                else
+                    this.PixelIdxList = PixelIdxList;
+                    this.Area = numel(PixelIdxList);
+                    this.width = width;
+                    this.height = height;
+                    this.segmentationStack = stack;
+                end
+            end
+        end
+    end
+    
+    %getter
+    methods
+        function equivDiameter = get.EquivDiameter(this)
+            if (isempty(this.EquivDiameter_))
+                this.EquivDiameter_ = 2*sqrt(this.Area / pi);
+            end
+            equivDiameter = this.EquivDiameter_;
+        end
+        
+        function image = get.Image(this)
+            if (isempty(this.Image_))
+                minX_ = this.minX;maxX_ = this.maxX;
+                minY_ = this.minY;maxY_ = this.maxY;
+                imageSize = [maxY_ - minY_ + 1, maxX_ - minX_ + 1];
+                this.Image_ = false(imageSize);
+                subX_ = this.subX - minX_ + 1;
+                subY_ = this.subY - minY_ + 1;
+                this.Image_((subX_ - 1) * imageSize(1) + subY_) = true;
+                
+%                 canvas = false(this.height, this.width);
+%                 canvas(this.PixelIdxList) = true;
+%                 this.Image_ = canvas(this.minY:this.maxY, this.minX:this.maxX);
+            end
+            image = this.Image_;
+        end
+        
+        function concaveImage = get.ConcaveImage(this)
+            if (isempty(this.ConcaveImage_))
+                this.ConcaveImage_ = Image.convexHull(this.image);
+            end
+            concaveImage = this.ConcaveImage_;
+        end
+        
+        function perimeter = get.Perimeter(this)
+            if (isempty(this.Perimeter_))
+                this.Perimeter_ = Image.getPerimeter(this.Image);
+            end
+            perimeter = this.Perimeter_;
+        end
+        
+        function MajorAxisLength = get.MajorAxisLength(this)
+            if (isempty(this.MajorAxisLength_))
+                this.calculateEllipse();
+            end
+            MajorAxisLength = this.MajorAxisLength_;
+        end
+        
+        function MinorAxisLength = get.MinorAxisLength(this)
+            if (isempty(this.MinorAxisLength_))
+                this.calculateEllipse();
+            end
+            MinorAxisLength = this.MinorAxisLength_;
+        end
+        
+        function Eccentricity = get.Eccentricity(this)
+            if (isempty(this.Eccentricity_))
+                this.calculateEllipse();
+            end
+            Eccentricity = this.Eccentricity_;
+        end
+        
+        function Orientation = get.Orientation(this)
+            if (isempty(this.Orientation_))
+                this.calculateEllipse();
+            end
+            Orientation = this.Orientation_;
+        end
+        
+        function Cyclicity = get.Cyclicity(this)
+            Cyclicity = this.EquivDiameter * pi / this.Perimeter;
+        end
+        
+        function Concavity = getConcavity(this)
+            Concavity = sum(this.Image(:))/sum(this.ConcaveImage(:));
+        end
+    end
+    
+    methods (Access=private)
+        calculateEllipse(this)
+    end
+    
+    %normal methods
+    methods
+        function initialiseProperties(this)
+            for o = this
+%                 if (isempty(o.subY))
+                    [o.subY, o.subX, data] = ...
+                        getSub([o.height, o.width], o.PixelIdxList);
+                    o.minY = data(1);
+                    o.maxY = data(2);
+                    o.minX = data(4);
+                    o.maxX = data(5);
+                    o.Centroid = [data(6), data(3)];
+                    
+%                     [o.subY, o.subX] = ind2sub2D([o.height, o.width], o.PixelIdxList);
+%                     [o.minX, o.maxX] = minmax(o.subX);
+%                     [o.minY, o.maxY] = minmax(o.subY);
+%                 end
+            end
+        end
+        
+        function loadIntensity(this, image, numIntensityPoints, stackIndex, stack)
+            if (nargin < 2)
+                numIntensityPoints = 5;
+            end
+            if (nargin < 3)
+                stackIndex = 1;
+            end
+            if (nargin < 4)
+                stack = [];
+            end
+            for o = this
+                intensityValues = double(image(o.PixelIdxList));
+                brightValues = im2bw(intensityValues, graythresh(intensityValues));
+%                 properties = struct( ...
+%                     'sum', sum(intensityValues), ...
+%                     'min', sum(mink(intensityValues, numIntensityPoints) / numIntensityPoints), ...
+%                     'max', sum(maxk(intensityValues, numIntensityPoints) / numIntensityPoints)...
+%                 );
+                properties.sum = sum(intensityValues);
+                properties.min = sum(mink(intensityValues, numIntensityPoints) / numIntensityPoints);
+                properties.max = sum(maxk(intensityValues, numIntensityPoints) / numIntensityPoints);
+
+                properties.brightArea = sum(brightValues);
+                properties.brightSum = sum(intensityValues(brightValues));
+                
+                if (isempty(o.Intensity) && stackIndex == 1)
+                    o.Intensity = properties;
+                else
+                    o.Intensity(stackIndex) = properties;
+                end
+                
+                o.intensityStacks{stackIndex} = stack;
+            end
+        end
+        
+        function image = toImage(this)
+            if (numel(this))
+                image = false(this(1).height, this(1).width);
+                image(vertcat(this.PixelIdxList)) = true;
+            else
+                image = false;
+            end
+        end
+        
+        function obj = findByPosition(this, x, y)
+            idx = y + (x - 1) * this(1).height;
+            
+            obj = ROI.empty();
+            for o = this
+                if any(o.PixelIdxList == idx)
+                    obj(end + 1, 1) = o;
+                end
+            end
+        end
+        
+        d = Droplet(this, dataSize, currentIndex)
+    end
+end
+

@@ -1,0 +1,33 @@
+function [dists, angles] = getNextNeighbourDistance(drop, neighbourDrop)
+    numDataPoints = numel(drop(1).radius);
+    numDrop = numel(drop);
+    numNeigh = numel(neighbourDrop);
+    if (numNeigh == 0)
+        dists = Inf(numDataPoints, numDrop);
+        angles = nan(numDataPoints, numDrop);
+    else
+        dists = zeros(numDataPoints, numDrop);
+        angles = zeros(numDataPoints, numDrop);
+
+        neighP = vertcat(neighbourDrop.p);
+        for t = 1:numDataPoints
+            neighPT = neighP(t:numDataPoints:end, :);
+            for i = 1:numDrop
+                [minDists, minIdx] = min( ...
+                    sum( ...
+                        ( ...
+                            (ones(numNeigh, 1) * drop(i).p(t, :)) - neighPT ...
+                        ) .^ 2, ...
+                        2 ...
+                    ) ...
+                );
+                dists(t, i) = sqrt(minDists);
+                
+                angles(t, i) = atan2( ...
+                    drop(i).p(t, 2) - neighbourDrop(minIdx).p(t, 2), ...
+                    drop(i).p(t, 1) - neighbourDrop(minIdx).p(t, 1) ...
+                );
+            end
+        end
+    end
+end
