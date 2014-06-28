@@ -112,8 +112,8 @@ function result = guiFit2D(this, zData, varargin)
 
     % remove toolbar buttons excep 'rotate'
     htb = findall(findall(f, 'type', 'uitoolbar'));
-    i = true(ones(size(htb')));
-    i([1 9]) = 0;
+    i = true(ones(1, numel(htb)));
+    i([1 9]) = false;
     delete(htb(i));
     
     hPlot = axes('Units', 'Pixels', ...
