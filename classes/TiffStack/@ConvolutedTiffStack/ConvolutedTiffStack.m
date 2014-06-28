@@ -44,9 +44,5 @@ classdef ConvolutedTiffStack < TiffStackDecorator
             end
         end
     end
-    
-    methods (Static)
-        [panel, getParameter] = getGUIParameterPanel(parent)
-    end
 end
 

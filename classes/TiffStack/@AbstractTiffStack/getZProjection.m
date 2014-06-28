@@ -1,12 +1,12 @@
-function varargout = getZProjection(stack, projectionFunction, numFrames, verbose)
+function varargout = getZProjection(this, projectionFunction, numFrames, verbose)
     if (nargin < 2)
         projectionFunction = @mean;
     end
     
     if (nargin < 3 || isempty(numFrames))
-        numFrames = stack.size;
+        numFrames = this.size;
     else
-        numFrames = min(numFrames, stack.size);
+        numFrames = min(numFrames, this.size);
     end
     
     if (nargin < 4)
@@ -29,7 +29,7 @@ function varargout = getZProjection(stack, projectionFunction, numFrames, verbos
             fprintf(char(repmat(8, 1, 4)));
             fprintf('% 3i%%', round(100 * i / numFrames));
         end
-        image = stack.getImage(i);
+        image = this.getImage(i);
         [funcout{:}] = projectionFunction(image(:));
         
         for outIdx = 1:nargout

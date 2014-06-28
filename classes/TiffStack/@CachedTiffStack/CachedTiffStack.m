@@ -16,6 +16,18 @@ classdef CachedTiffStack < TiffStackDecorator
     end
     
     methods
+        function width = getWidth(this)
+            width = size(this.video, 2);
+        end
+        
+        function height = getHeight(this)
+            height = size(this.video, 1);
+        end
+        
+        function length = getSize(this)
+            length = size(this.video, 3);
+        end
+        
         function reloadCache(this)
             for o = this
                 firstImage = this.stack.getImage(1);

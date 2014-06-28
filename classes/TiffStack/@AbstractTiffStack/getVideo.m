@@ -17,7 +17,7 @@ function video = getVideo(this, numFrames, verbose)
         fprintf('Getting video:\n    % 5i / % 5i (% 3i%%)', 0, numFrames, 0);
     end
     
-    video = zeros(this.info(1).Height, this.info(1).Width, numFrames);
+    video = zeros(this.height, this.width, numFrames);
     for i = 1:numFrames
         if (verbose)
             fprintf(char(repmat(8, 1, 20)));

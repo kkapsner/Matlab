@@ -4,6 +4,7 @@ tests/
 old/
 Apps/
 *.zip
+*.asv
 
 #################
 ## Eclipse

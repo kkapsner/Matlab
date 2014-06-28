@@ -1,19 +1,15 @@
-classdef TiffStack < handle & matlab.mixin.Heterogeneous
+classdef TiffStack < AbstractTiffStack
     %TiffStack manages a file containing a tiff image stack
     
     properties
         file
-        caching = true
     end
     properties(Access=private, Transient)
         info_
 %         link_
-        cachedIndex = []
-        cachedImage = []
     end
     
     properties(Dependent)
-        size
         info
 %         link
     end
@@ -36,9 +32,14 @@ classdef TiffStack < handle & matlab.mixin.Heterogeneous
             end
         end
         
-        function size = get.size(stack)
-            size = stack.getSize();
+        function height = getHeight(this)
+            height = this.info(1).Height;
         end
+        
+        function width = getWidth(this)
+            width = this.info(1).Width;
+        end
+        
         function size = getSize(stack)
             %TIFFSTACK.getSize returns the number of images in the stack
             %   overwrite this method in subclasses to overwrite the
@@ -67,25 +68,19 @@ classdef TiffStack < handle & matlab.mixin.Heterogeneous
 %         end
     end
     
-    methods
-        function clearCache(this)
-            %STACK.CLEARCACHE() deletes the cache of the Tiff stack.
-            
-            this.cachedIndex = [];
-            this.cachedImage = [];
-        end
-        
-        [panel] = getDialogPanel(this, dm, changeCallback)
-        dm = dialog(this, waitForClose, segmenter)
-    end
-    
     methods (Static)
         stack = guiCreateStack(selectedFile)
         [panel, getParameter] = getGUIParameterPanel(parent, file)
-        
+    end
+    
+    methods (Static)
         function obj = loadobj(A)
             if (strcmp(class(A), 'TiffStack'))
-                obj = TiffStack(A.file);
+                try
+                    obj = TiffStack(A.file);
+                catch
+                    obj = A;
+                end
                 obj.caching = A.caching;
             else
                 obj = A;

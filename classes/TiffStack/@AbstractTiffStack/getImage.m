@@ -1,14 +1,14 @@
-function image = getImage(stack, index)
+function image = getImage(this, index)
 %getImage extracts an image out of a tiff stack
 %   DO NOT OVERWRITE THIS FUNCTION IN SUBCLASSES OF TiffStack!
-    if (stack.caching && ~isempty(stack.cachedIndex) && (index == stack.cachedIndex))
-       image = stack.cachedImage;    
+    if (this.caching && ~isempty(this.cachedIndex) && (index == this.cachedIndex))
+       image = this.cachedImage;    
     else
-        image = stack.getUncachedImage(index);
+        image = this.getUncachedImage(index);
         
-        if (stack.caching)
-            stack.cachedIndex = index;
-            stack.cachedImage = image;
+        if (this.caching)
+            this.cachedIndex = index;
+            this.cachedImage = image;
         end
     end
 end

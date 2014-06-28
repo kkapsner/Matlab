@@ -1,6 +1,6 @@
-function str = char(stack)
+function str = char(this)
 %CHAR cast function to char
     
-    str = sprintf('%s<%d/%d of %s>', class(stack), stack.channel, stack.numChannel, stack.stack.char());
+    str = sprintf('%s<%d/%d of %s>', class(this), this.channel, this.numChannel, this.stack.char());
 end
 

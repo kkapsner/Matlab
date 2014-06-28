@@ -1,4 +1,4 @@
-classdef (Abstract) TiffStackDecorator < TiffStack
+classdef (Abstract) TiffStackDecorator < AbstractTiffStack
     properties (SetAccess=protected)
         stack
     end
@@ -21,12 +21,16 @@ classdef (Abstract) TiffStackDecorator < TiffStack
             end
         end
         
-        function size = getSize(obj)
-            size = obj.stack.size;
+        function size = getSize(this)
+            size = this.stack.size;
         end
         
-        function info = getInfo(obj)
-            info = obj.stack.info;
+        function width = getWidth(this)
+            width = this.stack.width;
+        end
+        
+        function height = getHeight(this)
+            height = this.stack.height;
         end
     end
     
@@ -41,7 +45,7 @@ classdef (Abstract) TiffStackDecorator < TiffStack
                 end
             elseif (isempty(stack))
                 
-            elseif (~isa(stack, 'TiffStack'))
+            elseif (~isa(stack, 'AbstractTiffStack'))
                 stack = TiffStackDecorator.uniformStack(TiffStack(stack));
             elseif (numel(stack) > 1)
                 s = size(stack);
@@ -52,10 +56,6 @@ classdef (Abstract) TiffStackDecorator < TiffStack
     
     methods (Abstract)
         image = getUncachedImage(obj, index)
-    end
-    
-    methods (Abstract, Static)
-        [panel, getParameter] = getGUIParameterPanel(parent)
     end
     
     methods (Static)

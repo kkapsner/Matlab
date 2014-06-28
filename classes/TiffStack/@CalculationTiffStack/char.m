@@ -1,10 +1,10 @@
-function str = char(stack)
+function str = char(this)
 %CHAR cast function to char
     
-    if (isnumeric(stack.stack2))
-        str = sprintf('(%s %s %f)', stack.stack1.char(), stack.operation, stack.stack2);
+    if (isnumeric(this.stack2))
+        str = sprintf('(%s %s %f)', this.stack1.char(), this.operation, this.stack2);
     else
-        str = sprintf('(%s %s %s)', stack.stack1.char(), stack.operation, stack.stack2.char());
+        str = sprintf('(%s %s %s)', this.stack1.char(), this.operation, this.stack2.char());
     end
 end
 

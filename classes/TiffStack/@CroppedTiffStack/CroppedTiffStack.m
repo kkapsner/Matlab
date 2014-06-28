@@ -20,10 +20,10 @@ classdef CroppedTiffStack < TiffStackDecorator
             
             if (nargin > 0)
                 if (nargin < 2)
-                    xRange = [1, stack.info(1).Width];
+                    xRange = [1, stack.width];
                 end
                 if (nargin < 3)
-                    yRange = [1, stack.info(1).Height];
+                    yRange = [1, stack.height];
                 end
                 
                 this.setXRange(xRange);
@@ -60,7 +60,7 @@ classdef CroppedTiffStack < TiffStackDecorator
 
             assert(xRange(1) > 0, 'X-Range start has to be bigger than 0.');
             for o = this
-                assert(xRange(2) <= o.stack.info(1).Width, 'X-Range end has to be smaller or equal to the image size.');
+                assert(xRange(2) <= o.stack.width, 'X-Range end has to be smaller or equal to the image size.');
             end
             
             for o = this
@@ -79,29 +79,26 @@ classdef CroppedTiffStack < TiffStackDecorator
 
             assert(yRange(1) > 0, 'Y-Range start has to be bigger than 0.');
             for o = this
-                assert(yRange(2) <= o.stack.info(1).Height, 'Y-Range end has to be smaller or equal to the image size.');
+                assert(yRange(2) <= o.stack.height, 'Y-Range end has to be smaller or equal to the image size.');
             end
             
             for o = this
                 o.yRange_ = round(yRange);
             end
         end
-        function info = getInfo(this)
-            info = this.stack.info;
-            for i = 1:this.size
-            	info(i).Width =  diff(this.xRange) + 1;
-                info(i).Height = diff(this.yRange) + 1;
-            end
+        
+        function width = getWidth(this)
+            width = diff(this.xRange) + 1;
+        end
+        
+        function height = getHeight(this)
+            height = diff(this.yRange) + 1;
         end
         
         function image = getUncachedImage(this, index)
             image = this.stack.getImage(index);
             image = image(this.yRange(1):this.yRange(2), this.xRange(1):this.xRange(2));
         end
-    end
-    
-    methods(Static)
-        [panel, getParameter] = getGUIParameterPanel(parent)
     end
 end
 

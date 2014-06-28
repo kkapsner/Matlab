@@ -1,4 +1,4 @@
-classdef CalculationTiffStack < TiffStack
+classdef CalculationTiffStack < AbstractTiffStack
     %CalculationTiffStack
     %   stacks must be of equal size (same number of tiff images in stack)
     %   and images must be all of same size
@@ -16,11 +16,16 @@ classdef CalculationTiffStack < TiffStack
             this.stack2 = stack2;
         end
         
+        function width = getWidth(this)
+            width = this.stack1.width;
+        end
+        
+        function height = getHeight(this)
+            height = this.stack1.height;
+        end
+        
         function size = getSize(this)
             size = this.stack1.size;
-        end
-        function info = getInfo(this)
-            info = this.stack1.info;
         end
         
         function image = getUncachedImage(this, index)
