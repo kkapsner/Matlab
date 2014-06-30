@@ -109,7 +109,7 @@ function dm = dialog(this, waitForClose, segmenter)
         if (~isempty(segmenter))
             lastROI = segmenter.segment(image);
             
-            assignin('base', 'classificationData', lastROI);
+%             assignin('base', 'classificationData', lastROI);
 %             Gui.classificationPlot(lastROI, ...
 %                 { ...
 %                     'EquivDiameter', ...
@@ -123,14 +123,14 @@ function dm = dialog(this, waitForClose, segmenter)
 %                 } ...
 %             );
             if (get(handles.segmentColorsOn, 'Value'))
-                colors = prism(6);
+                colorROIS = lastROI.separateToColorize();
+                colors = hsv(numel(colorROIS));
                 image = [];
-                for roiIdx = 1:6
-                    image = lastROI(roiIdx:6:end).toImage(image, colors(roiIdx,:));
+                for colorIdx = 1:numel(colorROIS)
+                    image = colorROIS{colorIdx}.toImage(image, colors(colorIdx, :));
                 end
-%                 image = cell(numel(lastROI), 1);
-%                 for roiIdx = 1:numel(lastROI)
-%                     image{roiIdx} = lastROI(roiIdx).toImage();
+%                 for roiIdx = 1:6
+%                     image = lastROI(roiIdx:6:end).toImage(image, colors(roiIdx,:));
 %                 end
             else
                 image = lastROI.toImage();

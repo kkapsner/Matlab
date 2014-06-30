@@ -266,19 +266,58 @@ classdef ROI < Selectable & Binable & handle
                         );
                 end
             else
-                image = false;
+                if (nargin < 2)
+                    image = false;
+                end
+            end
+        end
+        
+        function sameColor = separateToColorize(this, numColors, colorDist)
+            if (nargin < 2)
+                numColors = 20;
+            end
+            if (nargin < 3)
+                colorDist = 5;
+            end
+            
+            numROIs = numel(this);
+            colorMatrix = true(numROIs, numColors);
+            
+            neighbourhood = double(Image.circle(colorDist));
+            for i = 1:numROIs
+                color = find(colorMatrix(i, :), 1, 'first');
+                if (isempty(color))
+                    error('Not enough colors to colorize.');
+                end
+                colorMatrix(i, (color + 1):end) = false;
+                
+                distImage = conv2(double(this(i).toImage()), neighbourhood, 'same');
+                for j = (i + 1):numROIs
+                    if (any(distImage(this(j).PixelIdxList)))
+                        colorMatrix(j, color) = false;
+                    end
+                end
+            end
+            
+            sameColor = cell(numColors, 1);
+            for i = 1:numColors
+                sameColor{i} = this(colorMatrix(:, i));
+                if (isempty(sameColor{i}))
+                    sameColor = sameColor(1:(i-1));
+                    break;
+                end
             end
         end
         
         function obj = findByPosition(this, x, y)
             idx = y + (x - 1) * this(1).height;
             
-            obj = ROI.empty();
-            for o = this
-                if any(o.PixelIdxList == idx)
-                    obj(end + 1, 1) = o;
-                end
+            filter = false(size(this));
+            for i = 1:numel(this)
+                filter(i) = any(this(i).PixelIdxList == idx);
             end
+            
+            obj = this(filter);
         end
         
         d = Droplet(this, dataSize, currentIndex)
