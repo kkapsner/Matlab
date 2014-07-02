@@ -83,7 +83,7 @@ classdef Directory < handle
         end
         
         function isEq = eq(obj, eqDir)
-            isEq = isa(eqDir, 'Directory') && obj.path == eqDir.path;
+            isEq = isa(eqDir, 'Directory') && strcmp(obj.path, eqDir.path);
         end
     end
     

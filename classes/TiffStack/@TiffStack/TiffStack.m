@@ -75,7 +75,7 @@ classdef TiffStack < AbstractTiffStack
     
     methods (Static)
         function obj = loadobj(A)
-            if (strcmp(class(A), 'TiffStack'))
+            if (strcmp(class(A), 'TiffStack')) %#ok<STISA>
                 try
                     obj = TiffStack(A.file);
                 catch
