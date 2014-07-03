@@ -6,9 +6,6 @@ classdef FitObject < handle
         % name of the fit
         name
         
-        % tex to display
-        funcTex = '... not spezified ...'
-        
         % function that is used to fit
         func
         
@@ -38,9 +35,13 @@ classdef FitObject < handle
     properties (Access=private)
         funcBody
         argumentType
+        
+        funcTex_
     end
     
     properties (Dependent)
+        funcTex
+        
         argumentNames
         parameterNames
         problemNames
@@ -61,46 +62,61 @@ classdef FitObject < handle
     
     % SETTER
     methods
-        function set.func(obj, func)
+        function set.func(this, func)
             parNames = getFunctionArguments(func);
-            obj.numArguments = nargin(func);
+            this.numArguments = nargin(func);
             
-            obj.arguments = Fit.Parameter.empty();
-            obj.arguments(obj.numArguments) = Fit.Parameter;
-            obj.parameter = 1:obj.numArguments;
-            obj.argumentType = cell(obj.numArguments, 1);
+            this.arguments = Fit.Parameter.empty();
+            this.arguments(this.numArguments) = Fit.Parameter;
+            this.parameter = 1:this.numArguments;
+            this.argumentType = cell(this.numArguments, 1);
             
-            symbols = cell(obj.numArguments, 1);
-            for i = 1:obj.numArguments
-                obj.arguments(i) = Fit.Parameter(parNames{i});
+            for i = 1:this.numArguments
+                this.arguments(i) = Fit.Parameter(parNames{i});
                 addlistener( ...
-                    obj.arguments(i), ...
+                    this.arguments(i), ...
                     'type', 'PostSet', ...
-                    @(~,~)obj.addArgumentToList( ...
-                        obj.arguments(i).name, ...
-                        obj.arguments(i).type ...
+                    @(~,~)this.addArgumentToList( ...
+                        this.arguments(i).name, ...
+                        this.arguments(i).type ...
                     ) ...
                 );
-                obj.argumentType{i} = 'parameter';
-                
-                symbols{i} = sym(parNames{i});
+                this.argumentType{i} = 'parameter';
             end
             
-            obj.problem = [];
-            obj.independent = [];
-            obj.setIndependent(parNames{end});
+            this.problem = [];
+            this.independent = [];
+            this.setIndependent(parNames{end});
             
-            obj.func = func;
+            this.func = func;
             str = func2str(func);
-            obj.funcBody = str(strfind(str, ')') + 1:end);
-            try
-                obj.funcTex = ['$', latex(func(symbols{:})), '$'];
-            end
+            this.funcBody = str(strfind(str, ')') + 1:end);
+            
+            this.funcTex = [];
+        end
+        
+        function set.funcTex(this, funcTex)
+            this.funcTex_ = funcTex;
         end
     end
     
     % GETTER
     methods
+        function funcTex = get.funcTex(this)
+            if (isempty(this.funcTex_))
+                
+                symbols = cell(this.numArguments, 1);
+                for i = 1:this.numArguments
+                    symbols{i} = sym(this.arguments(i).name);
+                end
+                try
+                    this.funcTex = ['$', latex(this.func(symbols{:})), '$'];
+                catch
+                    this.funcTex = '... not spezified ...';
+                end
+            end
+            funcTex = this.funcTex_;
+        end
         function names = get.argumentNames(obj)
             names = {obj.arguments.name};
         end
