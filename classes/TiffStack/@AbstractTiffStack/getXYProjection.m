@@ -22,15 +22,15 @@ function projection = getXYProjection(this, projectionFunction, numFrames, verbo
         args{strcmpi('dim', functionArguments)} = 3;
         projection = projectionFunction(args{:});
     else
-        projection = zeros(this.info(1).Height, this.info(1).Width);
+        projection = zeros(this.height, this.width);
         numPixels = numel(projection);
         if (verbose)
             fprintf('\nProjecting:\n    % 5i / % 5i (% 3i%%)', 0, numPixels, 0);
         end
-        for x = 1:this.info(1).Width
-            for y = 1:this.info(1).Height
+        for x = 1:this.width
+            for y = 1:this.height
                 if (verbose)
-                    i = (x - 1) * this.info(1).Height + y;
+                    i = (x - 1) * this.height + y;
                     fprintf(char(repmat(8, 1, 20)));
                     fprintf('% 5i / % 5i (% 3i%%)', i, numPixels, round(100 * i / numPixels));
                 end
