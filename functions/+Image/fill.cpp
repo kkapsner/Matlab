@@ -2,7 +2,12 @@
 #include <algorithm>
 #include <math.h>
 #include <iostream>
-
+#include <queue>
+#define addToQueue(x, y) if (!floodedImage[(x) * height + (y)] && !image[(x) * height + (y)]){ \
+	floodedImage[(x) * height + (y)] = 1;\
+	xQueue.push(x);\
+	yQueue.push(y);\
+}
 /*
  * fill.cpp
  */
@@ -12,8 +17,8 @@ void floodFill(
 	mxLogical *floodedImage,
 	const unsigned int width,
 	const unsigned int height,
-	const unsigned int x,
-	const unsigned int y,
+	unsigned int x,
+	unsigned int y,
 	unsigned int &minX,
 	unsigned int &maxX,
 	unsigned int &minY,
@@ -21,11 +26,18 @@ void floodFill(
 	unsigned int &count
 )
 {
-	if (!floodedImage[x * height + y] && !image[x * height + y]){
-		floodedImage[x * height + y] = 1;
-		
+	std::queue<unsigned int> xQueue;
+	std::queue<unsigned int> yQueue;
+	
+	addToQueue(x, y);
+	
+	while (xQueue.size()){
+		x = xQueue.front();
+		xQueue.pop();
+		y = yQueue.front();
+		yQueue.pop();
 		count += 1;
-		
+			
 		if (x < minX){
 			minX = x;
 		}
@@ -40,27 +52,27 @@ void floodFill(
 		}
 		
 		if (x > 0){
-			floodFill(image, floodedImage, width, height, x - 1, y, minX, maxX, minY, maxY, count);
+			addToQueue(x - 1, y);
 			if (y > 0){
-				floodFill(image, floodedImage, width, height, x - 1, y - 1, minX, maxX, minY, maxY, count);
+				addToQueue(x - 1, y - 1);
 			}
 			if (y < height - 1){
-				floodFill(image, floodedImage, width, height, x - 1, y + 1, minX, maxX, minY, maxY, count);
+				addToQueue(x - 1, y + 1);
 			}
 		}
 		if (y > 0){
-			floodFill(image, floodedImage, width, height, x, y - 1, minX, maxX, minY, maxY, count);
+			addToQueue(x, y - 1);
 		}
 		if (y < height - 1){
-			floodFill(image, floodedImage, width, height, x, y + 1, minX, maxX, minY, maxY, count);
+			addToQueue(x, y + 1);
 		}
 		if (x < width - 1){
-			floodFill(image, floodedImage, width, height, x + 1, y, minX, maxX, minY, maxY, count);
+			addToQueue(x + 1, y);
 			if (y > 0){
-				floodFill(image, floodedImage, width, height, x + 1, y - 1, minX, maxX, minY, maxY, count);
+				addToQueue(x + 1, y - 1);
 			}
 			if (y < height - 1){
-				floodFill(image, floodedImage, width, height, x + 1, y + 1, minX, maxX, minY, maxY, count);
+				addToQueue(x + 1, y + 1);
 			}
 		}
 	}
