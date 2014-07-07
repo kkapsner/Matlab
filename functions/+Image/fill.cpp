@@ -3,11 +3,15 @@
 #include <math.h>
 #include <iostream>
 #include <queue>
-#define addToQueue(x, y) if (!floodedImage[(x) * height + (y)] && !image[(x) * height + (y)]){ \
+#define addToQueue(x, y) if ( \
+	!floodedImage[(x) * height + (y)] && \
+	!image[(x) * height + (y)] \
+){ \
 	floodedImage[(x) * height + (y)] = 1;\
 	xQueue.push(x);\
 	yQueue.push(y);\
 }
+
 /*
  * fill.cpp
  */
@@ -159,18 +163,38 @@ void mexFunction( int nlhs, mxArray *plhs[],
             unsigned int idx = x_ + y;
 			
 			if (!image[idx]){
-				unsigned int minX = w, maxX = 0, minY = h, maxY = 0, count = 0;
-				floodFill(image, fillImage, w, h, x, y, minX, maxX, minY, maxY, count);
+				unsigned int
+					minX = w,
+					maxX = 0,
+					minY = h,
+					maxY = 0,
+					count = 0;
 				
-				// std::cout << minX << "-" << maxX << " " << minY << "-" << maxY << " #" << count << std::endl;
+				floodFill(
+					image, fillImage,
+					w, h, x, y,
+					minX, maxX, minY, maxY,
+					count
+				);
 				
 				if (count <= maxHoleSize){
-					copyFilling(fillImage, outImage, w, h, minX, maxX, minY, maxY);
+					copyFilling(
+						fillImage, outImage,
+						w, h,
+						minX, maxX, minY, maxY
+					);
 				}
-				copyFilling(fillImage, image, w, h, minX, maxX, minY, maxY);
-				clearFilling(fillImage, w, h, minX, maxX, minY, maxY);
+				copyFilling(
+					fillImage, image,
+					w, h,
+					minX, maxX, minY, maxY
+				);
+				clearFilling(
+					fillImage,
+					w, h,
+					minX, maxX, minY, maxY
+				);
 			}
 		}
 	}
-	
 }
