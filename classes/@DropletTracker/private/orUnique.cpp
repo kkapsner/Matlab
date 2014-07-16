@@ -38,12 +38,15 @@ void mexFunction( int nlhs, mxArray *plhs[],
         double index = 0;
         for (int y_ = 0; y_ < y; y_++){
             if (indices[y_]){
+				/* pair y_ is not unique itself */
                 continue;
             }
             for (int i = 0; i < dataSize[1]; i++){
+				/* iterate through all additional dimensions */
                 if (data[i * dataSize[0] + y] == data[i * dataSize[0] + y_]){
+					/* found one matching index*/
                     index = y_ + 1;
-                    y_ = y;
+                    y_ = y; // stop loop on y_
                     break;
                 }
             }
