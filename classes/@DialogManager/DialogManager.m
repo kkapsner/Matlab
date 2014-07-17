@@ -28,9 +28,10 @@ classdef DialogManager < handle
         lineHeight = 20;
         width = 500;
         height = 500;
-        remainingHeight
-        innerHeight
-        innerWidth
+        remainingHeight;
+        innerHeight;
+        innerWidth;
+        api = [];
     end
     
     methods

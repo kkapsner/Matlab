@@ -126,8 +126,12 @@ classdef TiffStackDisplay < handle
         
         end
         
-        function point = getCurrentPoint(this)
-            point = this.axes.CurrentPoint;
+        function point = getCurrentPoint(this, dim)
+            if (nargin < 2)
+                point = this.axes.CurrentPoint;
+            else
+                point = this.axes.CurrentPoint(1, dim);
+            end
         end
         
         function is = ishandle(this)

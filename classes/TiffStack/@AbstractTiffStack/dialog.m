@@ -78,7 +78,7 @@ function dm = dialog(this, waitForClose, segmenter)
     addlistener(dm, 'propertyChange', @(~,~)handles.display.refreshImage());
     addlistener(dm, 'propertyChange', @(~,~)updateBWImage());
     dm.show();
-    
+    dm.api = handles;
     if (waitForClose)
         dm.wait();
     end
@@ -108,6 +108,7 @@ function dm = dialog(this, waitForClose, segmenter)
     function image = getBWImage(image)
         if (~isempty(segmenter))
             lastROI = segmenter.segment(image);
+            dm.api.lastROI = lastROI;
             
 %             assignin('base', 'classificationData', lastROI);
 %             Gui.classificationPlot(lastROI, ...
