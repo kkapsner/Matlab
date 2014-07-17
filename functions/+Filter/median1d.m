@@ -1,15 +1,16 @@
 function filtered = median1d(data, windowSize, dim)
 %MEDIAN1D Performs a median filter
-%   this function does a similar task than medfilt1 BUT it has a less insane
-%   handling of the data borders.
-%   Additional it runs faster (depending on data and window size between 10
-%   an 100-fold). It also consumes less memory.
+%   this function does a similar task than medfilt1 BUT it has
+%   a less insane handling of the data borders.
+%   Additional it runs faster (depending on data and window
+%   size between 10 an 100-fold). It also consumes less memory.
 %   
-%       FILTERED = median1d(DATA, WINDOWSIZE) filters the DATA with the
-%       given WINDOWSIZE.
-%       FILTERED = median1d(..., dim) spezifies the dimension that should
-%       be filtered. Default is the first non singleton dimension.
-%   
+%       FILTERED = median1d(DATA, WINDOWSIZE) filters the DATA
+%           with the given WINDOWSIZE.
+%       FILTERED = median1d(..., dim) spezifies the dimension
+%       that should be filtered. Default is the first non
+%       singleton dimension.
+%
 %   See also MEDFILT1, MEDIAN1D_CPP
     
     if (windowSize <= 1)

@@ -1,5 +1,5 @@
 #include "mex.h"
-#include "../../../c++/medianFilter/List.cpp" //change this to the correct path!
+#include "median1d/List.cpp"
 
 void mexFunction( int nlhs, mxArray *plhs[],
                   int nrhs, const mxArray *prhs[] )
@@ -8,19 +8,28 @@ void mexFunction( int nlhs, mxArray *plhs[],
   int windowSize[2], dataSize[2];
   
   /* Check for proper number of arguments. */
-  if(nrhs != 2) {
-    mexErrMsgIdAndTxt( "MATLAB:Filter:median1d:invalidNumInputs",
-            "Two input arguments required.");
-  } else if(nlhs > 1) {
-    mexErrMsgIdAndTxt( "MATLAB:Filter:median1d:maxlhs",
-            "Too many output arguments.");
+  if(nrhs != 2){
+    mexErrMsgIdAndTxt(
+		"MATLAB:Filter:median1d:invalidNumInputs",
+		"Two input arguments required."
+	);
+  }
+  else if(nlhs > 1){
+    mexErrMsgIdAndTxt(
+		"MATLAB:Filter:median1d:maxlhs",
+		"Too many output arguments."
+	);
   }
   
   /* The input must be a noncomplex double.*/
-  if( !mxIsDouble(prhs[0]) || mxIsComplex(prhs[0]) ||
-      !mxIsDouble(prhs[1]) || mxIsComplex(prhs[1])) {
-    mexErrMsgIdAndTxt( "MATLAB:Filter:median1d:inputNotRealDouble",
-            "Input must be a noncomplex double.");
+  if(
+	!mxIsDouble(prhs[0]) || mxIsComplex(prhs[0]) ||
+	!mxIsDouble(prhs[1]) || mxIsComplex(prhs[1])
+  ){
+    mexErrMsgIdAndTxt(
+		"MATLAB:Filter:median1d:inputNotRealDouble",
+		"Input must be a noncomplex double."
+	);
   }
   
   dataSize[0] = (int) mxGetM(prhs[0]);
@@ -28,10 +37,14 @@ void mexFunction( int nlhs, mxArray *plhs[],
   windowSize[0] = (int) mxGetM(prhs[1]);
   windowSize[1] = (int) mxGetN(prhs[1]);
   
-  if( windowSize[0] != 1 ||
-          windowSize[1] != 1 ) {
-    mexErrMsgIdAndTxt( "MATLAB:Filter:median1d:windowSizeNoScalar",
-            "Window input must be a scalar.");
+  if(
+    windowSize[0] != 1 ||
+    windowSize[1] != 1
+  ){
+    mexErrMsgIdAndTxt(
+		"MATLAB:Filter:median1d:windowSizeNoScalar",
+		"Window input must be a scalar."
+	);
   }
   
   /* Create matrix for the return argument. */
