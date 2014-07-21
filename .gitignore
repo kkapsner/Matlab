@@ -3,6 +3,7 @@
 tests/
 old/
 Apps/
+fileexchange/
 *.zip
 *.asv
 
