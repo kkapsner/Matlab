@@ -9,9 +9,12 @@ classdef TiffStackDisplay < handle
         minIntensity = 0
         maxIntensity = 255
         autoStrechIntensity = true
+        
+        overlayColors = [];
     end
     properties (Dependent)
         overlayImage
+        image
     end
     properties (SetAccess=private)
         axes
@@ -77,23 +80,37 @@ classdef TiffStackDisplay < handle
             end
         end
         
+        function image = get.image(this)
+            image = this.stack.getImage(this.currentImageIndex);
+        end
         function set.overlayImage(this, overlayImage)
             if (iscell(overlayImage) && ~isempty(overlayImage))
-                numDifferentColors = 6;
-                colors = prism(numDifferentColors);
-%                 colors = colors(randperm(numDifferentColors), :);
+                if (isempty(this.overlayColors))
+                    numDifferentColors = 6;
+                    colors = prism(numDifferentColors);
+                else
+                    numDifferentColors = size(this.overlayColors, 1);
+                    colors = this.overlayColors;
+                end
                 
-                imageSize = size(overlayImage{1});
+                imageSize = size(overlayImage{find(cellfun(@(c)~isempty(c), overlayImage), 1, 'first')});
+                
                 cData = zeros(imageSize(1), imageSize(2), 3);
                 alphaData = zeros(imageSize);
+                normalisationData = zeros(imageSize(1), imageSize(2), 3);
                 for i = 1:numel(overlayImage)
-                    cData(:,:,1) = cData(:,:,1) + colors(mod(i,numDifferentColors) + 1, 1) * overlayImage{i}; 
-                    cData(:,:,2) = cData(:,:,2) + colors(mod(i,numDifferentColors) + 1, 2) * overlayImage{i}; 
-                    cData(:,:,3) = cData(:,:,3) + colors(mod(i,numDifferentColors) + 1, 3) * overlayImage{i}; 
-                    
-                    alphaData = alphaData | overlayImage{i};
+                    if (~isempty(overlayImage{i}))
+                        cData(:,:,1) = cData(:,:,1) + colors(mod(i - 1,numDifferentColors) + 1, 1) * overlayImage{i}; 
+                        cData(:,:,2) = cData(:,:,2) + colors(mod(i - 1,numDifferentColors) + 1, 2) * overlayImage{i}; 
+                        cData(:,:,3) = cData(:,:,3) + colors(mod(i - 1,numDifferentColors) + 1, 3) * overlayImage{i}; 
+
+                        alphaData = alphaData | overlayImage{i};
+                        normalisationData(:,:,1) = normalisationData(:,:,1) + overlayImage{i};
+                        normalisationData(:,:,2) = normalisationData(:,:,2) + overlayImage{i};
+                        normalisationData(:,:,3) = normalisationData(:,:,3) + overlayImage{i};
+                    end
                 end
-                this.overlay.CData = min(1, cData);
+                this.overlay.CData = cData ./ normalisationData;%min(1, cData);
                 this.overlay.AlphaData = alphaData * 0.15;
                 
             else
