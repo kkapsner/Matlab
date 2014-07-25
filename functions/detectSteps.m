@@ -25,8 +25,8 @@ function steps = detectSteps(data, varargin)
     % the point in the population to compare with
     % (i.e. the quantile)
     comparePoint = p.Results.comparePoint;
-    % the factor by which the compare point has to be mulipied
-    % to get the threshold
+    % the factor by which the compare point has to be
+    % mulipied to get the threshold
     compareFactor = p.Results.compareFactor;
     
     %% data too short
@@ -42,7 +42,7 @@ function steps = detectSteps(data, varargin)
         'Data has to be a vector.' ...
     );
     
-    %% filter data, calculate derivative and generate threshold
+    %% filter data, calculate derivative & generate threshold
     filteredData = medfilt1(data, 2*medianLength + 1);
     dFilteredData = abs(diff(filteredData));
     

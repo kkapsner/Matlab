@@ -727,7 +727,7 @@ classdef DialogManager < handle
         end
     end
     
-    methods (Access=private)
+    methods (Access=public)
         function addDeleteListener(this, l)
             if isempty(this.eventListener)
                 this.eventListener = l;
