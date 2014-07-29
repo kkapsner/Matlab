@@ -1,14 +1,20 @@
 function stack = guiCreateStack(selectedFile)
 %GUICREATESTACK creates a stack over a GUI
-%   STACK = GUICREATESTACK() opens the GUI and after closing it returns the
-%       selected stack(s).
-%   STACK = GUICRATESTACK(PRESELECT) opens the file choose GUI at the
-%       specified position PRESELECT
+%   STACK = GUICREATESTACK()
+%       opens the GUI and after closing it returns the selected stack(s).
+%   STACK = GUICRATESTACK(PRESELECT)
+%       opens the file choose GUI at the specified position PRESELECT
+%   STACK = GUICREATESTACK(FILE)
+%       does not open a file select GUI but only the stack creation GUI
 
     if (nargin < 1)
         selectedFile = [];
     end
-    file = File.get({'*.tiff;*.tif', 'File Selector'}, 'Select Tiff stack', 'on', selectedFile);
+    if (~isa(selectedFile, 'File'))
+        file = File.get({'*.tiff;*.tif'}, 'Select Tiff stack', 'on', selectedFile);
+    else
+        file = selectedFile;
+    end
     
     if isempty(file)
         stack = [];
