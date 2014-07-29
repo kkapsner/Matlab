@@ -61,14 +61,14 @@ function dm = dialog(this, waitForClose, segmenter)
 
     %% create image index slider
     dm.addPanel(1);
-    handles.indexSlider = dm.addSlider(currentIndex, 1, stackSize, ...
-        [0 0 0 20], @indexSliderCallback ...
+    handles.indexSlider = handles.display.createIndexSlider( ...
+        dm, ...
+        @indexSliderCallback ...
     );
     function indexSliderCallback(varargin)
         index = round(get(handles.indexSlider, 'Value'));
 %         set(handles.indexSlider, 'Value', index);
         currentIndex = index;
-        handles.display.currentImageIndex = index;
     end
 
     %% display first image

@@ -151,6 +151,24 @@ classdef TiffStackDisplay < handle
             end
         end
         
+        function indexSlider = createIndexSlider(this, dm, callback)
+            if (nargin < 3)
+                callback = @(a)a;
+            end
+            indexSlider = dm.addSlider( ...
+                this.currentImageIndex, ...
+                1, ...
+                this.stack.size, ...
+                [0 0 0 20], @indexSliderCallback ...
+            );
+            function indexSliderCallback(varargin)
+                index = round(get(indexSlider, 'Value'));
+        %         set(handles.indexSlider, 'Value', index);
+                this.currentImageIndex = index;
+                callback(varargin{:});
+            end
+        end
+        
         function is = ishandle(this)
             is = ishandle(this.axes);
         end
