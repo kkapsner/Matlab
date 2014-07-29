@@ -217,8 +217,13 @@ classdef ROI < Selectable & Binable & handle
 %                     'max', sum(maxk(intensityValues, numIntensityPoints) / numIntensityPoints)...
 %                 );
                 properties.sum = sum(intensityValues);
-                properties.min = sum(mink(intensityValues, numIntensityPoints) / numIntensityPoints);
-                properties.max = sum(maxk(intensityValues, numIntensityPoints) / numIntensityPoints);
+                if (numel(intensityValues) >= numIntensityPoints)
+                    properties.min = sum(mink(intensityValues, numIntensityPoints) / numIntensityPoints);
+                    properties.max = sum(maxk(intensityValues, numIntensityPoints) / numIntensityPoints);
+                else
+                    properties.min = properties.sum / numel(intensityValues);
+                    properties.max = properties.min;
+                end
 
                 properties.brightArea = sum(brightValues);
                 properties.brightSum = sum(intensityValues(brightValues));
@@ -321,6 +326,15 @@ classdef ROI < Selectable & Binable & handle
         end
         
         d = Droplet(this, dataSize, currentIndex)
+    end
+    
+    methods (Static)
+        function o = loadobj(o)
+            for this = o
+                this.Area = numel(this.PixelIdxList);
+            end
+            o.initialiseProperties();
+        end
     end
 end
 
