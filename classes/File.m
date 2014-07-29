@@ -6,10 +6,11 @@ classdef File < handle
     
     properties (Dependent)
         fullpath
+        extension
     end
     
     methods
-        function obj = File(path, filename)
+        function this = File(path, filename)
             %FILE constructor of the FILE-class
             %   F = FILE(PATH) creates a FILE instance to a file with the
             %   path PATH. PATH can be an absolute or relative path.
@@ -22,43 +23,47 @@ classdef File < handle
                 if (nargin < 2 || isempty(filename))
                     if (isa(path, 'char'))
                         [path, filename, ext] = fileparts(path);
-                        obj.path = path;
-                        obj.filename = [filename, ext];
+                        this.path = path;
+                        this.filename = [filename, ext];
                     elseif (isa(path, 'File'))
-                        obj.path = path.path;
-                        obj.filename = obj.filename;
+                        this.path = path.path;
+                        this.filename = this.filename;
                     end
                 else
-                    obj.path = path;
-                    obj.filename = filename;
+                    this.path = path;
+                    this.filename = filename;
                 end
             end
         end
         
-        function set.path(obj, path)
+        function set.path(this, path)
             if (isa(path, 'char'))
-                obj.path = path;
+                this.path = path;
             elseif (isa(path, 'Directory'))
-                obj.path = path.path;
+                this.path = path.path;
             else
-                obj.path = '';
+                this.path = '';
             end
         end
         
-        function set.filename(obj, filename)
+        function set.filename(this, filename)
             if (isa(filename, 'char'))
-                obj.filename = filename;
+                this.filename = filename;
             else
-                obj.filename = '';
+                this.filename = '';
             end
         end
         
-        function ex = exist(obj)
-            ex = logical(exist(obj.fullpath(), 'file'));
+        function ex = exist(this)
+            ex = logical(exist(this.fullpath(), 'file'));
         end
         
-        function path = get.fullpath(obj)
-            path = fullfile(obj.path, obj.filename);
+        function path = get.fullpath(this)
+            path = fullfile(this.path, this.filename);
+        end
+        
+        function extension = get.extension(this)
+            [~, ~, extension] = fileparts(this.filename);
         end
         
         function str = read(obj)
@@ -99,7 +104,7 @@ classdef File < handle
             end
             
             persistent lastFile;
-            if (nargin >= 4)
+            if (nargin >= 4 && ~isempty(selectedFile))
                 lastFile = char(selectedFile);
             end
             if (isempty(lastFile))
