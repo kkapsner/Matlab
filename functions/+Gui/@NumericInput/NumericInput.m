@@ -39,7 +39,7 @@ classdef NumericInput < handle
         end
         
         function set(obj, varargin)
-            set(obj.handle, varargin{:});
+            set([obj.handle], varargin{:});
         end
         function varargout = get(obj, varargin)
             [varargout{1:nargout}] = get(obj.handle, varargin{:});
