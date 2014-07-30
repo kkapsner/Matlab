@@ -277,6 +277,17 @@ classdef ROI < Selectable & Binable & handle
             end
         end
         
+        function video = toVideo(this)
+            if (numel(this))
+                video = false(this(1).height, this(1).width, numel(this));
+                for i = 1:numel(this)
+                    video(:,:,this(i).PixelidxList) = true;
+                end
+            else
+                video = false;
+            end
+        end
+        
         function sameColor = separateToColorize(this, numColors, colorDist)
             if (nargin < 2)
                 numColors = 20;
