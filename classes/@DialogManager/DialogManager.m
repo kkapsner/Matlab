@@ -609,6 +609,46 @@ classdef DialogManager < handle
             end
         end
         
+        function button = addToggleButton(this, str, pos, userCallbackDown, userCallbackUp)
+            if (nargin < 3)
+                pos = 0;
+            end
+            if (nargin < 4)
+                userCallbackDown = @(a)a;
+            end
+            if (nargin < 5)
+                userCallbackUp = @(a)a;
+            end
+            
+            
+            button = handle(uicontrol( ...
+                'Parent', this.currentPanel, ...
+                'Style', 'togglebutton', ...
+                'String', str, ...
+                'HandleVisibility', 'off', ...
+                'Units', 'pixels', ...
+                'Min', false, ...
+                'Max', true, ...
+                'Value', false, ...
+                ...'Position', pos, ...
+                'Callback', @callback...
+            ));
+            this.addElement(button, pos);
+            
+            function callback(~,~)
+                if (button.Value)
+                    userCallbackDown();
+                else
+                    userCallbackUp();
+                end
+                if (ishandle(this))
+                    notify(this, 'propertyChange', ArbitraryEventData( ...
+                        struct('Object', button) ...
+                    ));
+                end
+            end
+        end
+        
         function popupmenu = addPropertyPopupmenu(this, prop, str, pos, userCallback, obj)
             if (nargin < 4)
                 pos = 0;
