@@ -13,4 +13,7 @@ function y = feval(this, x)
     end
     
     y = this.func(param{:});
+    if (numel(y) ~= numel(x))
+        y = nan(size(x));
+    end
 end

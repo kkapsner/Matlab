@@ -37,7 +37,7 @@ classdef Scharfit < handle & matlab.mixin.Copyable
                 if (iscell(param))
                     this.allParameter = Fit.Parameter;
                     for i = 1:numel(param)
-                        this.allParameter(i) = Fit.Parameter(param{i});
+                        this.allParameter(i) = Fit.Parameter(this, param{i});
                     end
                 elseif (isa(param, 'Fit.Parameter'))
                     this.allParameter = param;
@@ -289,6 +289,9 @@ classdef Scharfit < handle & matlab.mixin.Copyable
         function this = loadobj(this)
             for o = this
                 o.setListeners();
+                for arg = o.allParameter
+                    arg.fit = o;
+                end
             end
         end
     end

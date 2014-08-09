@@ -72,7 +72,7 @@ classdef FitObject < handle
             this.argumentType = cell(this.numArguments, 1);
             
             for i = 1:this.numArguments
-                this.arguments(i) = Fit.Parameter(parNames{i});
+                this.arguments(i) = Fit.Parameter(this, parNames{i});
                 addlistener( ...
                     this.arguments(i), ...
                     'type', 'PostSet', ...
@@ -248,6 +248,23 @@ classdef FitObject < handle
             end
             if nargout > 3
                 varargout{4} = [args.upperBound];
+            end
+        end
+    end
+    
+    methods (Static)
+        function this = loadobj(o)
+            if (isstruct(o))
+                this = Fit.FitObject();
+                for fieldname = fieldnames(o)
+                    this.(fieldname{1}) = o.(fieldname{1});
+                end
+            else
+                this = o;
+            end
+            
+            for arg = o.arguments
+                arg.fit = o;
             end
         end
     end

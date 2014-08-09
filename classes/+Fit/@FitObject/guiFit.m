@@ -177,8 +177,20 @@ function result = guiFit(this, yData, varargin)
             delete(hFitPlots(index));
         end
         
-        x0 = this(index).startX;
-        x1 = this(index).endX;
+        if (this(index).startX == -Inf)
+            x0 = minX;
+        elseif (this(index).startX == Inf)
+            x0 = maxX;
+        else
+            x0 = this(index).startX;
+        end
+        if (this(index).endX == -Inf)
+            x1 = minX;
+        elseif (this(index).endX == Inf)
+            x1 = maxX;
+        else
+            x1 = this(index).endX;
+        end
         
         plotX = linspace(x0, x1, 500);
         hFitPlots(index) = plot( ...
