@@ -1,0 +1,28 @@
+function image = enhanceBW(this, image)
+    % ENHANCEBW performs the bw image enhancement
+    %   ROI = SEGMENTER.ENHANCEBW(IMAGE)
+
+    if (this.performFilling)
+        image = Image.fill(image, this.fillingMaxHoleSize);
+        %binImage = bwmorph(binImage, 'fill');
+    end
+    if (this.performDeadEndRemoving)
+        image = Image.removeDeadEnds(image);
+    end
+    if (this.performBridging)
+%                 binImage = ~bwmorph(~binImage, 'bridge');
+        image = ~Image.bridge(~image);
+    end
+    if (this.performExtrude)
+        image = ~bwmorph(~image, 'dilate', this.extrudeStrength);
+%         binImage = ~bwmorph(~binImage, 'thicken', seg.extrudeStrength);
+        image = ~bwmorph(~image, 'bridge');
+    end
+    if (this.performThinning)
+        image = ~bwmorph(~image, 'thin', Inf);
+    end
+
+    if (this.clearBorder)
+        image = imclearborder(image, 4);
+    end
+end

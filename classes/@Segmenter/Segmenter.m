@@ -57,7 +57,9 @@ classdef Segmenter < handle & Configable
     end
     
     methods
-        roi = segment(seg, image, stack)
+        roi = segment(this, image, stack)
+        roi = enhanceBW(this, image)
+        roi = segmentEnhancedBW(this, image, stack)
     end
 end
 
