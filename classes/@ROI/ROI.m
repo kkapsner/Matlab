@@ -281,7 +281,7 @@ classdef ROI < Selectable & Binable & handle
             if (numel(this))
                 video = false(this(1).height, this(1).width, numel(this));
                 for i = 1:numel(this)
-                    video(:,:,this(i).PixelidxList) = true;
+                    video(:,:,this(i).PixelIdxList) = true;
                 end
             else
                 video = false;
