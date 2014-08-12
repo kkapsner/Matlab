@@ -95,5 +95,13 @@ classdef CalculationTrace < AbstractTrace & handle
             end
         end
     end
+    
+    methods(Access=protected)
+        function copiedThis = copyElement(this)
+            copiedThis = copyElement@AbstractTrace(this);
+            copiedThis.trace1 = copy(this.trace1);
+            copiedThis.trace2 = copy(this.trace2);
+        end
+    end
 end
 

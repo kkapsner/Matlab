@@ -1,4 +1,4 @@
-classdef (Abstract) AbstractTrace < handle & Selectable & Binable & matlab.mixin.Heterogeneous
+classdef (Abstract) AbstractTrace < handle & Selectable & Binable & matlab.mixin.Heterogeneous & matlab.mixin.Copyable
     %ABSTRACTTRACE is the inheritance root for the Trace-framework
     %
     
@@ -55,6 +55,13 @@ classdef (Abstract) AbstractTrace < handle & Selectable & Binable & matlab.mixin
         name = getName(this)
         
         registerListeners(this)
+    end
+    
+    methods(Access=protected)
+        function copiedThis = copyElement(this)
+            copiedThis = copyElement@matlab.mixin.Copyable(this);
+            copiedThis.registerListeners();
+        end
     end
     
     methods (Static, Access=protected)

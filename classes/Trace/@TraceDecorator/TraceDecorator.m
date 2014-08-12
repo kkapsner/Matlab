@@ -39,6 +39,13 @@ classdef (Abstract) TraceDecorator < AbstractTrace & handle
         end
     end
     
+    methods(Access=protected)
+        function copiedThis = copyElement(this)
+            copiedThis = copyElement@AbstractTrace(this);
+            copiedThis.trace = copy(this.trace);
+        end
+    end
+    
     methods (Access=private, Static)
         function trace = uniformTrace(trace)
             if (iscell(trace))
