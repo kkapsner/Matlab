@@ -45,7 +45,7 @@ function menu = addSliderContextMenu(slider, menu)
 
             guiDm.show();
 
-            guiDm.f.Resize = 'off';
+            set(guiDm.getFigure(), 'Resize', 'off');
 
         else
             guiDm.focus();
@@ -53,8 +53,8 @@ function menu = addSliderContextMenu(slider, menu)
         
         fPos = get(f, 'Position');
         mousePosition = get(f, 'CurrentPoint');
-        guiDm.f.OuterPosition(1) = fPos(1) + mousePosition(1) - guiDm.f.OuterPosition(3)/2;
-        guiDm.f.OuterPosition(2) = fPos(2) + mousePosition(2) - guiDm.f.OuterPosition(4);
+        guiDm.container.OuterPosition(1) = fPos(1) + mousePosition(1) - guiDm.container.OuterPosition(3)/2;
+        guiDm.container.OuterPosition(2) = fPos(2) + mousePosition(2) - guiDm.container.OuterPosition(4);
         
         function removeListener(~,~)
             delete(closeListener);

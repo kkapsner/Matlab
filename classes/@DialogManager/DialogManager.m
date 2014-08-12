@@ -2,6 +2,7 @@ classdef DialogManager < handle
     properties(SetAccess=private)
         container
         parentManager = []
+        childManagers = []
         obj
         currentPanel
     end
@@ -56,6 +57,11 @@ classdef DialogManager < handle
                         if (isa(container, 'DialogManager'))
                             fig = container.addPanel();
                             this.parentManager = container;
+                            if (isempty(container.childManagers))
+                                container.childManagers = this;
+                            else
+                                container.childManagers(end + 1) = this;
+                            end
                         else
                             fig = container;
                         end
@@ -197,6 +203,9 @@ classdef DialogManager < handle
         
         function close(this)
             for o = this
+                if (~isempty(o.childManagers))
+                    o.childManagers.close();
+                end
                 delete(o.eventListener);
                 delete(o.container);
                 notify(o, 'closeWin');
@@ -385,7 +394,9 @@ classdef DialogManager < handle
                 ) ...
             );
             jText = findjobj(text);
-            jText.Border = [];
+            if (~isempty(jText))
+                jText.Border = [];
+            end
             this.addElement(text, pos);
         end
         
