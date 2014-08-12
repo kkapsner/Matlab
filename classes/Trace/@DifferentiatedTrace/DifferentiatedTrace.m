@@ -1,4 +1,7 @@
 classdef DifferentiatedTrace < TraceDecorator & handle
+    properties (SetObservable, AbortSet)
+        differentiationWindowSize = 0;
+    end
     
     properties (Access=private,Transient)
         differentiatedValue
@@ -20,6 +23,8 @@ classdef DifferentiatedTrace < TraceDecorator & handle
             for i = 1:numel(this)
                 rTrace = this(i);
                 l = addlistener(rTrace.trace, 'change', @rTrace.resetDifferentiated);
+                addlistener(rTrace, 'ObjectBeingDestroyed', @(~,~)delete(l));
+                l = addlistener(rTrace, 'differentiationWindowSize', 'PostSet', @rTrace.resetDifferentiated);
                 addlistener(rTrace, 'ObjectBeingDestroyed', @(~,~)delete(l));
             end
         end
@@ -53,15 +58,31 @@ classdef DifferentiatedTrace < TraceDecorator & handle
         end
         function differentiate(this)
             for o = this
-                dValue = diff(o.trace.value);
-                dTime = diff(o.trace.time);
-                
-                o.differentiatedValue = ...
-                    ( ...
-                        dValue([1; (1:end)']) + dValue([(1:end)'; 1]) ...
-                    ) ./ ( ...
-                        dTime([1; (1:end)']) + dTime([(1:end)'; 1]) ...
-                    );
+                dValue = zeros(size(o.trace.value));
+                if (o.differentiationWindowSize == 0)
+                    dValue = diff(o.trace.value);
+                    dTime = diff(o.trace.time);
+
+                    dValue = ...
+                        ( ...
+                            dValue([1; (1:end)']) + dValue([(1:end)'; 1]) ...
+                        ) ./ ( ...
+                            dTime([1; (1:end)']) + dTime([(1:end)'; 1]) ...
+                        );
+                else
+                    windowSize = round(o.differentiationWindowSize);
+                    for i = 1:o.dataSize
+                        startIdx = max(1, i - windowSize);
+                        endIdx = min(o.dataSize, i + windowSize);
+                        length = endIdx - startIdx + 1;
+                        x = o.trace.time(startIdx:endIdx);
+                        y = o.trace.value(startIdx:endIdx);
+                        A = [x, ones(length, 1)];
+                        beta = pinv(A)*y;
+                        dValue(i) = beta(1);
+                    end
+                end
+                o.differentiatedValue = dValue;
             end
         end
     end

@@ -30,13 +30,16 @@ classdef (Abstract) AbstractTrace < handle & Selectable & Binable & matlab.mixin
         function dataSize = get.dataSize(this)
             dataSize = numel(this.time);
         end
-        
+    end
+    
+    methods (Sealed)
         dm = dialog(this)
         h = plot(this, varargin)
-        
+
         tr = filter(this, filterValue, filterType)
         tr = slice(this, startTime, endTime)
-        tr = diff(this)
+        tr = diff(this, windowSize)
+        tr = int(this)
     end
     
     methods (Abstract)
@@ -52,6 +55,12 @@ classdef (Abstract) AbstractTrace < handle & Selectable & Binable & matlab.mixin
         name = getName(this)
         
         registerListeners(this)
+    end
+    
+    methods (Static, Access=protected)
+        function tr = getDefaultScalarElement()
+            tr = RawDataTrace(0, 0, 'default');
+        end
     end
     
     methods (Static)

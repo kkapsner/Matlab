@@ -11,9 +11,9 @@ classdef (Abstract) TraceDecorator < AbstractTrace & handle
                 
                 if (numel(trace) > 1)
                     c = class(this);
-                    s = num2cell(size(trace));
-                    this(s{:}) = feval(c);
+                    this = this(ones(size(trace)));
                     for i = 1:numel(trace)
+                        this(i) = feval(c);
                         this(i).trace = trace{i};
                     end
                 elseif (numel(trace) == 1)
