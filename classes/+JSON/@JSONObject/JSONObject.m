@@ -11,7 +11,7 @@ classdef JSONObject < containers.Map
         end
         
         function value = subsref(this, name)
-            if (numel(name) == 1 && strcmp(name.type, '()') && numel(name.subs) > 1)
+            if (numel(name) == 1 && strcmp(name.type, '()') && iscell(name.subs) && numel(name.subs) > 1)
                 oneName = name;
                 oneName.subs = oneName.subs(1);
                 value = this.subsref@containers.Map(oneName);
@@ -25,7 +25,7 @@ classdef JSONObject < containers.Map
         end
         
         function this = subsasgn(this, name, value)
-            if (numel(name) == 1 && strcmp(name.type, '()') && numel(name.subs) > 1)
+            if (numel(name) == 1 && strcmp(name.type, '()') && iscell(name.subs) && numel(name.subs) > 1)
                 
                 firstName = name.subs{1};
                 
@@ -46,6 +46,22 @@ classdef JSONObject < containers.Map
                 );
             else
                 this.subsasgn@containers.Map(name, value);
+            end
+        end
+        
+        function value = value(this, name)
+            value = this.values({name});
+            value = value{1};
+        end
+        
+        function s = struct(this)
+            s = struct();
+            for key = this.keys()
+                value = this.value(key{1});
+                if (isa(value, 'JSON.JSONObject'))
+                    value = value.struct();
+                end
+                s.(key{1}) = value;
             end
         end
     end
