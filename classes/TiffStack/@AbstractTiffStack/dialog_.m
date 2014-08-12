@@ -25,7 +25,7 @@ function dm = dialog(this, waitForClose, segmenter)
     dm.open();
     
     %% create figure and axes
-    set(dm.f, ...
+    set(dm.getFigure(), ...
         'ToolBar', 'figure', ...
         'HandleVisibility', 'callback' ...
     );
@@ -92,7 +92,7 @@ function dm = dialog(this, waitForClose, segmenter)
     %% display first image
     updateImage(1);
     
-    dm.f.Position(4) = 400;
+    dm.container.Position(4) = 400;
     addlistener(dm, 'propertyChange', @(~,~)updateImage());
     dm.show();
     
@@ -184,7 +184,7 @@ function dm = dialog(this, waitForClose, segmenter)
     end
 
     function menu = createROIContextMenu()
-        menu = uicontextmenu('Parent', dm.f, 'Callback', @callback);
+        menu = uicontextmenu('Parent', dm.getFigure(), 'Callback', @callback);
         
         menuItems = uimenu(menu, 'Label', 'Display ROI properties', 'Callback', @displayROI);
         

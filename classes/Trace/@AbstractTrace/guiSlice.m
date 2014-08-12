@@ -10,7 +10,7 @@ function [tr, times] = guiSlice(this, title)
     dm.open(title);
     dm.addPanel();
     
-    dm.f.Toolbar = 'figure';
+    set(dm.getFigure(), 'Toolbar', 'figure');
     
     ax = axes( ...
         'Parent', dm.currentPanel, ...

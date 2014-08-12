@@ -1,7 +1,7 @@
-function dm = propertyDialog(this)
+function dm = propertyDialog(this, container)
     dm = DialogManager(this);
     
-    dm.open();
+    dm.open([], container);
     
     minTime = min(this.trace.time);
     maxTime = max(this.trace.time);

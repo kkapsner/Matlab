@@ -25,7 +25,7 @@ function dm = dialog(this, waitForClose, segmenter)
     dm.open();
     
     %% create figure and axes
-    set(dm.f, ...
+    set(dm.getFigure(), ...
         'ToolBar', 'figure', ...
         'HandleVisibility', 'callback' ...
     );
@@ -74,7 +74,7 @@ function dm = dialog(this, waitForClose, segmenter)
     %% display first image
     updateImage(1);
     
-    dm.f.Position(4) = 400;
+    dm.container.Position(4) = 400;
     addlistener(dm, 'propertyChange', @(~,~)handles.display.refreshImage());
     addlistener(dm, 'propertyChange', @(~,~)updateBWImage());
     dm.show();
@@ -175,7 +175,7 @@ function dm = dialog(this, waitForClose, segmenter)
     function menu = createROIContextMenu()
         menu = get(handles.display.bwImage, 'uicontextmenu');
         if (isempty(menu))
-            menu = uicontextmenu('Parent', dm.f, 'Callback', @callback);
+            menu = uicontextmenu('Parent', dm.getFigure(), 'Callback', @callback);
             set(handles.display.bwImage, 'uicontextmenu', menu);
         else
             set(menu, 'Callback', @callback);

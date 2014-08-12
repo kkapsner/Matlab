@@ -1,6 +1,7 @@
 classdef DialogManager < handle
     properties(SetAccess=private)
-        f
+        container
+        parentManager = []
         obj
         currentPanel
     end
@@ -39,43 +40,68 @@ classdef DialogManager < handle
             this.obj = obj;
         end
         
-        function open(this, title)
+        function open(this, title, container)
             if (nargin < 2 || isempty(title))
                 title = [class(this.obj), ' Dialog'];
             end
             
-            if (isempty(this.f) || ~ishandle(this.f))
+            if (isempty(this.container) || ~ishandle(this.container))
                 this.innerWidth = this.width - 2*this.padding;
                 this.innerHeight = this.height - 2*this.padding;
                 this.remainingHeight = this.height - this.padding;
-                this.f = handle(figure( ...
-                    'Name', title, ...
-                    'NumberTitle', 'off', ...
-                    'Units', 'pixels', ...
-                    'Position', [50, 50, this.width, this.height], ...
-                    'Resize', 'on', ...
-                    'HandleVisibility', 'off', ...
-                    'CloseReq', @(~,~)this.close(), ...
-                    'MenuBar', 'none', ...
-                    'Toolbar', 'none' ...
-                ));
-                addlistener(this.f, 'SizeChange', @this.adjustPositions);
+                if (nargin > 2 && ~isempty(container))
+                    if (ishghandle(container) && strcmp(get(container, 'Type'), 'figure'))
+                        fig = clf(container, 'reset');
+                    else
+                        if (isa(container, 'DialogManager'))
+                            fig = container.addPanel();
+                            this.parentManager = container;
+                        else
+                            fig = container;
+                        end
+                    end
+                else
+                    fig = figure();
+                end
+                this.container = handle(fig);
+                if (this.isStandalone())
+                    set(this.container, ...
+                        'Name', title, ...
+                        'NumberTitle', 'off', ...
+                        'Units', 'pixels', ...
+                        'Position', [50, 50, this.width, this.height], ...
+                        'Resize', 'on', ...
+                        'HandleVisibility', 'off', ...
+                        'CloseReq', @(~,~)this.close(), ...
+                        'MenuBar', 'none', ...
+                        'Toolbar', 'none' ...
+                    );
+                end
+                addlistener(this.container, 'SizeChange', @this.adjustPositions);
                 notify(this, 'openWin');
             end
         end
         
         function is = isOpen(this)
-            is = ishandle(this) && ~isempty(this.f) && ishandle(this.f);
+            is = ishandle(this) && ~isempty(this.container) && ishandle(this.container);
+        end
+        
+        function is = isStandalone(this)
+            is = strcmpi(get(this.container, 'Type'), 'figure');
+        end
+        
+        function fig = getFigure(this)
+            fig = Gui.getParentFigure(this.container);
         end
         
         function focus(this)
             if (this.isOpen())
-                figure(this.f);
+                figure(this.getFigure());
             end
         end
         
         function adjustPositions(this, varargin)
-            pos = this.f.Position;
+            pos = this.container.Position;
             this.width = pos(3);
             this.innerWidth = this.width - 2*this.padding;
             for p = this.allPanels
@@ -92,7 +118,7 @@ classdef DialogManager < handle
                 this.height = y + this.padding;
                 this.innerHeight = y - this.padding;
                 
-                this.f.Position(4) = this.height;
+                this.container.Position(4) = this.height;
             else
                 % spring panels --> spring panels have to be adjusted in
                 % height
@@ -113,7 +139,7 @@ classdef DialogManager < handle
                         (this.lineHeight - springHeight) * ...
                         numel(this.springPanels);
                     this.innerHeight = this.height - 2*this.padding;
-                    this.f.Position(4) = this.height;
+                    this.container.Position(4) = this.height;
                     springHeight = this.lineHeight;
                 end
                 
@@ -136,43 +162,48 @@ classdef DialogManager < handle
         end
         
         function hide(this)
-            this.f.Visible = 'off';
+            this.container.Visible = 'off';
         end
         function show(this, fullscreen)
             if (nargin < 2)
                 fullscreen = false;
             end
-            if (fullscreen)
-                this.f.Visible = 'on';
-                Gui.maximizeFigure(this.f);
+            if (fullscreen && this.isStandalone())
+                this.container.Visible = 'on';
+                Gui.maximizeFigure(this.container);
             else
                 this.adjustPositions();
-                this.f.Visible = 'on';
+                this.container.Visible = 'on';
+                if (~isempty(this.parentManager))
+                    if (isempty(this.springPanels))
+                        this.parentManager.normalPanel(this.container);
+                    end
+                end
             end
             drawnow;
         end
         
         function move(this, pos)
-            movegui(this.f, pos);
+            movegui(this.getFigure(), pos);
         end
         
         function wait(this)
-            uiwait(this.f);
+            uiwait(this.getFigure());
         end
         
         function resume(this)
-            uiresume(this.f);
+            uiresume(this.getFigure());
         end
         
         function close(this)
             for o = this
                 delete(o.eventListener);
-                delete(o.f);
+                delete(o.container);
                 notify(o, 'closeWin');
                 delete(o);
             end
         end
-    
+        
         function panel = addPanel(this, rowNum, str)
             if (nargin < 2)
                 spring = true;
@@ -192,13 +223,19 @@ classdef DialogManager < handle
             
             this.remainingHeight = this.remainingHeight - panelHeight;
             panel = handle(uipanel( ...
-                'Parent', this.f, ...
-                'BackgroundColor', this.f.Color, ...
+                'Parent', this.container, ...
                 'Units', 'pixels', ...
                 'Position', [this.padding, this.remainingHeight, this.innerWidth, panelHeight], ...
                 'BorderWidth', 0, ...
+                'BorderType', 'none', ...
                 'HandleVisibility', 'off' ...
             ));
+            if (this.isStandalone())
+                panel.BackgroundColor = this.container.Color;
+            else
+                panel.BackgroundColor = this.container.BackgroundColor;
+            end
+            
             this.remainingHeight = this.remainingHeight - this.innerPadding;
             
             % set up panel properties
@@ -218,17 +255,26 @@ classdef DialogManager < handle
                 this.allPanels(end + 1) = panel;
             end
             if (spring)
-                if (isempty(this.springPanels))
-                    this.springPanels = panel;
-                else
-                    this.springPanels(end + 1) = panel;
-                end
+                this.springPanel(panel);
             else
-                if (isempty(this.normalPanels))
-                    this.normalPanels = panel;
-                else
-                    this.normalPanels(end + 1) = panel;
-                end
+                this.normalPanel(panel);
+            end
+        end
+        
+        function springPanel(this, panel)
+            this.normalPanels = this.normalPanels(this.normalPanels ~= panel);
+            if (isempty(this.springPanels))
+                this.springPanels = panel;
+            else
+                this.springPanels(end + 1) = panel;
+            end
+        end
+        function normalPanel(this, panel)
+            this.springPanels = this.springPanels(this.springPanels ~= panel);
+            if (isempty(this.normalPanels))
+                this.normalPanels = panel;
+            else
+                this.normalPanels(end + 1) = panel;
             end
         end
         
@@ -763,7 +809,7 @@ classdef DialogManager < handle
         end
         
         function arrange(this, rowCounts)
-            Gui.arrangeFigures([this.f], rowCounts);
+            Gui.arrangeFigures([this.container], rowCounts);
         end
     end
     

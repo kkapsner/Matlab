@@ -76,7 +76,7 @@ function dm = dialog(this)
     function handles = createTimeCourseWindow()
         handles.dm = DialogManager(this);
         handles.dm.open();
-        handles.figure = handles.dm.f;
+        handles.figure = handles.dm.getFigure();
         handles.dm.addPanel();
         handles.axes = axes( ...
             'Parent', handles.dm.currentPanel, ...
@@ -163,7 +163,7 @@ function dm = dialog(this)
         if (index ~= currentIndex)
             loopCall = true;
             set(handles.position, 'Value', index);
-            if (ishandle(handles.timeCourse.dm.f))
+            if (ishandle(handles.timeCourse.dm.getFigure()))
                 handles.timeCourse.vline.position = index;
             end
             loopCall = false;
@@ -286,7 +286,7 @@ function dm = dialog(this)
         pos = pos(1, 1:2);
         idx = this.findDroplet(pos, currentIndex);
         if (~isempty(idx) && idx ~=0)
-            switch (get(dm.f, 'SelectionType'))
+            switch (get(dm.getFigure(), 'SelectionType'))
                 case 'normal'
                     dropletsToShow = idx;
                 case {'extend', 'alt'}

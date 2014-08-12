@@ -1,9 +1,6 @@
 function [varargout] = dialog(this)
 %TRACE.DIALOG generates a UI for the trace(s)
     allDm = DialogManager(this);
-    if (nargout == 1)
-        varargout{1} = allDm;
-    end
     
     dm = allDm(1);
     
@@ -11,32 +8,35 @@ function [varargout] = dialog(this)
         traceStack = {this};
         lastTrace = this;
         while (isa(lastTrace, 'TraceDecorator'))
-            propDialog = lastTrace.propertyDialog();
-            if (~isempty(propDialog))
-                allDm(end + 1) = propDialog;
-                allDm(end).dependsOn(dm);
-            end
             lastTrace = lastTrace.trace;
             traceStack{end + 1} = lastTrace;
         end
-        allDm = allDm([1, end:-1:2]);
         traceStack = traceStack(end:-1:1);
+        
+        propertyDm = [];
+        for i = 1:numel(traceStack)
+            lastTrace = traceStack{i};
+            if (isa(lastTrace, 'TraceDecorator'))
+                if (isempty(propertyDm))
+                    propertyDm = DialogManager(this);
+                    propertyDm.open('Settings');
+                    allDm(2) = propertyDm;
+                    propertyDm.dependsOn(dm);
+                end
+
+                lastTrace.propertyDialog(propertyDm);
+            end
+        end
+        if (~isempty(propertyDm))
+            propertyDm.show();
+        end
     else
         traceStack = num2cell(this);
-%         for tr = this
-%             if (isa(tr, 'TraceDecorator'))
-%                 propDialog = tr.propertyDialog();
-%                 if (~isempty(propDialog))
-%                     allDm(end + 1) = propDialog;
-%                     allDm(end).dependsOn(dm);
-%                 end
-%             end
-%         end
     end
     
     
     dm.open();
-    dm.f.Toolbar = 'figure';
+    set(dm.getFigure(), 'Toolbar', 'figure');
     dm.addPanel();
     a = handle(axes( ...
         'Parent', dm.currentPanel, ...
@@ -97,4 +97,7 @@ function [varargout] = dialog(this)
     
     allDm.arrange([1, numel(allDm) - 1]);
     
+    if (nargout == 1)
+        varargout{1} = allDm;
+    end
 end

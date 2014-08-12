@@ -356,7 +356,7 @@ classdef DropletSelectionDisplay < handle
                     
                     newSelection = false(size(this.droplets));
                     newSelection(idx) = true;
-                    switch (get(this.dm.f, 'SelectionType'))
+                    switch (get(this.dm.getFigure(), 'SelectionType'))
                         case 'normal'
 
                         case {'extend', 'alt'}

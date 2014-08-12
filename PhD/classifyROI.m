@@ -10,7 +10,7 @@ function [classifications, numClassifications] = classifyROI(this, rawImage)
     dm.open();
     
     %% create figure and axes
-    dm.f.ToolBar = 'figure';
+    set(dm.getFigure(), 'ToolBar', 'figure');
     aPanel = dm.addPanel();
     
     imageAxes = handle(axes( ...
@@ -94,7 +94,7 @@ function [classifications, numClassifications] = classifyROI(this, rawImage)
     %% display first image
     updateImage(1);
     
-    dm.f.Position(4) = 400;
+    dm.container.Position(4) = 400;
     addlistener(dm, 'propertyChange', @(~,~)handles.display.refreshImage());
     addlistener(dm, 'propertyChange', @(~,~)updateBWImage());
     dm.show();
@@ -183,7 +183,7 @@ function [classifications, numClassifications] = classifyROI(this, rawImage)
     function menu = createROIContextMenu()
         menu = get(handles.display.bwImage, 'uicontextmenu');
         if (isempty(menu))
-            menu = uicontextmenu('Parent', dm.f, 'Callback', @callback);
+            menu = uicontextmenu('Parent', dm.getFigure(), 'Callback', @callback);
             set(handles.display.bwImage, 'uicontextmenu', menu);
         else
             set(menu, 'Callback', @callback);

@@ -61,7 +61,7 @@ classdef (Abstract) TraceDecorator < AbstractTrace & handle
     end
     
     methods (Abstract)
-        dm = propertyDialog(this)
+        dm = propertyDialog(this, container)
     end
     
 %     methods (Abstract, Static)

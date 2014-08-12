@@ -1,7 +1,7 @@
-function dm = propertyDialog(this)
+function dm = propertyDialog(this, container)
     dm = DialogManager(this);
     
-    dm.open();
+    dm.open([], container);
     
     dm.addPanel(1, 'Integration settings');
     dm.addText('constant', 80);

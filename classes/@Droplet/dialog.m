@@ -30,7 +30,7 @@ function dm = dialog(this, selectionDisplay)
         handles.dm = DialogManager(this);
         handles.dm.dependsOn(selectionDisplay.dm);
         handles.dm.open();
-        handles.figure = handles.dm.f;
+        handles.figure = handles.dm.getFigure();
         handles.dm.addPanel();
         handles.axes = axes( ...
             'Parent', handles.dm.currentPanel, ...

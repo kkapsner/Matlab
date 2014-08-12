@@ -104,7 +104,7 @@ function dm = dialog(this)
 
         table.ColumnName = {scharParam.name};
         table.Data = [scharParam.value];
-        tablePanel.Position(4) = dm.f.Position(4) * table.Extent(4);
+        tablePanel.Position(4) = dm.container.Position(4) * table.Extent(4);
         dm.adjustPositions();
     end
 

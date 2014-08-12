@@ -1,7 +1,7 @@
-function dm = propertyDialog(this)
+function dm = propertyDialog(this, container)
     dm = DialogManager(this);
     
-    dm.open();
+    dm.open([], container);
     
     dm.addPanel(1, 'Differentiation settings');
     dm.addText('diff. window size', 100);
