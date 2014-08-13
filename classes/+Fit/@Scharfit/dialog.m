@@ -102,16 +102,20 @@ function dm = dialog(this)
 
         scharParam = this.allParameter.select(@(p)any(strcmpi(p.type, {'scharParameter', 'scharProblem'})));
 
-        table.ColumnName = {scharParam.name};
-        table.Data = [scharParam.value];
+        table.ColumnName = {'weighting', scharParam.name};
+        table.Data = [this.weighting, [scharParam.value]];
         tablePanel.Position(4) = dm.container.Position(4) * table.Extent(4);
         dm.adjustPositions();
     end
 
     function tableChangeCallback(~, event)
         scharParam = this.allParameter.select(@(p)any(strcmpi(p.type, {'scharParameter', 'scharProblem'})));
-        p = scharParam(event.Indices(2));
-        p.value(event.Indices(1)) = table.Data(event.Indices(1), event.Indices(2));
+        if (event.Indices(2) == 1)
+            this.weighting(event.Indices(1)) = table.Data(event.Indices(1), event.Indices(2));
+        else
+            p = scharParam(event.Indices(2) - 1);
+            p.value(event.Indices(1)) = table.Data(event.Indices(1), event.Indices(2));
+        end
     end
 end
 

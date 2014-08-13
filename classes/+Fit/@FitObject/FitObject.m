@@ -132,38 +132,38 @@ classdef FitObject < handle
     end
     
     methods
-        function has = hasArgument(obj, argName)
-            has = (sum(ismember(obj.argumentNames, argName) > 0));
+        function has = hasArgument(this, name)
+            has = (sum(ismember(this.argumentNames, name) > 0));
         end
-        function arg = arg(obj, argName)
+        function arg = arg(this, name)
             %OBJ.arg(NAME) alias to OBJ.getArgumentByName(NAME)
             
-            arg = obj.getArgumentByName(argName);
+            arg = this.getArgumentByName(name);
         end
-        function arg = getArgumentByName(obj, argName)
-            arg = obj.arguments(obj.getArgumentIndex(argName));
-        end
-        
-        function setParameter(obj, argName)
-            obj.addArgumentToList(argName, 'parameter');
-        end
-        function setProblem(obj, argName)
-            obj.addArgumentToList(argName, 'problem');
-        end
-        function setIndependent(obj, argName)
-            obj.addArgumentToList(argName, 'independent');
+        function arg = getArgumentByName(this, name)
+            arg = this.arguments(this.getArgumentIndex(name));
         end
         
-        function setArgumentValue(obj, argName, value)
-            if isa(argName, 'cell')
+        function setParameter(this, name)
+            this.addArgumentToList(name, 'parameter');
+        end
+        function setProblem(this, name)
+            this.addArgumentToList(name, 'problem');
+        end
+        function setIndependent(this, name)
+            this.addArgumentToList(name, 'independent');
+        end
+        
+        function setArgumentValue(this, name, value)
+            if isa(name, 'cell')
                 if length(value) == 1
-                    value = ones(size(argName)) * value;
+                    value = ones(size(name)) * value;
                 end
-                for i = 1:numel(argName)
-                    obj.setArgumentValue(argName{i}, value(i));
+                for i = 1:numel(name)
+                    this.setArgumentValue(name{i}, value(i));
                 end
             else
-                obj.arguments(obj.getArgumentIndex(argName)).value = value;
+                this.arguments(this.getArgumentIndex(name)).value = value;
             end
         end
         

@@ -1,8 +1,9 @@
 classdef Scharfit < handle & matlab.mixin.Copyable
     %SCHARFIT provides functionality to fit families of parameter functions
     
-    properties
+    properties (SetObservable)
         scharSize = 1
+        weighting = 1
     end
     
     properties (SetAccess=private)
@@ -44,6 +45,7 @@ classdef Scharfit < handle & matlab.mixin.Copyable
                 else
                     error('Scharfit:invalidParameter', 'Invalid parameter input.');
                 end
+                this.allParameter(end).type = 'independent';
 
                 this.setListeners();
             end
@@ -57,7 +59,7 @@ classdef Scharfit < handle & matlab.mixin.Copyable
             for i = 1:numel(param)
                 p = oldParams.select(@(p)strcmp(p.name, param{i}));
                 if (isempty(p))
-                    p = Fit.Parameter(param{i});
+                    p = Fit.Parameter(this, param{i});
                 end
                 this.allParameter(i) = p;
             end
@@ -73,9 +75,10 @@ classdef Scharfit < handle & matlab.mixin.Copyable
                     if (isempty(this.listeners))
                         this.listeners = l;
                     else
-                        this.listeners(end) = l;
+                        this.listeners(end + 1) = l;
                     end
                 end
+                this.listeners(end + 1) = addlistener(this, 'scharSize', 'PostSet', @this.newScharSize);
             end
         end
         
@@ -109,6 +112,35 @@ classdef Scharfit < handle & matlab.mixin.Copyable
             params = this.allParameter.select(@(p)strcmp(name, p.name));
             for p = params
                 p.type = type;
+            end
+        end
+        
+        function arg = arg(this, name)
+            %THIS.arg(NAME) alias to THIS.getArgumentByName(NAME)
+            
+            arg = this.getArgumentByName(name);
+        end
+        function arg = getArgumentByName(this, name)
+            arg = this.allParameter.select(@(p)strcmp(name, p.name));
+        end
+        function setArgumentValue(this, name, value)
+            if isa(name, 'cell')
+                if length(value) == 1
+                    value = ones(size(name)) * value;
+                end
+                for i = 1:numel(name)
+                    this.setArgumentValue(name{i}, value(:,i));
+                end
+            else
+                arg = this.arg(name);
+                arg.value = value;
+            end
+        end
+        
+        function setArgumentProperties(this, name, varargin)
+            arg = this.arg(name);
+            for i = 1:2:(numel(varargin) - 1)
+                arg.(varargin{i}) = varargin{i + 1};
             end
         end
         
@@ -169,6 +201,17 @@ classdef Scharfit < handle & matlab.mixin.Copyable
                 
                 p.value = reshape(p.value, [], 1);
             end
+            
+            % adjust weighting factor
+            currentSize = numel(this.weighting);
+            if (currentSize > scharSize)
+                this.weighting = this.weighting(1:scharSize);
+            elseif (currentSize == 0)
+                this.weighting = ones(scharSize, 1);
+            elseif (currentSize < scharSize)
+                this.weighting = this.weighting([1:currentSize, ones(1, scharSize - currentSize)]);
+            end
+            this.weighting = reshape(this.weighting, [], 1);
         end
         
         function [func, startValues, lowerBounds, upperBounds] = ...
@@ -184,7 +227,7 @@ classdef Scharfit < handle & matlab.mixin.Copyable
             end
 
             if (nargin < 3 || isempty(weights))
-                weights = maxSize ./ dataSizes;
+                weights = maxSize ./ dataSizes .* this.weighting;
             end
             
             parameterCount = numel(this.allParameter);
@@ -243,30 +286,34 @@ classdef Scharfit < handle & matlab.mixin.Copyable
             function difference = evaluate(param)
                 difference = zeros(allDataSize, 1);
                 for i = 1:numel(schar)
-                    t = schar(i).time;
-                    args = cell(parameterCount, 1);
-                    args(problemIndices) = problemValues;
-                    if (~isempty(scharProblemIndices))
-                        args(scharProblemIndices) = scharProblemValues(i, :);
+                    if (weights(i) ~= 0)
+                        t = schar(i).time;
+                        args = cell(parameterCount, 1);
+                        args(problemIndices) = problemValues;
+                        if (~isempty(scharProblemIndices))
+                            args(scharProblemIndices) = scharProblemValues(i, :);
+                        end
+
+                        args(parameterIndices) = num2cell(param(parameterInputIndices));
+                        if (~isempty(scharParameterIndices))
+                            args(scharParameterIndices) = num2cell( ...
+                                param(scharParameterInputIndices * (i - 1) + scharParameterInputOffset) ...
+                            );
+                        end
+
+                        args{independentIndex} = t;
+
+                        yFit = this.modelFunction(args{:});
+                        % difference(i) = sqrt(sum((yFit - schar(i).value).^2));
+                        difference(dataIndices{i}) = (yFit - schar(i).value) * weights(i);
                     end
-                    
-                    args(parameterIndices) = num2cell(param(parameterInputIndices));
-                    if (~isempty(scharParameterIndices))
-                        args(scharParameterIndices) = num2cell( ...
-                            param(scharParameterInputIndices * (i - 1) + scharParameterInputOffset) ...
-                        );
-                    end
-                    
-                    args{independentIndex} = t;
-                    
-                    yFit = this.modelFunction(args{:});
-                    % difference(i) = sqrt(sum((yFit - schar(i).value).^2));
-                    difference(dataIndices{i}) = (yFit - schar(i).value) * weights(i);
                 end
             end
         end
         
         function feedBackParameter(this, values)
+            this.removeListeners();
+            
             parameter = ...
                 this.allParameter.select(@(p)strcmpi('parameter', p.type));
             parameterCount = numel(parameter);
@@ -282,6 +329,8 @@ classdef Scharfit < handle & matlab.mixin.Copyable
             for i = 1:scharParameterCount
                 scharParameter(i).value = values((i - 1) * scharSize + (1:scharSize).');
             end
+            this.notify('change');
+            this.setListeners();
         end
     end
     
