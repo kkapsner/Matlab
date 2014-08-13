@@ -17,9 +17,16 @@ classdef DialogManager < handle
     
     events
         openWin
-        propertyChange
+        showWin
+        hideWin
         closeWin
         
+        openContainer
+        showContainer
+        hideContainer
+        closeContainer
+        
+        propertyChange
         message
     end
     
@@ -78,13 +85,14 @@ classdef DialogManager < handle
                         'Position', [50, 50, this.width, this.height], ...
                         'Resize', 'on', ...
                         'HandleVisibility', 'off', ...
+                        'Visible', 'off', ...
                         'CloseReq', @(~,~)this.close(), ...
                         'MenuBar', 'none', ...
                         'Toolbar', 'none' ...
                     );
                 end
                 addlistener(this.container, 'SizeChange', @this.adjustPositions);
-                notify(this, 'openWin');
+                this.containerNotify('open');
             end
         end
         
@@ -169,6 +177,7 @@ classdef DialogManager < handle
         
         function hide(this)
             this.container.Visible = 'off';
+            this.containerNotify('hide');
         end
         function show(this, fullscreen)
             if (nargin < 2)
@@ -186,6 +195,7 @@ classdef DialogManager < handle
                     end
                 end
             end
+            this.containerNotify('show');
             drawnow;
         end
         
@@ -203,12 +213,12 @@ classdef DialogManager < handle
         
         function close(this)
             for o = this
-                if (~isempty(o.childManagers))
-                    o.childManagers.close();
+                for c = o.childManagers
+                    c.close();
                 end
                 delete(o.eventListener);
+                this.containerNotify('close');
                 delete(o.container);
-                notify(o, 'closeWin');
                 delete(o);
             end
         end
@@ -393,11 +403,17 @@ classdef DialogManager < handle
                     'HorizontalAlignment', 'left' ...
                 ) ...
             );
-            jText = findjobj(text);
-            if (~isempty(jText))
-                jText.Border = [];
-            end
+            
+            l = addlistener(this, 'showWin', @removeBorder); 
             this.addElement(text, pos);
+            
+            function removeBorder(varargin)
+                jText = findjobj(text, 'persist');
+                if (~isempty(jText))
+                    jText.Border = [];
+                    delete(l);
+                end
+            end
         end
         
         function box = addPropertyCheckbox(this, str, prop, pos, posCallback, negCallback, obj)
@@ -806,6 +822,19 @@ classdef DialogManager < handle
                     if (globValue == this.obj)
                         openvar(globVars{i});
                         break;
+                    end
+                end
+            end
+        end
+        
+        function containerNotify(this, event)
+            notify(this, [event, 'Container']);
+            
+            if (this.isStandalone())
+                notify(this, [event, 'Win']);
+                for c = this.childManagers
+                    if (isvalid(c))
+                        notify(c, [event, 'Win']);
                     end
                 end
             end
