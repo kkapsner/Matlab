@@ -59,7 +59,8 @@ classdef DifferentiatedTrace < TraceDecorator & handle
         function differentiate(this)
             for o = this
                 dValue = zeros(size(o.trace.value));
-                if (o.differentiationWindowSize == 0)
+                windowSize = abs(round(o.differentiationWindowSize));
+                if (windowSize == 0)
                     dValue = diff(o.trace.value);
                     dTime = diff(o.trace.time);
 
@@ -70,7 +71,6 @@ classdef DifferentiatedTrace < TraceDecorator & handle
                             dTime([1; (1:end)']) + dTime([(1:end)'; 1]) ...
                         );
                 else
-                    windowSize = round(o.differentiationWindowSize);
                     for i = 1:o.dataSize
                         startIdx = max(1, i - windowSize);
                         endIdx = min(o.dataSize, i + windowSize);
