@@ -130,6 +130,8 @@ classdef Droplet < handle & Selectable
         dm = guiExport(this)
         dm = dialog(this, selectionDisplay)
         
+        video = getVideo(this, stackIndex, varargin)
+        
         droplet = trackByHand(this)
         
         display = displaySelection(this)
