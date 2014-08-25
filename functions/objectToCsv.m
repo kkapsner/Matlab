@@ -1,5 +1,5 @@
 function objectToCsv(object, fields, file, varargin)
-    if (nargin < 2 || isempty(file))
+    if (nargin < 3 || isempty(file))
         file = File.get({'*.csv', 'CSV-file'},'select struct output file', 'put');
     end
     
