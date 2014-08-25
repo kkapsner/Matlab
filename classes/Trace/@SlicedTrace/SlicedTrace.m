@@ -32,8 +32,8 @@ classdef SlicedTrace < TraceDecorator & handle
                         fTrace.endTime = fTrace.trace.time(endIndex);
                     end
                 end
+                this.registerListeners();
             end
-            this.registerListeners();
         end
         
         function registerListeners(this)
