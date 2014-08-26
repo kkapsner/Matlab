@@ -147,6 +147,7 @@ classdef Scharfit < handle & matlab.mixin.Copyable
         fitP = fit(this, schar, weights)
         y = feval(this, y)
         h = plot(this, y, varargin)
+        parameterToCsv(this, varargin)
         
     end
     
