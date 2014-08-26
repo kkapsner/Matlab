@@ -15,8 +15,10 @@ function objectToCsv(object, fields, file, varargin)
     p.parse(varargin{:});
     
     newline = setNewline(p.Results.newline);
-    size = numel([object.(fields{1})]);
-    data = cell(size, numel(fields));
+    precisionIsNumeric = isnumeric(p.Results.precision);
+    size = numel({object.(fields{1})});
+    numFields = numel(fields);
+    data = cell(size, numFields);
     for i = 1:numel(fields)
         dataColumn = reshape({object.(fields{i})}, [], 1);
         if (numel(dataColumn) == 1)
@@ -25,6 +27,7 @@ function objectToCsv(object, fields, file, varargin)
         if (size ~= numel(dataColumn))
             error('Missmatching dimensions');
         end
+        
         data(:, i) = dataColumn;
     end
     
@@ -32,14 +35,46 @@ function objectToCsv(object, fields, file, varargin)
         strjoin(fields, p.Results.delimiter), ...
         newline ...
     ]);
-    dlmwrite( ...
-        file.fullpath, ....
-        data, ...
-        '-append', ...
-        'delimiter', p.Results.delimiter, ...
-        'newline', p.Results.newline, ...
-        'precision', p.Results.precision ...
-    );
+
+    rows = cell(1, size);
+    
+    for rowIdx = 1:size
+        row = valueToStr(data{rowIdx, 1});
+        for colIdx = 2:numFields
+            row = [row, p.Results.delimiter, valueToStr(data{rowIdx, colIdx})];
+        end
+        rows{rowIdx} = row;
+    end
+    file.write(strjoin(rows, newline));
+    
+%     dlmwrite( ...
+%         file.fullpath, ....
+%         data, ...
+%         '-append', ...
+%         'delimiter', p.Results.delimiter, ...
+%         'newline', p.Results.newline, ...
+%         'precision', p.Results.precision ...
+%     );
+    
+    function str = valueToStr(value)
+        if isempty(value)
+            str = '';
+        elseif ischar(value)
+            if (~isempty(strfind(value, p.Results.delimiter)) || ~isempty(strfind(value, newline)))
+                str = ['"', strrep(value, '"', '""'), '"'];
+            else
+                str = value;
+            end
+        elseif isnumeric(value)
+            if precisionIsNumeric
+                str = sprintf('%.*g', p.Results.precision, value);
+            else
+                str = sprintf(p.Results.precision, value);
+            end
+        else
+            str = '';
+        end
+    end
 end
 
 function out = setNewline(in)
