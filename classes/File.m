@@ -6,6 +6,7 @@ classdef File < handle
     
     properties (Dependent)
         fullpath
+        name
         extension
     end
     
@@ -55,11 +56,20 @@ classdef File < handle
         end
         
         function ex = exist(this)
+            warning('File:exist:deprecated', 'File.exist() is deprecated. Use File.exists().');
+            ex = this.exists();
+        end
+        
+        function ex = exists(this)
             ex = logical(exist(this.fullpath(), 'file'));
         end
         
         function path = get.fullpath(this)
             path = fullfile(this.path, this.filename);
+        end
+        
+        function name = get.name(this)
+            [~, name, ~] = fileparts(this.filename);
         end
         
         function extension = get.extension(this)
@@ -82,6 +92,31 @@ classdef File < handle
         
         function deleteFile(obj)
             delete(obj.fullpath);
+        end
+        
+        function varargout = copyFile(obj, destination)
+            varargout = cell(nargout, 1);
+            [varargout{:}] = copyfile(obj.fullpath, destination.fullpath);
+        end
+		
+        function save(obj, variables, flag)
+            if (nargin < 3)
+                flag = [];
+            end
+            variableStruct = struct();
+            for var = variables
+                variableStruct.(var{1}) = evalin('caller', var{1});
+            end
+            save(obj.fullpath, variableStruct, flag);
+		end
+        
+        function varargout = load(obj, varargin)
+            if (nargout)
+                varargout = cell(nargout, 1);
+                [varargout{:}] = load(obj.fullpath, varargin{:});
+            else
+                
+            end
         end
         
         %% casts
