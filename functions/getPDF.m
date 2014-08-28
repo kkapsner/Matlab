@@ -14,15 +14,19 @@ function [varargout] = getPDF(data, threshold)
         threshold = 1;
         lastDelta = 1;
         xAll = sort(data(~isnan(data)));
-        a = axes('Parent', figure(), 'HandleVisibility', 'callback');
-        hold(a, 'all');
+        if (nargout == 0)
+            a = axes('Parent', figure(), 'HandleVisibility', 'callback');
+            hold(a, 'all');
+        end
         while (true)
             [x, pdf, error, xCum, yCum] = getPDF(xAll, threshold);
-            plot( ...
-                x, pdf, ...
-                'DisplayName', sprintf('threshold %f', threshold), ...
-                'Parent', a ...
-            );
+            if (nargout == 0)
+                plot( ...
+                    x, pdf, ...
+                    'DisplayName', sprintf('threshold %f', threshold), ...
+                    'Parent', a ...
+                );
+            end
             
             change = abs(diff(sign(diff(pdf)))) / 2;
             error = max(change(1:end-2) + change(2:end-1) + change(3:end));
