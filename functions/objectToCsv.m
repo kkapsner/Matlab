@@ -17,6 +17,9 @@ function objectToCsv(object, fields, file, varargin)
     newline = setNewline(p.Results.newline);
     precisionIsNumeric = isnumeric(p.Results.precision);
     size = numel({object.(fields{1})});
+    if (size == 1)
+        size = numel([object.(fields{1})]);
+    end
     numFields = numel(fields);
     data = cell(size, numFields);
     for i = 1:numel(fields)
@@ -45,7 +48,7 @@ function objectToCsv(object, fields, file, varargin)
         end
         rows{rowIdx} = row;
     end
-    file.write(strjoin(rows, newline));
+    file.write(strjoin(rows, newline), 'a');
     
 %     dlmwrite( ...
 %         file.fullpath, ....
@@ -60,7 +63,11 @@ function objectToCsv(object, fields, file, varargin)
         if isempty(value)
             str = '';
         elseif ischar(value)
-            if (~isempty(strfind(value, p.Results.delimiter)) || ~isempty(strfind(value, newline)))
+            if ( ...
+                ~isempty(strfind(value, p.Results.delimiter)) || ...
+                ~isempty(strfind(value, newline)) || ...
+                ~isempty(strfind(value, '"')) ...
+            )
                 str = ['"', strrep(value, '"', '""'), '"'];
             else
                 str = value;
