@@ -1,12 +1,17 @@
 function [varargout] = plot(this, x, varargin)
 %PLOT plots the model
-    
-    if (~isnumeric(x))
-        arg = x;
-        x = linspace(this.startX, this.endX, 200);
-        h = plot(x, this.feval(x), arg, varargin{:}, 'DisplayName', this.getTextResult());
-    else
-        h = plot(x, this.feval(x), varargin{:}, 'DisplayName', this.getTextResult());
+    h = zeros(size(this));
+    for i = 1:numel(this)
+        if (nargin < 2 || isempty(x) )
+            x = linspace(this(i).startX, this(i).endX, 200);
+            h(i) = plot(x, this(i).feval(x), varargin{:}, 'DisplayName', this(i).getTextResult());
+        elseif (~isnumeric(x))
+            arg = x;
+            x = linspace(this(i).startX, this(i).endX, 200);
+            h(i) = plot(x, this(i).feval(x), arg, varargin{:}, 'DisplayName', this(i).getTextResult());
+        else
+            h(i) = plot(x, this(i).feval(x), varargin{:}, 'DisplayName', this(i).getTextResult());
+        end
     end
     
 %     for i = 1:numel(h)

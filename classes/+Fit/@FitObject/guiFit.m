@@ -10,6 +10,7 @@ function result = guiFit(this, yData, varargin)
     p.addOptional('Points', [], @isnumeric);
     p.addOptional('Buttons', defaultButtons);
     p.addOptional('Name', 'Fitting');
+    p.addOptional('Weights', [], @isnumeric);
     p.addOptional('Wait', false, @islogical);
     
     p.parse(yData, varargin{:});
@@ -221,6 +222,11 @@ function result = guiFit(this, yData, varargin)
             
             x = xData(filter);
             y = yData(filter);
+            if (~isempty(p.Results.Weights))
+                w = p.Results.Weights(filter);
+            else
+                w = [];
+            end
             
             if (fitObject.hasArgument('x0'))
                 fitObject.setArgumentValue('x0', x(1));
@@ -229,7 +235,7 @@ function result = guiFit(this, yData, varargin)
                 fitObject.setArgumentValue('y0', y(1));
             end
             
-            r = fitObject.fit(x, y);
+            r = fitObject.fit(x, y, w);
             
             if (~isempty(fitObject.lastResult.errstr))
                 msgbox(fitObject.lastResult.errstr, 'Fiterror', 'error');

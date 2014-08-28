@@ -168,7 +168,7 @@ classdef FitObject < handle
         end
         
         [fitobj, goodness, output, warnstr, errstr, convmsg] = ...
-                fit(obj, xData, yData)
+                fit(obj, xData, yData, weights)
         interval = confidenceInterval(fitObj, level, name)
     end
     
