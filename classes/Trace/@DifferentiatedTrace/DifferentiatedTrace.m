@@ -1,6 +1,7 @@
 classdef DifferentiatedTrace < TraceDecorator & handle
     properties (SetObservable, AbortSet)
         differentiationWindowSize = 0;
+        differentiationWindowType = 'datapoints',
     end
     
     properties (Access=private,Transient)
@@ -59,7 +60,12 @@ classdef DifferentiatedTrace < TraceDecorator & handle
         function differentiate(this)
             for o = this
                 dValue = zeros(size(o.trace.value));
-                windowSize = abs(round(o.differentiationWindowSize));
+                switch (this.differentiationWindowType)
+                    case 'datapoints'
+                        windowSize = abs(round(o.differentiationWindowSize));
+                    case 'time'
+                        windowSize = o.differentiationWindowSize;
+                end
                 if (windowSize == 0)
                     dValue = diff(o.trace.value);
                     dTime = diff(o.trace.time);
@@ -72,12 +78,28 @@ classdef DifferentiatedTrace < TraceDecorator & handle
                         );
                 else
                     for i = 1:o.dataSize
-                        startIdx = max(1, i - windowSize);
-                        endIdx = min(o.dataSize, i + windowSize);
-                        length = endIdx - startIdx + 1;
-                        x = o.trace.time(startIdx:endIdx);
-                        y = o.trace.value(startIdx:endIdx);
-                        A = [x, ones(length, 1)];
+                        switch (this.differentiationWindowType)
+                            case 'datapoints'
+                                startIdx = max(1, i - windowSize);
+                                endIdx = min(o.dataSize, i + windowSize);
+                                x = o.trace.time(startIdx:endIdx);
+                                y = o.trace.value(startIdx:endIdx);
+                            case 'time'
+                                filter =  ...
+                                    o.trace.time > o.trace.time(i) - windowSize & ...
+                                    o.trace.time < o.trace.time(i) + windowSize;
+                                if (sum(filter) < 2)
+                                    if (i > 1)
+                                        filter(i - 1) = true;
+                                    end
+                                    if (i < o.dataSize)
+                                        filter(i + 1) = true;
+                                    end
+                                end
+                                x = o.trace.time(filter);
+                                y = o.trace.value(filter);
+                        end
+                        A = [x, ones(size(x))];
                         beta = pinv(A)*y;
                         dValue(i) = beta(1);
                     end
