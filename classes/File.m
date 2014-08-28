@@ -80,8 +80,11 @@ classdef File < handle
             str = fileread(obj.fullpath());
         end
         
-        function write(obj, str)
-            fid = fopen(obj.fullpath, 'w');
+        function write(obj, str, mode)
+            if (nargin < 3)
+                mode = 'w';
+            end
+            fid = fopen(obj.fullpath, mode);
             fprintf(fid, '%s', str);
             fclose(fid);
         end
