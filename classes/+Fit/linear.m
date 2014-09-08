@@ -1,11 +1,11 @@
 function fit = linear()
 %LINEAR creates an liner fit object
 
-    fit = Fit.FitObject(@(a, b, x)a.*x + b);
+    fit = Fit.FitObject(@(slope, offset, x)slope.*x + offset);
     
-    fit.funcTex = '$a \cdot x + b$';
+    fit.funcTex = '$slope \cdot x + offset$';
     fit.setArgumentValue( ...
-        {'a', 'b'}, ...
+        {'slope', 'offset'}, ...
         [1, 0] ...
     );
 end

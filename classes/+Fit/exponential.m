@@ -1,11 +1,11 @@
 function fit = exponential()
 %EXPONENTIAL creates a exponential fit object
     
-    fit = Fit.FitObject(@(a, b, c, x)a+b.*x.^c);
+    fit = Fit.FitObject(@(offset, amplitude, exponent, x)offset+amplitude.*x.^exponent);
     
-    fit.funcTex = '$a + b \cdot x^c$';
+    fit.funcTex = '$offset + amplitude \cdot x^{exponent}$';
     fit.setArgumentValue( ...
-        {'a', 'b', 'c'}, ...
+        {'offset', 'amplitude', 'exponent'}, ...
         [0, 1, 1] ...
     );
 end
