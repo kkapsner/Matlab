@@ -228,7 +228,7 @@ function obj = parse(str, reviver)
         
         if (isempty(arr))
             arr = [];
-        elseif (~ischar(arr{1}))
+        elseif (~ischar(arr{1}) && ~isa(arr{1}, 'JSON.JSONObject'))
             type = class(arr{1});
             sameType = true;
             for i = 2:numel(arr)
