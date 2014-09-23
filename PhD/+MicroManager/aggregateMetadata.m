@@ -14,20 +14,38 @@ function aggregate = aggregateMetadata(dir, referenceTime, shiftTime)
         shiftTime = 0;
     end
     
-    positions = dir.search('Pos*');
-    positions = positions([positions.isdir]);
+    files = File.empty();
+    allPositions = dir.search('Pos*');
+    positions = allPositions([allPositions.isdir]);
     posCount = numel(positions);
     
-    if (posCount == 0)
+    if (posCount ~= 0)
+        try 
+            posIdx = arrayfun(@(p)sscanf(p.name, 'Pos%d'), positions);
+        catch e
+            return
+        end
+        [~, sortIdx] = sort(posIdx);
+        positions = positions(sortIdx);
+
+        for i = 1:posCount
+            pos = dir.child(positions(i).name);
+            files(i) = File(pos, 'metadata.txt');
+        end
+        
+        return;
+    else
+        allPositions = dir.search('*Pos*_metadata.txt');
+        positions = allPositions(~[allPositions.isdir]);
+        posCount = numel(positions);
+        for i = 1:posCount
+            files(i) = File(dir, positions(i).name);
+        end
+    end
+    
+    if (isempty(files))
         return;
     end
-    try 
-        posIdx = arrayfun(@(p)sscanf(p.name, 'Pos%d'), positions);
-    catch e
-        return
-    end
-    [~, sortIdx] = sort(posIdx);
-    positions = positions(sortIdx);
     
     aggregate = struct( ...
         'position', [], ...
@@ -40,11 +58,17 @@ function aggregate = aggregateMetadata(dir, referenceTime, shiftTime)
         'shiftedTime', [] ...
     );
     
-    for i = 1:posCount
-        fprintf('read %s\n', positions(i).name);
-        pos = dir.child(positions(i).name);
-        jsonFile = File(pos, 'metadata.txt');
-        json = JSON.parse(jsonFile.read());
+    for fileIdx = 1:numel(files)
+        fillAggregate(files(fileIdx), fileIdx);
+    end
+    
+    if (nargout == 0)
+        saveFile = File(dir, 'aggregate.mat');
+        save(saveFile.char(), 'aggregate');
+    end
+    function fillAggregate(file, idx)
+        fprintf('read %s\n', positions(idx).name);
+        json = JSON.parse(file.read());
         agg = struct( ...
             'position', [], ...
             'frames', [], ...
@@ -56,7 +80,7 @@ function aggregate = aggregateMetadata(dir, referenceTime, shiftTime)
             'shiftedTime', [] ...
         );
         agg.position = [0, 0, 0];
-        agg.name = positions(i).name;
+        agg.name = positions(idx).name;
         
         summary = json('Summary');
         agg.fluorescenceName = summary('ChNames');
@@ -67,9 +91,12 @@ function aggregate = aggregateMetadata(dir, referenceTime, shiftTime)
         if (summary.isKey('StartTime'))
 %             agg.startTime = datevec(summary('StartTime'), 'yyyy-mm-dd ddd HH:MM:SS');
             agg.startTime = sscanf(summary('StartTime'), '%4d-%2d-%2d %*s %2d:%2d:%2d')';
-        else
-            agg.startTime = datevec(summary('Time'), 'yyyy-mm-dd HH:MM:SS');
+        elseif (summary.isKey('Time'))
+%             agg.startTime = datevec(summary('Time'), 'yyyy-mm-dd HH:MM:SS');
+            agg.startTime = sscanf(summary('Time'), '%4d-%2d-%2d %*s %2d:%2d:%2d')';
             agg.startTime(6) = agg.startTime(6) - frameOne('ElapsedTime-ms') / 1000;
+        else
+            agg.startTime = zeros(1, 6);
         end
         
         start = etime(agg.startTime, referenceTime);
@@ -93,12 +120,7 @@ function aggregate = aggregateMetadata(dir, referenceTime, shiftTime)
         end
         agg.frames = numel(agg.time);
         
-        aggregate(i) = agg;
-    end
-    
-    if (nargout == 0)
-        saveFile = File(dir, 'aggregate.mat');
-        save(saveFile.char(), 'aggregate');
+        aggregate(idx) = agg;
     end
 end
 
