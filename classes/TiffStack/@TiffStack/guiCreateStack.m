@@ -135,10 +135,11 @@ function stack = guiCreateStack(selectedFile)
         end
         if allSameType
             stackC = stack;
-            stack = feval(sprintf('%s.empty', stackTypes{firstType}));
-            for i = numFiles:-1:1
-                stack(i) = stackC{i};
-            end
+%             stack = feval(sprintf('%s.empty', stackTypes{firstType}));
+            stack = [stackC{:}];
+%             for i = numFiles:-1:1
+%                 stack(i) = stackC{i};
+%             end
         end
         
         delete(f);
