@@ -130,6 +130,12 @@ classdef File < handle
     end
     
     methods(Static)
+        function file = loadobj(file)
+            if (~file.exists())
+                file = File.get([], ['Select new location of ', file.filename]);
+            end
+        end
+        
         function file = get(filterspec, title, multiSelect, selectedFile)
             if (nargin < 1 || isempty(filterspec))
                 filterspec = {'*.*', 'All Files'};
