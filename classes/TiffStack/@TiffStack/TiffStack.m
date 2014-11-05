@@ -22,8 +22,8 @@ classdef TiffStack < AbstractTiffStack
                 end
 %                 if (isa(file, 'char'))
                     if (~logical(exist(file, 'file')))
-                        file = File.get([], ['Select new file location for ', file]);
-                        file = file.fullpath;
+                        newFile = File.getMappedFile(File(file));
+                        file = newFile.fullpath;
                     end
                     obj.file = file;
                     obj.info_ = imfinfo(file);

@@ -11,6 +11,8 @@ classdef DistributedTiffStack < TiffStack
         function stack = DistributedTiffStack(folder, fileSchema, files)
             if (isa(folder, 'File'))
                 folder = fileparts(folder.fullpath);
+            elseif (isa(folder, 'Directory'))
+                folder = folder.path;
             end
             stack@TiffStack( ...
                 File( ...
