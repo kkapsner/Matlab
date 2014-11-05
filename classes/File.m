@@ -129,10 +129,23 @@ classdef File < handle
         end
     end
     
+    properties (Constant, Transient)
+        fileMap = containers.Map;
+    end
+    
     methods(Static)
+        function file = getMappedFile(oldFile)
+            map = File.fileMap;
+            if (map.isKey(oldFile.fullpath))
+                file = map(oldFile.fullpath);
+            else
+                file = File.get([], ['Select new location of ', oldFile.filename]);
+                map(oldFile.fullpath) = file;
+            end
+        end
         function file = loadobj(file)
             if (~file.exists())
-                file = File.get([], ['Select new location of ', file.filename]);
+                file = File.getmappedFile(file);
             end
         end
         
