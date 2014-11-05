@@ -9,6 +9,9 @@ function cellToCsv(data, fields, file, varargin)
     
     p = inputParser();
     p.addParameter('delimiter', ',', @ischar);
+    p.addParameter('NaN', 'NaN', @ischar);
+    p.addParameter('Inf', 'Inf', @ischar);
+    p.addParameter('NegInf', [], @ischar);
     p.addParameter('newline', 'pc', @ischar);
     p.addParameter('precision', 5);
     
@@ -59,10 +62,24 @@ function cellToCsv(data, fields, file, varargin)
                 str = value;
             end
         elseif isnumeric(value)
-            if precisionIsNumeric
-                str = sprintf('%.*g', p.Results.precision, value);
+            if (isnan(value))
+                str = p.Results.NaN;
+            elseif (~isfinite(value))
+                if (value < 0)
+                    if (isempty(p.Results.NegInf))
+                        str = ['-', p.Results.Inf];
+                    else
+                        str = p.Results.NegInf;
+                    end
+                else
+                    str = p.Results.Inf;
+                end
             else
-                str = sprintf(p.Results.precision, value);
+                if precisionIsNumeric
+                    str = sprintf('%.*g', p.Results.precision, value);
+                else
+                    str = sprintf(p.Results.precision, value);
+                end
             end
         else
             str = '';
