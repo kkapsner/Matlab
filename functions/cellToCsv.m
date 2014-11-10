@@ -23,21 +23,31 @@ function cellToCsv(data, fields, file, varargin)
     fields = reshape(fields, 1, []);
     numFields = numel(fields);
     
-    file.write([ ...
+    fid = fopen(file.fullpath, 'w');
+    fprintf(fid, '%s', [ ...
+%     file.write([ ...
         strjoin(fields, p.Results.delimiter), ...
         newline ...
     ]);
 
-    rows = cell(1, numRows);
+%     rows = cell(1, numRows);
     
     for rowIdx = 1:numRows
         row = valueToStr(data{rowIdx, 1});
         for colIdx = 2:numFields
             row = [row, p.Results.delimiter, valueToStr(data{rowIdx, colIdx})];
         end
-        rows{rowIdx} = row;
+        if (rowIdx ~= 1)
+            fprintf(fid, '%s', newline);
+%             file.write(newline, 'a');
+        end
+        fprintf(fid, '%s', row);
+%         file.write(row, 'a');
+%         rows{rowIdx} = row;
     end
-    file.write(strjoin(rows, newline), 'a');
+%     file.write(strjoin(rows, newline), 'a');
+
+    fclose(fid);
     
 %     dlmwrite( ...
 %         file.fullpath, ....
