@@ -47,6 +47,7 @@ classdef Axes < handle
         h = title(a, varargin)
         name(a, name)
         
+        h = colorbar(a, varargin)
         
         save(a, file, formats)
     end
