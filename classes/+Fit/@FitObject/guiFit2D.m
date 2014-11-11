@@ -29,7 +29,7 @@ function result = guiFit2D(this, zData, varargin)
         if (p.Results.YData == Inf)
             yData = transpose(1:size(zData, 1));
         else
-            yData = p.Results.XData;
+            yData = p.Results.YData;
             assert(numel(yData) == size(zData, 1), 'y and z data must match in dimensions.');
         end
         yData = reshape(yData, [], 1) * ones(1, size(zData, 2));
