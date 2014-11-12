@@ -13,6 +13,7 @@ function cellToCsv(data, fields, file, varargin)
     p.addParameter('Inf', 'Inf', @ischar);
     p.addParameter('NegInf', [], @ischar);
     p.addParameter('newline', 'pc', @ischar);
+    p.addParameter('addEmptyLineOnColumnChange', [], @isnumeric);
     p.addParameter('precision', 5);
     
     p.parse(varargin{:});
@@ -31,15 +32,24 @@ function cellToCsv(data, fields, file, varargin)
     ]);
 
 %     rows = cell(1, numRows);
-    
+    changeColumnValue = [];
+    changeColumnIdx = p.Results.addEmptyLineOnColumnChange;
     for rowIdx = 1:numRows
         row = valueToStr(data{rowIdx, 1});
         for colIdx = 2:numFields
             row = [row, p.Results.delimiter, valueToStr(data{rowIdx, colIdx})];
         end
         if (rowIdx ~= 1)
+            if (~isempty(changeColumnIdx) && any(changeColumnValue ~= data{rowIdx, changeColumnIdx}))
+                fprintf(fid, '%s', newline);
+                changeColumnValue = data{rowIdx, changeColumnIdx};
+            end
             fprintf(fid, '%s', newline);
 %             file.write(newline, 'a');
+        else
+            if (~isempty(changeColumnIdx))
+                changeColumnValue = data{rowIdx, changeColumnIdx};
+            end
         end
         fprintf(fid, '%s', row);
 %         file.write(row, 'a');
