@@ -176,6 +176,7 @@ classdef FitObject < handle
     methods
         guiChangeSettings(obj)
         y = feval(obj, x)
+        z = feval2D(obj, x, y)
         h = plot(obj, x, varargin)
         str = getTextResult(this)
         % converter

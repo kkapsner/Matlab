@@ -122,7 +122,7 @@ function result = guiFit2D(this, zData, varargin)
     );
     
     hold(hPlot, 'all');
-    plot3(xData, yData, zData, '.', 'Parent', hPlot);
+    plot3(xData, yData, zData, '.', 'MarkerSize', 0.5, 'Parent', hPlot);
     
     for i=1:3:numel(p.Results.Points) - 1
         plot3( ...
