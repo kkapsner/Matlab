@@ -149,6 +149,18 @@ classdef File < handle
             end
         end
         
+        function file = put(filterspec, title, selectedFile)
+            if (nargin < 1)
+                filterspec = [];
+            end
+            if (nargin < 2)
+                title = [];
+            end
+            if (nargin < 3)
+                selectedFile = [];
+            end
+            file = File.get(filterspec, title, 'put', selectedFile);
+        end
         function file = get(filterspec, title, multiSelect, selectedFile)
             if (nargin < 1 || isempty(filterspec))
                 filterspec = {'*.*', 'All Files'};
