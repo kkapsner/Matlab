@@ -40,7 +40,10 @@ function h = plot(this, varargin)
     end
     
     
-    h = plot(time, value, 'DisplayName', {this.traceName}, unmatched{:});
+    h = plot(time, value, unmatched{:});
+    for i = 1:numel(h)
+        set(h, 'DisplayName', this(i).traceName);
+    end
     
     if (p.Results.keepUpdated || p.Results.keepValuesUpdated || p.Results.keepNameUpdated)
         for i = 1:numel(this)

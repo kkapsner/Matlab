@@ -58,7 +58,7 @@ function [panel, getParameter] = getGUIParameterPanel(parent)
         channelInput.Value = round(channelInput.Value);
     end
 
-    addlistener(panel, 'SizeChange', @arrange);
+    addlistener(panel, 'SizeChanged', @arrange);
 
     getParameter = @readParameter;
     function arrange(~,~)

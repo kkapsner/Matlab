@@ -30,7 +30,7 @@ function dialog(droplet)
 
     function horizontalLayout(container)
         sizeChangeCallback();
-        addlistender(container, 'SizeChange', @sizeChangeCallback);
+        addlistender(container, 'SizeChanged', @sizeChangeCallback);
         function sizeChangeCallback(varargin)
             c = get(container, 'Children');
             

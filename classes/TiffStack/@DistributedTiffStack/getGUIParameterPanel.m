@@ -36,7 +36,7 @@ function [panel, getParameter] = getGUIParameterPanel(parent, file)
         'HandleVisibility', 'off' ...
     ));
 
-    addlistener(panel, 'SizeChange', @arrange);
+    addlistener(panel, 'SizeChanged', @arrange);
 
     getParameter = @readParameter;
     function arrange(~,~)

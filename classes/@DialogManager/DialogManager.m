@@ -91,7 +91,7 @@ classdef DialogManager < handle
                         'Toolbar', 'none' ...
                     );
                 end
-                addlistener(this.container, 'SizeChange', @this.adjustPositions);
+                addlistener(this.container, 'SizeChanged', @this.adjustPositions);
                 this.containerNotify('open');
             end
         end
@@ -337,7 +337,7 @@ classdef DialogManager < handle
             if (nargin < 4 || isempty(dynWidth))
                 dynWidth = @(a)a;
             end
-            addlistener(element.Parent, 'SizeChange', @callback);
+            addlistener(element.Parent, 'SizeChanged', @callback);
             callback();
             
             function callback(~,~)
@@ -437,13 +437,13 @@ classdef DialogManager < handle
             function callback(value)
                 obj.(prop)(propIndex) = value;
                 if (value)
-                    posCallback(box.value);
+                    posCallback(box.Value);
                 else
-                    negCallback(box.value);
+                    negCallback(box.Value);
                 end
             end
             function reverseCallback(~,~)
-                box.value = obj.(prop)(propIndex);
+                box.Value = obj.(prop)(propIndex);
             end
         end
         
@@ -470,7 +470,7 @@ classdef DialogManager < handle
             
             oldValue = value;
             function callback(~,~)
-                newValue = logical(box.value);
+                newValue = logical(box.Value);
                 if (newValue ~= oldValue)
                     userCallback(newValue);
                     notify(this, 'propertyChange', ArbitraryEventData( ...
@@ -806,7 +806,7 @@ classdef DialogManager < handle
             addlistener(box, 'Value', 'PostSet', @callback);
             callback();
             function callback(~,~)
-                if (box.value)
+                if (box.Value)
                     set(el, 'Visible', on);
                 else
                     set(el, 'Visible', off);

@@ -18,7 +18,7 @@ function menu = addSliderContextMenu(slider, menu)
         menu = uicontextmenu('Parent', f);
     end
     
-    slider.uicontextmenu = menu;
+    slider.UIContextMenu = menu;
     
     %% GUI
     uimenu(menu, 'Label', 'open GUI', 'Callback', @openGUI);
@@ -88,7 +88,7 @@ function menu = addSliderContextMenu(slider, menu)
     hideValueDisplay();
     start(timer('TimerFcn', @showValueDisplay, 'StartDelay', 0.2, 'TasksToExecute', 1, 'StopFcn', @(t, ~)delete(t))); 
 
-    addlistener(slider, 'Value', 'PreSet', @(~,ev)updateString(ev.NewValue));
+    addlistener(slider, 'Value', 'PostSet', @(~,ev)updateString(slider.Value));
     
     updateString(slider.Value);
     function updateString(value)
@@ -97,7 +97,8 @@ function menu = addSliderContextMenu(slider, menu)
         drawnow update;
     end
 
-    addlistener(slider, 'Position', 'PostSet', @(~,~)updatePosition(slider.Value));
+%     addlistener(slider, 'Position', 'PostSet', @(~,~)updatePosition(slider.Value));
+    addlistener(slider, 'LocationChanged', @(~,~)updatePosition(slider.Value));
     addlistener(slider, 'Max', 'PostSet', @(~,~)updatePosition(slider.Value));
     addlistener(slider, 'Min', 'PostSet', @(~,~)updatePosition(slider.Value));
     function updatePosition(value)
