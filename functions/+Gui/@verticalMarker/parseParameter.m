@@ -42,7 +42,7 @@ function parseParameter(obj, varargin)
     end
     
     if (obj.max < obj.min)
-        [obj.max obj.min] = [obj.min obj.max];
+        [obj.max, obj.min] = deal(obj.min, obj.max);
     end
     
     if (obj.value < obj.min)

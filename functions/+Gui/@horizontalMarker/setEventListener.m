@@ -27,8 +27,8 @@ function setEventListener(obj)
     function sliderChange(~,~)
         obj.value = obj.controls.slider.value;
     end
-    function imlineChange(~,~)
-        obj.value = obj.controls.imline.position;
+    function imlineChange(imline,~)
+        obj.value = imline.position;
     end
     function notifyCallback(varargin)
         notify(obj, 'callback');

@@ -19,16 +19,16 @@ function setEventListener(obj)
         notifyCallback();
     end
     function minChange(~,~)
-        obj.min = obj.controls.minInput.value;
+        obj.min = obj.controls.minInput.Value;
     end
     function maxChange(~,~)
-        obj.max = obj.controls.maxInput.value;
+        obj.max = obj.controls.maxInput.Value;
     end
     function sliderChange(~,~)
-        obj.value = obj.controls.slider.value;
+        obj.value = obj.controls.slider.Value;
     end
-    function imlineChange(~,~)
-        obj.value = obj.controls.imline.position;
+    function imlineChange(imline,~)
+        obj.value = imline.position;
     end
     function notifyCallback(varargin)
         notify(obj, 'callback');
