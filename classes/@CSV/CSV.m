@@ -29,6 +29,11 @@ classdef CSV < handle
                 this.data(:, end + 1) = cellData;
             end
         end
+        function this = addTrace(this, traces)
+            for tr = traces
+                this.addColumn(tr.traceName, tr.value);
+            end
+        end
         function this = addRow(this, rowData)
             if (isstruct(rowData))
                 cellData = cell(1, numel(this.columns));
@@ -67,12 +72,15 @@ classdef CSV < handle
                 end
             else
                 for i = 1:size(rowData, 1)
-                    this.addRow(rowData(i, :))
+                    this.addRow(rowData(i, :));
                 end
             end
         end
         
         function toFile(this, file, varargin)
+            if (nargin < 2)
+                file = [];
+            end
             cellToCsv(this.data, this.columns, file, varargin{:});
         end
     end
