@@ -30,9 +30,18 @@ classdef RawDataTrace < AbstractTrace & handle
                     error('RawDataTrace:invalidDimension', ...
                         'Time and value must have a dimension of two.');
                 end
-                if (any(size(time) ~= size(value)))
-                    error('RawDataTrace:sizeMissmatch', ...
-                        'Time and value must have the same size.');
+                if (any(sTime == 1))
+                    if (numel(time) ~= sValue(1))
+                        error('RawDataTrace:sizeMissmatch', ...
+                            'Time and value must have same lengths.');
+                    end
+                    time = reshape(time, [], 1) * ones(1, sValue(2));
+                    sTime = sValue;
+                else
+                    if (any(sTime ~= sValue))
+                        error('RawDataTrace:sizeMissmatch', ...
+                            'Time and value must have the same size.');
+                    end
                 end
                 this(sTime(2)) = RawDataTrace();
                 for i = 1:sTime(2)
