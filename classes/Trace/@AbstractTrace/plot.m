@@ -41,8 +41,10 @@ function h = plot(this, varargin)
     
     
     h = plot(time, value, unmatched{:});
-    for i = 1:numel(h)
-        set(h, 'DisplayName', this(i).traceName);
+    if ~any(strcmpi('DisplayName', unmatchedFields))
+        for i = 1:numel(h)
+            set(h(i), 'DisplayName', this(i).traceName);
+        end
     end
     
     if (p.Results.keepUpdated || p.Results.keepValuesUpdated || p.Results.keepNameUpdated)
