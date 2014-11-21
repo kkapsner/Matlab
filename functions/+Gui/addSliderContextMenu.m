@@ -97,8 +97,11 @@ function menu = addSliderContextMenu(slider, menu)
         drawnow update;
     end
 
-%     addlistener(slider, 'Position', 'PostSet', @(~,~)updatePosition(slider.Value));
-    addlistener(slider, 'LocationChanged', @(~,~)updatePosition(slider.Value));
+    try
+        addlistener(slider, 'LocationChanged', @(~,~)updatePosition(slider.Value));
+    catch
+        addlistener(slider, 'Position', 'PostSet', @(~,~)updatePosition(slider.Value));
+    end
     addlistener(slider, 'Max', 'PostSet', @(~,~)updatePosition(slider.Value));
     addlistener(slider, 'Min', 'PostSet', @(~,~)updatePosition(slider.Value));
     function updatePosition(value)

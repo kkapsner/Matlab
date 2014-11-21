@@ -91,7 +91,11 @@ classdef DialogManager < handle
                         'Toolbar', 'none' ...
                     );
                 end
-                addlistener(this.container, 'SizeChanged', @this.adjustPositions);
+                try
+                    addlistener(this.container, 'SizeChanged', @this.adjustPositions);
+                catch
+                    addlistener(this.container, 'SizeChange', @this.adjustPositions);
+                end
                 this.containerNotify('open');
             end
         end
@@ -337,7 +341,11 @@ classdef DialogManager < handle
             if (nargin < 4 || isempty(dynWidth))
                 dynWidth = @(a)a;
             end
-            addlistener(element.Parent, 'SizeChanged', @callback);
+            try
+                addlistener(element.Parent, 'SizeChanged', @callback);
+            catch
+                addlistener(element.Parent, 'SizeChange', @callback);
+            end
             callback();
             
             function callback(~,~)

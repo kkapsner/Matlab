@@ -1,7 +1,12 @@
 function panel = getDialogPanel(this, dm, changeCallback)
 %GETDIALOGPANEL
     panel = dm.addPanel(1);
-    addlistener(panel, 'SizeChanged', @resizeCallback);
+    try
+        addlistener(panel, 'SizeChanged', @resizeCallback);
+    catch
+        addlistener(panel, 'SizeChange', @resizeCallback);
+    end
+    
     
     %% create filter control
     handles.filterOn = dm.addPropertyCheckbox('Filter on', 'filterOn', 70);

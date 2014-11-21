@@ -43,8 +43,12 @@ function [panel, getParameter] = getGUIParameterPanel(parent)
         'HandleVisibility', 'off' ...
     ));
     Gui.addSliderContextMenu(highCutOffInput);
-
-    addlistener(panel, 'SizeChanged', @arrange);
+    
+    try
+        addlistener(panel, 'SizeChanged', @arrange);
+    catch
+        addlistener(panel, 'SizeChange', @arrange);
+    end
 
     getParameter = @readParameter;
     function arrange(~,~)

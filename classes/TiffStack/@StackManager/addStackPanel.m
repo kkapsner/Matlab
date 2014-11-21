@@ -9,7 +9,11 @@ function panel = addStackPanel(this, stack)
         'BorderWidth', 0, ...
         'Position', [0, 0, 30, 30]...
     ));
-    addlistener(panel, 'SizeChanged', @arrange);
+    try
+        addlistener(panel, 'SizeChanged', @arrange);
+    catch
+        addlistener(panel, 'SizeChange', @arrange);
+    end
     addlistener(panel, 'BackgroundColor', 'PostSet', @propagateColor);
     
     name = handle(uicontrol( ...

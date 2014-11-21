@@ -29,7 +29,11 @@ function open(this, preselect)
         'Menubar', 'none', ...
         'Toolbar', 'figure' ...
     ));
-    addlistener(this.handles.figure, 'SizeChanged', @arrangeFigure);
+    try
+        addlistener(this.handles.figure, 'SizeChanged', @arrangeFigure);
+    catch
+        addlistener(this.handles.figure, 'SizeChange', @arrangeFigure);
+    end
     
     this.handles.header = createHeader();
     [this.handles.outerStackContainer, this.handles.innerStackContainer] = ...
@@ -51,7 +55,11 @@ function open(this, preselect)
             'HandleVisibility', 'off', ...
             'BorderWidth', 0 ...
         ));
-        addlistener(header, 'SizeChanged', @arrange);
+        try
+            addlistener(header, 'SizeChanged', @arrange);
+        catch
+            addlistener(header, 'SizeChange', @arrange);
+        end
         
         text = handle(uicontrol( ...
             'Parent', header, ...
@@ -131,7 +139,12 @@ function open(this, preselect)
             'BackgroundColor', this.handles.figure.Color, ...
             'BorderWidth', 1 ...
         ));
-        addlistener(outerStackContainer, 'SizeChanged', @arrangeOuter);
+        
+        try
+            addlistener(outerStackContainer, 'SizeChanged', @arrangeOuter);
+        catch
+            addlistener(outerStackContainer, 'SizeChange', @arrangeOuter);
+        end
         
         innerStackContainer = handle(uipanel( ...
             'Parent', outerStackContainer, ...
@@ -140,7 +153,11 @@ function open(this, preselect)
             'BackgroundColor', outerStackContainer.BackgroundColor, ...
             'BorderWidth', 0 ...
         ));
-        addlistener(innerStackContainer, 'SizeChanged', @arrangeInner);
+        try
+            addlistener(innerStackContainer, 'SizeChanged', @arrangeInner);
+        catch
+            addlistener(innerStackContainer, 'SizeChange', @arrangeInner);
+        end
         
         
         function arrangeOuter(~,~)
