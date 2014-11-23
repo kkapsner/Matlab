@@ -8,6 +8,7 @@ classdef File < handle
         fullpath
         name
         extension
+        basename
     end
     
     methods
@@ -70,6 +71,10 @@ classdef File < handle
         
         function name = get.name(this)
             [~, name, ~] = fileparts(this.filename);
+        end
+        
+        function basename = get.basename(this)
+            [~, basename] = fileparts(this.filename);
         end
         
         function extension = get.extension(this)
