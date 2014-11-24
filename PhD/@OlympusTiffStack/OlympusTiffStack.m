@@ -9,6 +9,8 @@ classdef OlympusTiffStack < TiffStack
             obj = obj@TiffStack(file);
             obj.olympusInfo = OlympusTiffStack.readOlympusTags(obj.info);
         end
+		
+		time = getTime(this)
     end
     
     methods(Static)
