@@ -3,7 +3,7 @@ function time = getTime(this)
     offset = this.olympusInfo.TimePos1;
     for i = 2:this.size
         currentInfo = OlympusTiffStack.readOlympusTags(this.info(i));
-        time(i) = currentInfo.TimePos1;
+        time(i) = currentInfo.TimePos1 - offset;
     end
     time = time ./ 1000;
 end
