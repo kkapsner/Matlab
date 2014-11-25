@@ -11,7 +11,7 @@ function aggregate = aggregateMetadata(dir, referenceTime, shiftTime)
         'shiftedTime', {} ...
     );
 
-    if (nargin < 1)
+    if (nargin < 1 || isempty(dir))
         dir = Directory.get();
         if (dir == 0)
             return;
@@ -20,10 +20,10 @@ function aggregate = aggregateMetadata(dir, referenceTime, shiftTime)
         dir = Directory(dir);
     end
     
-    if (nargin < 2)
+    if (nargin < 2 || isempty(referenceTime))
         referenceTime = zeros(1, 6);
     end
-    if (nargin < 3)
+    if (nargin < 3 || isempty(shiftTime))
         shiftTime = 0;
     end
     
@@ -48,7 +48,7 @@ function aggregate = aggregateMetadata(dir, referenceTime, shiftTime)
         
         return;
     else
-        allPositions = dir.search('*Pos*_metadata.txt');
+        allPositions = dir.search('*_metadata.txt');
         positions = allPositions(~[allPositions.isdir]);
         posCount = numel(positions);
         for i = 1:posCount
