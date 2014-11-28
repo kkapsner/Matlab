@@ -3,7 +3,8 @@
 tests/
 old/
 Apps/
-AppsDev/
+AppsDev/*
+!AppsDev/DropletTracking
 fileexchange/
 *.zip
 *.asv
