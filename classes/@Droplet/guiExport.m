@@ -41,7 +41,7 @@ function dm = guiExport(this)
     dm.newLine();
     dirButton = dm.addButton('select directory', @(w) w/2 - 5,  @selectDirectory);
     saveButton = dm.addButton('save', {@(w)w/2+5, @(w)w/2-5},  @save);
-    saveButton.enable = 'off';
+    saveButton.Enable = 'off';
     
     dm.show();
     
