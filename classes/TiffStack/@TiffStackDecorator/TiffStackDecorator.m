@@ -13,6 +13,7 @@ classdef (Abstract) TiffStackDecorator < AbstractTiffStack
                     s = num2cell(size(stack));
                     obj(s{:}) = feval(c);
                     for i = 1:numel(stack)
+                        obj(i) = feval(c);
                         obj(i).stack = stack{i};
                     end
                 elseif (numel(stack) == 1)

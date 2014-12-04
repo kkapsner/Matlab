@@ -89,9 +89,11 @@ classdef Droplet < handle & Selectable
             obj.perimeter(idx) = roi.Perimeter;
             
             intensity = roi.Intensity;
-            obj.minIntensity(idx, :) = [intensity.min];
-            obj.maxIntensity(idx, :) = [intensity.max];
-            obj.intensitySum(idx, :) = [intensity.sum];
+            if (~isempty(intensity))
+                obj.minIntensity(idx, :) = [intensity.min];
+                obj.maxIntensity(idx, :) = [intensity.max];
+                obj.intensitySum(idx, :) = [intensity.sum];
+            end
             obj.brightIntensitySum(idx, :) = [intensity.brightSum];
             obj.brightArea(idx, :) = [intensity.brightArea];
             

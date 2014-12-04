@@ -60,5 +60,11 @@ classdef (Abstract) AbstractTiffStack  < handle & matlab.mixin.Heterogeneous
         [panel] = getDialogPanel(this, dm, changeCallback)
         dm = dialog(this, waitForClose, segmenter)
     end
+    
+    methods (Static, Access=protected)
+        function el = getDefaultScalarElement()
+            el = EmptyTiffStack();
+        end
+    end
 end
 

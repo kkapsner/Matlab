@@ -2,7 +2,7 @@ function this = add3DData(this, xName, x, yName, y, zName, z, varargin)
     if (nargin == 4)
         z = yName;
         y = x;
-        y = xName;
+        x = xName;
         xName = 'x';
         yName = 'y';
         zName = 'z';
