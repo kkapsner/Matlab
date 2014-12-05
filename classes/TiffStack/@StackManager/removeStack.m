@@ -6,7 +6,9 @@ function removeStack(this, stack)
         this.stacks = this.stacks(filter);
         delete(this.handles.stackPanels{stackIndex});
         this.handles.stackPanels = this.handles.stackPanels(filter);
-        this.arrangeStackContainer();
+        
+%         this.arrangeStackContainer();
+        this.adjustInnerStackContainerHeight();
         
         notify(this, 'stackRemoved');%, stack);
     end

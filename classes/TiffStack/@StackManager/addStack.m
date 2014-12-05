@@ -1,7 +1,7 @@
 function addStack(this, stacks)
     if (~isempty(stacks))
         if (~iscell(stacks))
-            stacks = mat2cell(stacks, ones(size(stacks, 1), 1), ones(size(stacks, 2), 1)); %#ok<MMTC>
+            stacks = num2cell(stacks);
         end
         
         for i = 1:numel(stacks)
@@ -13,7 +13,9 @@ function addStack(this, stacks)
                 this.handles.stackPanels{end + 1} = this.addStackPanel(stacks{i});
             end
         end
-        this.arrangeStackContainer();
+%         this.arrangeStackContainer();
+        this.adjustInnerStackContainerHeight();
+        
         notify(this, 'stackAdded');%, stacks);
     end
 end
