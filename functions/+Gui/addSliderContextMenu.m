@@ -82,6 +82,7 @@ function menu = addSliderContextMenu(slider, menu)
         'Enable', 'off', ...
         'Position', [1, 2, 3, 4] ...
     ));
+    uistack(text, 'bottom');
     
     % enable "click through text"
     jText = [];
@@ -160,10 +161,15 @@ function menu = addSliderContextMenu(slider, menu)
     function enableClickThrough()
         if (isempty(jText))
             warning('off', 'YMA:FindJObj:invisibleHandle');
-            jText = findjobj(text);
-            if (~isempty(jText))
-                jText.setOpaque(0);
-                jText(end).getParent().setEnabled(0);
+            try
+                jText = findjobj(text);
+                if (~isempty(jText))
+                    parent = jText(end).getParent();
+                    jText.setOpaque(0);
+                    parent.setOpaque(0);
+                    jText.setEnabled(0);
+                    parent.setEnabled(0);
+                end
             end
         end
     end
