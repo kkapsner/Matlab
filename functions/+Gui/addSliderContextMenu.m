@@ -82,7 +82,6 @@ function menu = addSliderContextMenu(slider, menu)
         'Enable', 'off', ...
         'Position', [1, 2, 3, 4] ...
     ));
-    uistack(text, 'bottom');
     
     % enable "click through text"
     jText = [];
