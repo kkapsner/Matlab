@@ -417,8 +417,9 @@ classdef DialogManager < handle
             
             function removeBorder(varargin)
                 jText = findjobj(text, 'persist');
-                if (~isempty(jText))
-                    jText.Border = [];
+                for idx = 1:numel(jText)
+                    jT = jText(idx);
+                    jT.Border = [];
                     delete(l);
                 end
             end

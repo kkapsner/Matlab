@@ -245,9 +245,11 @@ classdef DropletSelectionDisplay < handle
             
             % position callbacks
             function hPositionCallback(~, ~)
-                newIndex = round(this.handles.position.Value);
-                if (newIndex ~= this.currentImageIndex)
-                    this.currentImageIndex = newIndex;
+                if (~isempty(this.handles.position)) % weird problem in 2014b...
+                    newIndex = round(this.handles.position.Value);
+                    if (newIndex ~= this.currentImageIndex)
+                        this.currentImageIndex = newIndex;
+                    end
                 end
             end
 
