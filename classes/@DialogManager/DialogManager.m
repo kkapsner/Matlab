@@ -420,6 +420,8 @@ classdef DialogManager < handle
                 for idx = 1:numel(jText)
                     jT = jText(idx);
                     jT.Border = [];
+                    jT.setOpaque(0);
+                    jT.repaint();
                     delete(l);
                 end
             end

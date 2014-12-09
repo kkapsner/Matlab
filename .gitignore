@@ -5,6 +5,7 @@ old/
 Apps/
 AppsDev/*
 !AppsDev/DropletTracking
+!AppsDev/TrackBacteriaByHand
 fileexchange/
 *.zip
 *.asv
