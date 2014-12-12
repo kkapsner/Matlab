@@ -30,6 +30,8 @@ classdef (Abstract) AbstractTrace < handle & Selectable & Binable & matlab.mixin
         function dataSize = get.dataSize(this)
             dataSize = numel(this.time);
         end
+        
+        csv = CSV(this, csv, nameFormat)
     end
     
     methods (Sealed)
