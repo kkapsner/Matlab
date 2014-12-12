@@ -26,9 +26,13 @@ function dm = dialog(this)
         'Position', [0.5 0.5] ...
     );
     
-    dm.addPanel(1);
+    dm.addPanel(2);
     dm.addText('Schar Size', 100);
     dm.addPropertyInput('scharSize', [100, 0, 100], @updateTable);
+    dm.newLine();
+    derivativeCheckbox = dm.addPropertyCheckbox('fit also derivative', 'fitAlsoDerivative', 110);
+    dm.checkboxHides(derivativeCheckbox, dm.addText('scaling', [110, 0, 100]));
+    dm.checkboxHides(derivativeCheckbox, dm.addPropertyInput('derivativeScaling', [210, 0, 100]));
     
     dm.addPanel(numel(this.allParameter) + 1, 'Parameter');
     
@@ -104,7 +108,10 @@ function dm = dialog(this)
 
         table.ColumnName = {'weighting', scharParam.name};
         table.Data = [this.weighting, [scharParam.value]];
-        tablePanel.Position(4) = dm.container.Position(4) * table.Extent(4);
+        tablePanel.Position(4) = tablePanel.Position(4) * table.Extent(4);
+        if (table.Extent(4) ~= 1)
+            tablePanel.Position(4) = dm.container.Position(4) * table.Extent(4);
+        end
         dm.adjustPositions();
     end
 
