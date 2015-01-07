@@ -437,7 +437,7 @@ classdef DialogManager < handle
             if (nargin < 6 || isempty(negCallback))
                 negCallback = posCallback;
             end
-            if (nargin < 6 || isempty(obj))
+            if (nargin < 7 || isempty(obj))
                 obj = this.obj;
             end
             
