@@ -252,11 +252,18 @@ classdef Scharfit < handle & matlab.mixin.Copyable
             scharProblemValues = num2cell([scharProblem.value]);
             
             [parameter, ~, parameterFilter] = ...
-                this.allParameter.select(@(p)strcmpi('parameter', p.type));
+                this.allParameter.select(@(p)strcmpi('parameter', p.type) && ~p.stepLogarithmical);
             parameterIndices = find(parameterFilter);
             parameterValues = vertcat(parameter.value);
             parameterLowerBounds = vertcat(parameter.lowerBound);
             parameterUpperBounds = vertcat(parameter.upperBound);
+            
+            [logParameter, ~, logParameterFilter] = ...
+                this.allParameter.select(@(p)strcmpi('parameter', p.type) && p.stepLogarithmical);
+            logParameterIndices = find(logParameterFilter);
+            logParameterValues = log(vertcat(logParameter.value));
+            logParameterLowerBounds = log(vertcat(logParameter.lowerBound));
+            logParameterUpperBounds = log(vertcat(logParameter.upperBound));
             
             [scharParameter, ~, scharParameterFilter] = ...
                 this.allParameter.select(@(p)strcmpi('scharParameter', p.type));
@@ -281,12 +288,13 @@ classdef Scharfit < handle & matlab.mixin.Copyable
             end
             
             func = @evaluate;
-            startValues = vertcat(parameterValues, scharParameterValues);
-            lowerBounds = vertcat(parameterLowerBounds, scharParameterLowerBounds);
-            upperBounds = vertcat(parameterUpperBounds, scharParameterUpperBounds);
+            startValues = vertcat(parameterValues, logParameterValues, scharParameterValues);
+            lowerBounds = vertcat(parameterLowerBounds, logParameterLowerBounds, scharParameterLowerBounds);
+            upperBounds = vertcat(parameterUpperBounds, logParameterUpperBounds, scharParameterUpperBounds);
             
             parameterInputIndices = 1:numel(parameterValues);
-            scharParameterInputOffset = numel(parameterValues) + 1;
+            logParameterInputIndices = numel(parameterValues) + (1:numel(logParameterValues));
+            scharParameterInputOffset = numel(parameterValues) + numel(logParameterValues) + 1;
             scharParameterInputIndices = 1:numel(scharParameterIndices);
             
             function difference = evaluate(param)
@@ -301,6 +309,7 @@ classdef Scharfit < handle & matlab.mixin.Copyable
                         end
 
                         args(parameterIndices) = num2cell(param(parameterInputIndices));
+                        args(logParameterIndices) = num2cell(exp(param(logParameterInputIndices)));
                         if (~isempty(scharParameterIndices))
                             args(scharParameterIndices) = num2cell( ...
                                 param(scharParameterInputIndices * (i - 1) + scharParameterInputOffset) ...
@@ -359,7 +368,12 @@ classdef Scharfit < handle & matlab.mixin.Copyable
                 this.allParameter.select(@(p)strcmpi('parameter', p.type));
             parameterCount = numel(parameter);
             for i = 1:parameterCount
-                parameter(i).value = values(i);
+                para = parameter(i);
+                if (para.stepLogarithmical)
+                    para.value = exp(values(i));
+                else
+                    para.value = values(i);
+                end
             end
             values = values((parameterCount + 1):end);
             

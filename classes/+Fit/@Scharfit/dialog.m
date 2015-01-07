@@ -2,7 +2,7 @@ function dm = dialog(this)
 %DIALOG opens a dialog for the Scharfit
 
     dm = DialogManager(this);
-    dm.width = 570;
+    dm.width = 620;
     dm.open();
     dm.addPanel();
     
@@ -40,6 +40,7 @@ function dm = dialog(this)
     dm.addTitle('Value', [250, 0, 100]);
     dm.addTitle('Lower Bound', [350, 0, 100]);
     dm.addTitle('Upper Bound', [450, 0, 100]);
+    dm.addTitle('log step', [550, 0, 50]);
     
     handles = struct();
     table = [];
@@ -52,6 +53,7 @@ function dm = dialog(this)
         handles(i).valueInput = dm.addPropertyInput('value(1)', [250, 0, 100], [], para);
         handles(i).lowerBoundInput = dm.addPropertyInput('lowerBound', [350, 0, 100], [], para);
         handles(i).upperBoundInput = dm.addPropertyInput('upperBound', [450, 0, 100], [], para);
+        handles(i).stepLogarithmical = dm.addPropertyCheckbox('', 'stepLogarithmical', [575, 0, 25], [], [], para);
         
         dm.listen('value', @updateTable, para); 
         
@@ -75,10 +77,12 @@ function dm = dialog(this)
             case {'parameter', 'problem'}
                 set(handles(i).valueInput, 'Visible', 'on');
                 handles(i).valueText.Visible = 'off';
+                set(handles(i).stepLogarithmical, 'Visible', 'on');
             case {'scharParameter', 'scharProblem'}
                 set(handles(i).valueInput, 'Visible', 'off');
                 handles(i).valueText.Visible = 'on';
                 handles(i).valueText.String = 'see below';
+                set(handles(i).stepLogarithmical, 'Visible', 'off');
             case 'independent'
                 set(handles(i).valueInput, 'Visible', 'off');
                 handles(i).valueText.Visible = 'on';
@@ -93,6 +97,7 @@ function dm = dialog(this)
             case {'problem', 'scharProblem', 'independent'}
                     set(handles(i).lowerBoundInput, 'Visible', 'off');
                     set(handles(i).upperBoundInput, 'Visible', 'off');
+                    set(handles(i).stepLogarithmical, 'Visible', 'off');
                 
         end
         
@@ -109,7 +114,7 @@ function dm = dialog(this)
         table.ColumnName = {'weighting', scharParam.name};
         table.Data = [this.weighting, [scharParam.value]];
         tablePanel.Position(4) = tablePanel.Position(4) * table.Extent(4);
-        if (table.Extent(4) ~= 1)
+        if (table.Extent(4) < 0.9)
             tablePanel.Position(4) = dm.container.Position(4) * table.Extent(4);
         end
         dm.adjustPositions();

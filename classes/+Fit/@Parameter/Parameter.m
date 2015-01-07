@@ -7,6 +7,7 @@ classdef Parameter < handle & Selectable & hgsetget & matlab.mixin.Copyable
         lowerBound = -Inf
         value = 0
         upperBound = Inf
+        stepLogarithmical = false
     end
     
     properties (SetAccess=private)
