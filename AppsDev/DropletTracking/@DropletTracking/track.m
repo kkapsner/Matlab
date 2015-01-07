@@ -45,10 +45,11 @@ function track(this)
             roi.loadIntensity(intensityImage, 5, stackIndex, intensityStacks{stackIndex})
         end
         this.tracker.addFirstDroplets(roi);
+        
+        dataSize = min(this.tracker.dataSize, segmentStack.size);
+        wbar{i}.Value = 1/dataSize;
 
-        wbar{i}.Value = 1/this.tracker.dataSize;
-
-        for imageIndex = 2:this.tracker.dataSize;
+        for imageIndex = 2:dataSize;
 
             segmentImage = segmentStack.getImage(imageIndex);
             roi = this.segmenter.segment(segmentImage, segmentStack);
@@ -59,7 +60,7 @@ function track(this)
             end
 
             this.tracker.addDroplets(roi);
-            wbar{i}.Value = imageIndex/this.tracker.dataSize;
+            wbar{i}.Value = imageIndex/dataSize;
         end
         saveFile = this.getDropletFile(segmentStack);
         
