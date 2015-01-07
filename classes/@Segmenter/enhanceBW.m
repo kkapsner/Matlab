@@ -19,7 +19,16 @@ function image = enhanceBW(this, image)
         image = ~bwmorph(~image, 'bridge');
     end
     if (this.performThinning)
+        if (this.preserveBorderConnectionsOnThinning)
+            img = zeros(size(image) + 2);
+            img(2:end-1, 2:end-1) = image;
+            image = img;
+            delete img;
+        end
         image = ~bwmorph(~image, 'thin', Inf);
+        if (this.preserveBorderConnectionsOnThinning)
+            image = image(2:end-1,2:end-1);
+        end
     end
 
     if (this.clearBorder)

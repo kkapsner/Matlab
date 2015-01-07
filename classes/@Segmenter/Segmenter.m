@@ -27,6 +27,11 @@ classdef Segmenter < handle & Configable
         % image to make the white areas as big as possible
         performThinning = true
         
+        % if the thinning algorithm is active if a black area that connects
+        % to the image border should be force to connect to it afterwards.
+        % This can introduce border artefacts!
+        preserveBorderConnectionsOnThinning = false
+        
         % whether a extrude algorithm should be proformed on the binary 
         % image to make the black areas bigger
         performExtrude = false
