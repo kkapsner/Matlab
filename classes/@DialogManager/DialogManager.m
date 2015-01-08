@@ -416,13 +416,15 @@ classdef DialogManager < handle
             this.addElement(text, pos);
             
             function removeBorder(varargin)
-                jText = findjobj(text, 'persist');
-                for idx = 1:numel(jText)
-                    jT = jText(idx);
-                    jT.Border = [];
-                    jT.setOpaque(0);
-                    jT.repaint();
-                    delete(l);
+                try
+                    jText = findjobj(text, 'persist');
+                    for idx = 1:numel(jText)
+                        jT = jText(idx);
+                        jT.Border = [];
+                        jT.setOpaque(0);
+                        jT.repaint();
+                        delete(l);
+                    end
                 end
             end
         end

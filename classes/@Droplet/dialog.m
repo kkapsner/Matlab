@@ -110,6 +110,7 @@ function dm = dialog(this, selectionDisplay)
     
     lineH = [];
     lastSelection = false(size(this));
+    lastType = 0;
     function displayValues = getDisplayValues(droplets, index)
         displayType = get(handles.timeCourse.displayTypeSelect, 'value');
         switch displayType
@@ -156,8 +157,9 @@ function dm = dialog(this, selectionDisplay)
     function plotIntensities()
         if (ishandle(handles.timeCourse.figure))
             if (numel(selectionDisplay.selections))
-                selectionChanged = any(lastSelection ~= selectionDisplay.selections{1});
+                selectionChanged = any(lastSelection ~= selectionDisplay.selections{1}) || lastType ~= get(handles.timeCourse.displayTypeSelect, 'value');
                 lastSelection = selectionDisplay.selections{1};
+                lastType = get(handles.timeCourse.displayTypeSelect, 'value');
             else
                 selectionChanged = true;
             end
@@ -168,6 +170,7 @@ function dm = dialog(this, selectionDisplay)
                 end
                 if (numel(selectionDisplay.selections) && any(selectionDisplay.selections{1}))
                     handles.timeCourse.vline.drawApi.removeReorderListener();
+                    handles.timeCourse.vline.drawApi.removeResizeListener();
 
                     d = this(selectionDisplay.selections{1});
                     dropletNumbers = find(selectionDisplay.selections{1});
@@ -203,6 +206,7 @@ function dm = dialog(this, selectionDisplay)
                     end
                     handles.timeCourse.resetMaxZoom();
                     handles.timeCourse.vline.drawApi.setReorderListener();
+                    handles.timeCourse.vline.drawApi.setResizeListener();
                 end
             end
         end

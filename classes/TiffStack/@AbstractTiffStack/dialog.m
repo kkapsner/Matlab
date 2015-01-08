@@ -173,7 +173,7 @@ function dm = dialog(this, waitForClose, segmenter)
     end
 
     function menu = createROIContextMenu()
-        menu = get(handles.display.bwImage, 'uicontextmenu');
+        menu = get(handles.display.axes, 'uicontextmenu');
         if (isempty(menu))
             menu = uicontextmenu('Parent', dm.getFigure(), 'Callback', @callback);
             set(handles.display.bwImage, 'uicontextmenu', menu);

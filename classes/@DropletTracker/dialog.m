@@ -19,7 +19,7 @@ function [varargout] = dialog(tracker)
     );
 
     function dataSizeCallback(value)
-        dataSizeSlider.value = round(value);
+        dataSizeSlider.Value = round(value);
         tracker.dataSize = round(value);
     end
     

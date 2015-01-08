@@ -182,6 +182,8 @@ classdef TiffStackDisplay < handle
             
             menu = uicontextmenu('Parent', Gui.getParentFigure(this.axes));
             set(this.bwImage, 'uicontextmenu', menu);
+            set(this.overlay, 'uicontextmenu', menu);
+            set(this.axes, 'uicontextmenu', menu);
         
             uimenu(menu, 'Label', 'Set brightness/contrast', 'Callback', @setBrightnessContrast);
             
