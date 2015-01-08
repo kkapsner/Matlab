@@ -100,11 +100,11 @@ function [varargout] = dialog(seg)
     dm.show();
     
     function minAreaCallback(~,~)
-        minAreaSlider.value = round(minAreaSlider.value);
-        maxAreaSlider.Min = minAreaSlider.value + 1.6;
+        minAreaSlider.Value = round(minAreaSlider.Value);
+        maxAreaSlider.Min = minAreaSlider.Value + 1.6;
     end
     function maxAreaCallback(~,~)
-        maxAreaSlider.value = round(maxAreaSlider.value);
-        minAreaSlider.Max = maxAreaSlider.value - 1.6;
+        maxAreaSlider.Value = round(maxAreaSlider.Value);
+        minAreaSlider.Max = maxAreaSlider.Value - 1.6;
     end
 end
