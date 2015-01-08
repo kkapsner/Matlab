@@ -31,6 +31,7 @@ function dm = dialog(this, selectionDisplay)
         handles.dm.dependsOn(selectionDisplay.dm);
         handles.dm.open();
         handles.figure = handles.dm.getFigure();
+        set(handles.figure, 'ToolBar', 'figure');
         handles.dm.addPanel();
         handles.axes = axes( ...
             'Parent', handles.dm.currentPanel, ...
@@ -108,6 +109,7 @@ function dm = dialog(this, selectionDisplay)
     end
     
     lineH = [];
+    lastSelection = false(size(this));
     function displayValues = getDisplayValues(droplets, index)
         displayType = get(handles.timeCourse.displayTypeSelect, 'value');
         switch displayType
@@ -153,28 +155,65 @@ function dm = dialog(this, selectionDisplay)
     end
     function plotIntensities()
         if (ishandle(handles.timeCourse.figure))
-            if (~isempty(lineH));
-                delete(lineH);
-                lineH = [];
+            if (numel(selectionDisplay.selections))
+                selectionChanged = any(lastSelection ~= selectionDisplay.selections{1});
+                lastSelection = selectionDisplay.selections{1};
+            else
+                selectionChanged = true;
             end
-            if (numel(selectionDisplay.selections) && any(selectionDisplay.selections{1}))
-                handles.timeCourse.vline.drawApi.removeReorderListener();
-                
-                d = this(selectionDisplay.selections{1});
-                displayValues = getDisplayValues(d);
-                set(handles.timeCourse.axes, 'XLimMode', 'auto', 'YLimMode', 'auto');
-                if (get(handles.timeCourse.displayTypeSelect, 'value') == 7)
+            if (selectionChanged)
+                if (~isempty(lineH));
+                    delete(lineH);
+                    lineH = [];
+                end
+                if (numel(selectionDisplay.selections) && any(selectionDisplay.selections{1}))
+                    handles.timeCourse.vline.drawApi.removeReorderListener();
+
+                    d = this(selectionDisplay.selections{1});
+                    dropletNumbers = find(selectionDisplay.selections{1});
+                    displayValues = getDisplayValues(d);
+                    set(handles.timeCourse.axes, 'XLimMode', 'auto', 'YLimMode', 'auto');
+                    if (get(handles.timeCourse.displayTypeSelect, 'value') == 7)
+                        handles.timeCourse.resetMaxZoom();
+                        return;
+                    end
+                    if (~isempty(displayValues))
+                        
+                        set(handles.timeCourse.axes, 'ColorOrderIndex', 1);
+                        lineH = plot( ...
+                            displayValues, ...
+                            'Parent', handles.timeCourse.axes ...
+                        );
+                        % proper legend entries
+                        for idx = 1:numel(lineH)
+                            set( ...
+                                lineH(idx), ...
+                                'DisplayName', ...
+                                sprintf('Droplet %d', dropletNumbers(idx)), ...
+                                'ButtonDownFcn', @(~,~) highlightDroplet(dropletNumbers(idx))...
+                            );
+                        end
+                        % update legend - the legend position can not be
+                        % preserved...
+                        l = legend(handles.timeCourse.axes);
+                        if (~isempty(l))
+                            delete(l);
+                            legend(handles.timeCourse.axes, 'show');
+                        end
+                    end
                     handles.timeCourse.resetMaxZoom();
-                    return;
+                    handles.timeCourse.vline.drawApi.setReorderListener();
                 end
-                if (~isempty(displayValues))
-                    lineH = plot( ...
-                        displayValues, ...
-                        'Parent', handles.timeCourse.axes ...
-                    );
-                end
-                handles.timeCourse.resetMaxZoom();
-                handles.timeCourse.vline.drawApi.setReorderListener();
+            end
+        end
+    end
+    function highlightDroplet(highlightIdx)
+        selectionDisplay.selections{2} = false(size(selectionDisplay.droplets));
+        selectionDisplay.selections{2}(highlightIdx) = true;
+        start(timer('TimerFcn', @reset, 'StartDelay', 1, 'TasksToExecute', 1, 'StopFcn', @(t, ~)delete(t)));
+        function reset(~,~)
+            try
+                selectionDisplay.selections{2}(highlightIdx) = false;
             end
         end
     end
