@@ -23,7 +23,7 @@ function [varargout] = dialog(seg)
     dm.checkboxHides(computeThreshold, thresholdSlider, true);
     
     %% BW enhancement panel
-    dm.addPanel(5, 'BW enhancements');
+    dm.addPanel(6, 'BW enhancements');
     
     % create controlls
     dm.checkboxHides( ...
@@ -40,8 +40,12 @@ function [varargout] = dialog(seg)
     );
     
     dm.newLine();
-    dm.addPropertyCheckbox('thinning', 'performThinning', {@(w)0, @(w)w});
-    dm.addPropertyCheckbox('clear border', 'clearBorder', {@(w)w/2, @(w)w/2});
+    dm.checkboxHides( ...
+        dm.addPropertyCheckbox('thinning', 'performThinning', {@(w)0, @(w)w/2}), ...
+        dm.addPropertyCheckbox('keep connection to image border', 'preserveBorderConnectionsOnThinning', {@(w)w/2, @(w)w/2}) ... 
+    );
+    dm.newLine();
+    dm.addPropertyCheckbox('clear border', 'clearBorder', {@(w)0, @(w)w});
     
     %% watershed panel
     dm.addPanel(2, 'Watershed');

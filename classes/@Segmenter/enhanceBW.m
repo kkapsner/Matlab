@@ -23,7 +23,7 @@ function image = enhanceBW(this, image)
             img = zeros(size(image) + 2);
             img(2:end-1, 2:end-1) = image;
             image = img;
-            delete img;
+            clear img;
         end
         image = ~bwmorph(~image, 'thin', Inf);
         if (this.preserveBorderConnectionsOnThinning)
