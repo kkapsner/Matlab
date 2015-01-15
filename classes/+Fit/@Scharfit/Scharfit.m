@@ -80,7 +80,6 @@ classdef Scharfit < handle & matlab.mixin.Copyable
                         this.listeners(end + 1) = l;
                     end
                 end
-                this.listeners(end + 1) = addlistener(this, 'scharSize', 'PostSet', @this.newScharSize);
             end
         end
         

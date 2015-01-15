@@ -11,6 +11,10 @@ classdef FitObject < handle
         
         % if only the function body should be used to fit
         useFuncBody = true
+        
+        % if only the function name should be used to fit
+        useFuncName = false
+
         startX = -Inf
         endX = Inf
         startY = -Inf

@@ -52,6 +52,10 @@ function [fitobj, goodness, output, warnstr, errstr, convmsg] = ...
     
     if (obj.useFuncBody)
         func = obj.funcBody;
+    elseif (obj.useFuncName)
+        argumentNames = {obj.arguments.name};
+        callStr = ['(', strjoin(argumentNames, ', '), ')'];
+        func = eval(['@', callStr, char(obj.func), callStr]);
     else
         func = obj.func;
     end
