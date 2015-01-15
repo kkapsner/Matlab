@@ -19,6 +19,13 @@ function args = getFunctionArguments(func)
 
             
         case 'simple'
+            if (isempty(info.file))
+                info.file = which(info.function);
+            end
+            if (isempty(info.file))
+                error('getFunctionArguments:functionFileNotFound', ...
+                    'Unable to find file location');
+            end
             str = fileread(info.file);
             argHead = str(strfind(str, '(') + 1:strfind(str, ')') - 1);
             argHead = regexprep(argHead, '\s*\.{3}.*?(?:\r\n?|\n)\s*', '');
