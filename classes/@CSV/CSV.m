@@ -8,25 +8,31 @@ classdef CSV < handle
             if (nargin < 3)
                 colData = {};
             end
-            if (~iscell(colData))
-                cellData = num2cell(reshape(colData, [], 1));
-            else
-                cellData = reshape(colData, [], 1);
-            end
-            if (numel(this.columns) == 0)
-                this.columns = {colName};
-                this.data = cellData;
-            else
-                if (numel(cellData) ~= size(this.data, 1))
-                    error( ...
-                        'CSV:addColumn:wrongDataSize', ...
-                        'Wrong data size: got %d rows but expected %d.', ...
-                        numel(cellData), ...
-                        size(this.data, 1)...
-                    );
+            if (iscell(colName))
+                for i = 1:numel(colName)
+                    this.addColumn(colName{i}, colData(:, i));
                 end
-                this.columns{end + 1} = colName;
-                this.data(:, end + 1) = cellData;
+            else
+                if (~iscell(colData))
+                    cellData = num2cell(reshape(colData, [], 1));
+                else
+                    cellData = reshape(colData, [], 1);
+                end
+                if (numel(this.columns) == 0)
+                    this.columns = {colName};
+                    this.data = cellData;
+                else
+                    if (numel(cellData) ~= size(this.data, 1))
+                        error( ...
+                            'CSV:addColumn:wrongDataSize', ...
+                            'Wrong data size: got %d rows but expected %d.', ...
+                            numel(cellData), ...
+                            size(this.data, 1)...
+                        );
+                    end
+                    this.columns{end + 1} = colName;
+                    this.data(:, end + 1) = cellData;
+                end
             end
         end
         function this = addTrace(this, traces)
