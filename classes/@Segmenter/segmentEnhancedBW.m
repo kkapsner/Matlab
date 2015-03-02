@@ -35,7 +35,11 @@ function roi = segmentEnhancedBW(seg, image, stack)
 %                         firstCol = 1:h;
 %                         lastRow = ((2:(w-1))*h);
 %                         rImage = rImage ~= imfill(rImage, [firstCol, lastRow, lastRow - h + 1, firstCol + (w-1)*h]', 8);
-                rImage = rImage ~= Image.borderFill(rImage);
+                if (isfinite(seg.watershedHoleThreshold))
+                    rImage = ~Image.fill(rImage, seg.watershedHoleThreshold);
+                else
+                    rImage = rImage ~= Image.borderFill(rImage);
+                end
 %                     rImage = ~imfill(rImage, 8, 'holes');
 
                 dist = Filter.gauss2D(-bwdist(rImage), [1, 1] * seg.watershedFilter, 1);

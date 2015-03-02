@@ -51,6 +51,10 @@ classdef Segmenter < handle & Configable
         % watershed algorithm
         watershedFilter = 8
         
+        % threshold for the size of holes that get removed before
+        % performing the distance measurement for the watershed
+        watershedHoleThreshold = Inf
+        
         % whether white areas touching the border should be removed
         clearBorder = true
         
