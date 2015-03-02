@@ -48,7 +48,7 @@ function [varargout] = dialog(seg)
     dm.addPropertyCheckbox('clear border', 'clearBorder', {@(w)0, @(w)w});
     
     %% watershed panel
-    dm.addPanel(2, 'Watershed');
+    dm.addPanel(3, 'Watershed');
     
     % create controlls
     performWatershed = dm.addPropertyCheckbox('perform', 'performWatershed', [0 0 80 20]);
@@ -74,7 +74,7 @@ function [varargout] = dialog(seg)
         [130, 0, dm.innerWidth - 130, 20] ...
     );
     dm.checkboxHides(performWatershed, watershedHoleThresholdText);
-    dm.checkboxHides(performWatershed, watershedHoleThresholdrSlider);
+    dm.checkboxHides(performWatershed, watershedHoleThresholdSlider);
 
     dm.newLine();
     
