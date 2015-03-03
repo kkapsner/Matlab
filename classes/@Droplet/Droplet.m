@@ -136,6 +136,8 @@ classdef Droplet < handle & Selectable
         
         droplet = trackByHand(this)
         
+        droplet = merge(this)
+        
         display = displaySelection(this)
     end
     
