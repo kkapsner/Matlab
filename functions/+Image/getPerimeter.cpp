@@ -391,7 +391,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
         }
     }
     
-    /* lsat column */
+    /* last column */
     for (int x = w - 1, y = 1; y < h - 1; y++){
         if (img(0, 0)){
             if (!img(0, -1)){
@@ -534,9 +534,10 @@ void mexFunction( int nlhs, mxArray *plhs[],
 
     /* Create matrix for the return argument. */
 	/* very edge is counted twice therefore p has to be divided by 2 */
-    /* the correction factor taken from Z. Kulpa, Area and perimeter measurement
-     * of blobs in discrete binary pictures. Comput. Graph. Image Process,
-     * 6:434-451, 1977, doi:10.1016/s0146-664X(77)80021-x*/
+    /* the correction factor taken from Z. Kulpa, Area and perimeter
+     * measurement of blobs in discrete binary pictures. Comput. Graph.
+     * Image Process, 6:434-451, 1977,
+	 * doi:10.1016/s0146-664X(77)80021-x */
 //     plhs[0] = mxCreateDoubleMatrix(1, 1, mxREAL);
 //     mxGetPr(plhs[0])[0] = p/2 * 0.94805944896851993568481554666752; //pi/8*(1+sqrt(2))
     plhs[0] = mxCreateDoubleScalar(p/2 * 0.94805944896851993568481554666752);

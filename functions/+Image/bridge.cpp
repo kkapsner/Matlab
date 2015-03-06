@@ -38,16 +38,16 @@ void mexFunction( int nlhs, mxArray *plhs[],
             if (!outImage[idx]){
                 mxLogical a, a1, b, c, c1, d, e, e1, f, g, g1, h;
                 /*
-                 * the neighbourhood of the current pixel (indicated by an 
-                 * X) look as follows:
+                 * the neighbourhood of the current pixel (indicated by 
+                 * an X) look as follows:
 				 *      a1
                  *    h a b
                  * g1 g X c c1
                  *    f e d
 				 *      e1
-                 * a, c, e and g are a combined with a1, c1, e1 and g1 in a
-				 * second check round. This makes the algorithm a TWO pixel
-				 * bridge algorithm.
+                 * a, c, e and g are a combined with a1, c1, e1 and g1
+				 * in a second check round. This makes the algorithm a
+				 * TWO pixel bridge algorithm.
                  */
                 a  = image[idx - 1];
 				a1 = a|image[idx - 2];
@@ -70,8 +70,8 @@ void mexFunction( int nlhs, mxArray *plhs[],
                 h  = image[idx - 1 - height];
                 
                 /*
-                 * The bridge has to be build if there is a color change on
-                 * two opposit corner of the 3x3 matrix shown above.
+                 * The bridge has to be build if there is a color change
+                 * on two opposit corner of the 3x3 matrix shown above.
                  * 
                  * A color change is detected as the following patterns
                  * (the X indicates the center pixel a hyphen ("-")
