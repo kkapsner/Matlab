@@ -1,4 +1,9 @@
 function this = add3DData(this, xName, x, yName, y, zName, z, varargin)
+% CSV.ADD3DDATA 3D data to the CSV
+%   
+%   CSV.ADD3DDATA(xName, x, yName, y, zName, z)
+%   CSV.ADD3DDATA(x, y, z) is the same as
+%       CSV.ADD3DDATA('x', x, 'y', y, 'z', z)
     if (nargin == 4)
         z = yName;
         y = x;
