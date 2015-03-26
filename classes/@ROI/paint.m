@@ -38,9 +38,6 @@ function dm = paint(this)
     display.overlayColors = [1, 0.5, 0];
     display.overlayImage = {paintBW};
     dm.show();
-    dm.wait();
-    this.PixelIdxList = find(paintBW);
-    this.resetProperties();
     
     function startPaint()
         if (paintMode)
@@ -63,6 +60,8 @@ function dm = paint(this)
     function stopPaint()
         if (paintMode)
             painting = -1;
+            this.PixelIdxList = find(paintBW);
+            this.resetProperties();
         end
     end
     
@@ -76,7 +75,7 @@ function dm = paint(this)
                 shape = impoly(display.axes);
         end
         
-        shape.wait();
+        wait(shape);
         if (isvalid(shape))
             shapeMask = shape.createMask(display.bwImage);
             if (paint)
@@ -86,6 +85,8 @@ function dm = paint(this)
             end
             delete(shape);
             display.overlayImage = {paintBW};
+            this.PixelIdxList = find(paintBW);
+            this.resetProperties();
         end
     end
     

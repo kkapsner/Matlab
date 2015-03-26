@@ -183,6 +183,7 @@ classdef ROI < Selectable & Binable & handle
         function initialiseProperties(this)
             for o = this
 %                 if (isempty(o.subY))
+                if ~isempty(o.PixelIdxList)
                     [o.subY, o.subX, data] = ...
                         getSub([o.height, o.width], o.PixelIdxList);
                     o.minY = data(1);
@@ -190,6 +191,7 @@ classdef ROI < Selectable & Binable & handle
                     o.minX = data(4);
                     o.maxX = data(5);
                     o.Centroid = [data(6), data(3)];
+                end
                     
 %                     [o.subY, o.subX] = ind2sub2D([o.height, o.width], o.PixelIdxList);
 %                     [o.minX, o.maxX] = minmax(o.subX);
@@ -344,6 +346,13 @@ classdef ROI < Selectable & Binable & handle
         function resetProperties(this)
             for o = this
                 o.Area = numel(o.PixelIdxList);
+                o.subX = [];
+                o.subY = [];
+                o.minX = [];
+                o.minY = [];
+                o.maxX = [];
+                o.maxY = [];
+                o.Centroid = [];
                 o.initialiseProperties();
                 o.EquivDiameter_ = [];
                 o.Image_ = [];
@@ -365,6 +374,11 @@ classdef ROI < Selectable & Binable & handle
                 this.Area = numel(this.PixelIdxList);
             end
             o.initialiseProperties();
+        end
+        
+        function o = create(stack)
+            o = ROI([], stack.width, stack.height, stack);
+            o.paint();
         end
     end
 end
