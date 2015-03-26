@@ -16,10 +16,12 @@ function dm = paint(this)
     display.overlayVisible = true;
     
     dm.addPanel(1);
-    dm.addButton('paint circle', 80, @(~,~)startCircle());
+    shapePopup = dm.addPopupmenu({'circle', 'rectangle', 'polygon'}, 80);
+    dm.addButton('paint', [85 0 40], @(~,~)paintShape(true));
+    dm.addButton('erase', [130 0 40], @(~,~)paintShape(false));
     stackSelect = dm.addPopupmenu( ...
         arrayfun(@(s)s.char(), [this.segmentationStack, this.intensityStacks{:}], 'UniformOutput', false), ...
-        {@(w)80, @(w)w-80}, ...
+        {@(w)170, @(w)w-170}, ...
         @hStackSelectCallback ...
     );
     function hStackSelectCallback(~, ~)
@@ -64,12 +66,25 @@ function dm = paint(this)
         end
     end
     
-    function startCircle()
-        c = imellipse(display.axes);
-        c.wait();
-        if (isvalid(c))
-            paintBW = paintBW | c.createMask(display.bwImage);
-            delete(c);
+    function paintShape(paint)
+        switch (shapePopup.Value)
+            case 1
+                shape = imellipse(display.axes);
+            case 2
+                shape = imrect(display.axes);
+            case 3
+                shape = impoly(display.axes);
+        end
+        
+        shape.wait();
+        if (isvalid(shape))
+            shapeMask = shape.createMask(display.bwImage);
+            if (paint)
+                paintBW = paintBW | shapeMask;
+            else
+                paintBW = paintBW & ~shapeMask;
+            end
+            delete(shape);
             display.overlayImage = {paintBW};
         end
     end
