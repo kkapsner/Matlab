@@ -25,11 +25,17 @@ void mexFunction( int nlhs, mxArray *plhs[],
     if (mxGetM(prhs[0]) * mxGetN(prhs[0]) != 2){
 		mexErrMsgIdAndTxt( "MATLAB:getSub:wrongSize",
 				"First input must have size 2.");
-	};
+	}
     size = mxGetPr(prhs[0]);
     h = mxGetM(prhs[1]);
     w = mxGetN(prhs[1]);
     ind = mxGetPr(prhs[1]);
+	dataSize = w*h;
+	
+	if (dataSize == 0){
+		mexErrMsgIdAndTxt( "MATLAB:getSub:wrongSize",
+				"The index array must not be empty.");
+	}
 
     /* Create matrix for the return argument. */
     plhs[0] = mxCreateDoubleMatrix(h, w, mxREAL);
@@ -45,7 +51,6 @@ void mexFunction( int nlhs, mxArray *plhs[],
 		}
 	}
 	
-	dataSize = w*h;
 	minX = xInd[0];
 	maxX = xInd[0];
 	sumX = xInd[0];
