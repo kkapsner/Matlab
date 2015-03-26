@@ -339,6 +339,26 @@ classdef ROI < Selectable & Binable & handle
         d = Droplet(this, dataSize, currentIndex)
     end
     
+    
+    methods (Access=private)
+        function resetProperties(this)
+            for o = this
+                o.Area = numel(o.PixelIdxList);
+                o.initialiseProperties();
+                o.EquivDiameter_ = [];
+                o.Image_ = [];
+                o.ConcaveImage_ = [];
+                o.Perimeter_ = [];
+                o.MajorAxisLength_ = [];
+                o.MinorAxisLength_ = [];
+                o.Eccentricity_ = [];
+                o.Orientation_ = [];
+                o.Cyclicity_ = [];
+                o.Concavity_ = [];
+            end
+        end
+    end
+    
     methods (Static)
         function o = loadobj(o)
             for this = o

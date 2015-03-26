@@ -24,6 +24,8 @@ function dm = dialog(this)
     image(TiffStackDisplay.mat2rgb(concaveImage, [1, 0, 0]), 'Parent', ax, 'AlphaData', 0.5 * concaveImage);
     axis(ax, 'off');
     
+    dm.addPanel(1);
+    dm.addButton('save to workspace', @(w)w, @(~,~)assignin('base', 'regionOfInterest', this));
     
     dm.addPanel(6, 'First order properties');
     
