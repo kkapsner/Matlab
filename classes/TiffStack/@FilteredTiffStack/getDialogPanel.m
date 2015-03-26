@@ -1,4 +1,4 @@
-function panel = getDialogPanel(this, dm, changeCallback)
+function panel = getDialogPanel(this, dm, handles)
 %GETDIALOGPANEL
     panel = dm.addPanel(1);
     try
@@ -39,7 +39,7 @@ function panel = getDialogPanel(this, dm, changeCallback)
         high = get(handles.highCutOff, 'Value');
         
         this.setCutOffs([low high]);
-        changeCallback();
+        handles.update();
     end
 end
 

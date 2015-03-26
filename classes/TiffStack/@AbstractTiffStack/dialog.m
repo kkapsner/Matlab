@@ -56,8 +56,8 @@ function dm = dialog(this, waitForClose, segmenter)
         lastROI = [];
         createROIContextMenu();
     end
-    
-    this.getDialogPanel(dm, @updateImage);
+    handles.update = @updateImage;
+    this.getDialogPanel(dm, handles);
 
     %% create image index slider
     dm.addPanel(1);
@@ -107,7 +107,7 @@ function dm = dialog(this, waitForClose, segmenter)
 
     function image = getBWImage(image)
         if (~isempty(segmenter))
-            lastROI = segmenter.segment(image);
+            lastROI = segmenter.segment(image, this);
             dm.api.lastROI = lastROI;
             
 %             assignin('base', 'classificationData', lastROI);

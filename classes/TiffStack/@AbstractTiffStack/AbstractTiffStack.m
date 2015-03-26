@@ -8,6 +8,9 @@ classdef (Abstract) AbstractTiffStack  < handle & matlab.mixin.Heterogeneous
         cachedIndex = []
         cachedImage = []
     end
+    events
+        cacheCleared
+    end
     
     properties(Dependent)
         size
@@ -55,6 +58,7 @@ classdef (Abstract) AbstractTiffStack  < handle & matlab.mixin.Heterogeneous
             
             this.cachedIndex = [];
             this.cachedImage = [];
+            this.notify('cacheCleared');
         end
         
         [panel] = getDialogPanel(this, dm, changeCallback)

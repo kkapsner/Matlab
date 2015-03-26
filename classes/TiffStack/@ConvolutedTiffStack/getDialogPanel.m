@@ -1,4 +1,4 @@
-function panel = getDialogPanel(this, dm, changeCallback)
+function panel = getDialogPanel(this, dm, ~)
 %GETDIALOGPANEL
     panel = dm.addPanel(1);
     
