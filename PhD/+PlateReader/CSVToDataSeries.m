@@ -1,6 +1,7 @@
-function [varargout] = PlateReaderCSVToDataSeries(file)
+function [varargout] = CSVToDataSeries(file)
     % semicolon as value separator
-    lines = file.readLines(';');
+    lines = file.readLines();
+    lines = cellfun(@(line) regexp(line, ';', 'split'), lines, 'Uniform', false);
     
     timeLine = lines{6};
     dataLength = numel(timeLine);
@@ -9,10 +10,12 @@ function [varargout] = PlateReaderCSVToDataSeries(file)
     for item = timeLine
         if (j > 0) && (j <= dataLength - 4)
             % comma as decimal point
-            item = regexp(item{1}, '^.*-\s', 
-            parts = sscanf(item{1}, '%d h %d min');
+            timePart = regexprep(item{1}, '^.*-\s*', '');
+            parts = sscanf(timePart, '%d h %d min');
             if (isempty(parts))
-                parts = sscanf(item{1}, '%d h');
+                parts = sscanf(timePart, '%d h');
+                parts(2) = 0;
+            elseif (numel(parts) == 1)
                 parts(2) = 0;
             end
             time(j) = parts(1) * 3600 + parts(2) * 60;
