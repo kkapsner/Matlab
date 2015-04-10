@@ -37,6 +37,10 @@ function dm = paint(this)
     set(display.overlay, 'ButtonDownFcn', @imageButtonDown, 'Hit', 'on');
     display.overlayColors = [1, 0.5, 0];
     display.overlayImage = {paintBW};
+    
+    dm.addPanel(1);
+    display.createIndexSlider(dm);
+    
     dm.show();
     
     function startPaint()
