@@ -11,17 +11,16 @@ classdef ResampledTrace < TraceDecorator & handle
     methods
         function this = ResampledTrace(trace)
             if (nargin == 0)
-                trace = [];
+            else
+                this = this@TraceDecorator(trace);
+                this.registerListeners();
             end
-            
-            this = this@TraceDecorator(trace);
-            this.registerListeners(this);
         end
         
         function registerListeners(this)
             for i = 1:numel(this)
                 rTrace = this(i);
-                l = addlistener(trace(i), 'change', @rTrace.resetResampled);
+                l = addlistener(rTrace.trace, 'change', @rTrace.resetResampled);
                 addlistener(rTrace, 'ObjectBeingDestroyed', @(~,~)delete(l));
                 addlistener(rTrace, 'resampledTime', 'PostSet', @rTrace.resetResampled);
             end

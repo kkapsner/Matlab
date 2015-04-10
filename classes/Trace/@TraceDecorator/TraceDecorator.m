@@ -15,6 +15,7 @@ classdef (Abstract) TraceDecorator < AbstractTrace & handle
                     for i = 1:numel(trace)
                         this(i) = feval(c);
                         this(i).trace = trace{i};
+                        this(i).registerListeners();
                     end
                 elseif (numel(trace) == 1)
                     this.trace = trace;
@@ -69,6 +70,7 @@ classdef (Abstract) TraceDecorator < AbstractTrace & handle
     
     methods (Abstract)
         dm = propertyDialog(this, container)
+        registerListeners(this)
     end
     
 %     methods (Abstract, Static)

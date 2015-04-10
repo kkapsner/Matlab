@@ -13,30 +13,54 @@ classdef CalculationTrace < AbstractTrace & handle
     
     methods
         function this = CalculationTrace(trace1, operation, trace2)
-            
-            this.trace1 = trace1;
-            this.operation = operation;
-            if ( ...
-                numel(trace1.time) ~= numel(trace2.time) || ...
-                any(trace1.time ~= trace2.time) ...
-            )
-                trace2 = ResampledTrace(trace2);
-                trace2.setResampledTime(trace1.time);
+            if (nargin > 0)
+                num1 = numel(trace1);
+                num2 = numel(trace2);
+                if (num1 == 1 && num2 == 1)
+                    this.trace1 = trace1;
+                    this.operation = operation;
+                    if ( ...
+                        numel(trace1.time) ~= numel(trace2.time) || ...
+                        any(trace1.time ~= trace2.time) ...
+                    )
+                        trace2 = ResampledTrace(trace2);
+                        trace2.setResampledTime(trace1.time);
+                    end
+                    this.trace2 = trace2;
+
+                    this.registerListeners();
+                elseif (num1 == 1 && num2 ~= 1)
+                    this(num2) = CalculationTrace();
+                    for i = 1:num2
+                        this(i) = CalculationTrace(trace1, operation, trace2(i));
+                    end
+                elseif (num1 ~= 1 && num2 == 1)
+                    this(num1) = CalculationTrace();
+                    for i = 1:num1
+                        this(i) = CalculationTrace(trace1(i), operation, trace2);
+                    end
+                elseif (num1 ~= 1 && num2 ~= 1 && num1 == num2)
+                    this(num1) = CalculationTrace();
+                    for i = 1:num1
+                        this(i) = CalculationTrace(trace1(i), operation, trace2(i));
+                    end
+                else
+                    error('CalculationTrace:dimensionMissmatch', 'Number of traces have to match.');
+                end
             end
-            this.trace2 = trace2;
-            
-            this.registerListeners();
         end
         
         function registerListeners(this)
+            for i = 1:numel(this)
+                trace = this(i);
             
-            
-            l = [ ...
-                addlistener(this.trace1, 'change', @this.resetCalculated), ...
-                addlistener(this.trace2, 'change', @this.resetCalculated) ...
-            ];
-            
-            addlistener(this, 'ObjectBeingDestroyed', @(~,~)delete(l));
+                l = [ ...
+                    addlistener(trace.trace1, 'change', @this.resetCalculated), ...
+                    addlistener(trace.trace2, 'change', @this.resetCalculated) ...
+                ];
+
+                addlistener(trace, 'ObjectBeingDestroyed', @(~,~)delete(l));
+            end
         end
         
         function time = getTime(this)
