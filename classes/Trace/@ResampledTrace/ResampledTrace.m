@@ -11,10 +11,11 @@ classdef ResampledTrace < TraceDecorator & handle
     methods
         function this = ResampledTrace(trace)
             if (nargin == 0)
-            else
-                this = this@TraceDecorator(trace);
-                this.registerListeners();
+                trace = [];
             end
+            
+            this = this@TraceDecorator(trace);
+            this.registerListeners();
         end
         
         function registerListeners(this)
