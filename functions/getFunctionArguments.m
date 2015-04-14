@@ -14,7 +14,7 @@ function args = getFunctionArguments(func)
     switch info.type
         case 'anonymous'
             str = info.function;
-            argHead = str(3:strfind(str, ')')-1);
+            argHead = str((strfind(str, '@(') + 2):(strfind(str, ')')-1));
             args = regexp(argHead, '\s*,\s*', 'split');
 
             
