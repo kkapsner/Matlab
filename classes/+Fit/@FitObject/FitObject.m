@@ -183,6 +183,8 @@ classdef FitObject < handle
         z = feval2D(obj, x, y)
         h = plot(obj, x, varargin)
         str = getTextResult(this)
+        
+        result = guiFitToGraph(this, graph)
         % converter
         str = char(obj)
     end
