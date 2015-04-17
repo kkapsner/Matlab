@@ -9,6 +9,7 @@ classdef TiffStackDisplay < handle
         minIntensity = 0
         maxIntensity = 255
         autoStrechIntensity = true
+        ignoreLowAndHigh = 0.02
         
         overlayColors = [];
     end
@@ -75,7 +76,9 @@ classdef TiffStackDisplay < handle
             addlistener(this, 'minIntensity', 'PostSet', @refreshImage);
             addlistener(this, 'maxIntensity', 'PostSet', @refreshImage);
             addlistener(this, 'autoStrechIntensity', 'PostSet', @refreshImage);
+            addlistener(this, 'ignoreLowAndHigh', 'PostSet', @refreshImage);
             addlistener(this, 'overlayVisible', 'PostSet', @updateOverlayVisible);
+            refreshImage();
             
             function updateOverlayVisible(~,~)
                 if (this.overlayVisible)
@@ -142,7 +145,12 @@ classdef TiffStackDisplay < handle
             image = double(this.stack.getImage(this.currentImageIndex));
             if (this.autoStrechIntensity)
                 this.setEvent = false;
-                [this.minIntensity, this.maxIntensity] = minmax(image(:));
+                if (this.ignoreLowAndHigh > 0)
+                    this.minIntensity = quantile(image(:), this.ignoreLowAndHigh);
+                    this.maxIntensity = quantile(image(:), 1 - this.ignoreLowAndHigh);
+                else
+                    [this.minIntensity, this.maxIntensity] = minmax(image(:));
+                end
                 this.setEvent = true;
             end 
             
@@ -211,8 +219,10 @@ classdef TiffStackDisplay < handle
                 updateHist();
                 
                 dm.addPanel(3);
-                dm.addPropertyCheckbox('auto strech', 'autoStrechIntensity', {@(w)0, @(w)(w/2)});
-                dm.addButton('auto strech all', {@(w)w/2, @(w)w/2}, @autoStrechAll);
+                dm.addPropertyCheckbox('auto strech', 'autoStrechIntensity', {@(w)0, @(w)(w/2-150)});
+                dm.addText('ignore quantile', {@(w)w/2 - 150, @(w)100});
+                dm.addPropertyInput('ignoreLowAndHigh', {@(w)w/2 - 50, @(w)100});
+                dm.addButton('auto strech all', {@(w)w/2+50, @(w)w/2-50}, @autoStrechAll);
                 dm.newLine();
                 dm.addText('min', 40);
                 dm.addPropertySlider('minIntensity', mi, ma, {@(w)40, @(w)w-40});
