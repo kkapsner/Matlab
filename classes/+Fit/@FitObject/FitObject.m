@@ -225,6 +225,9 @@ classdef FitObject < handle
                         end
                     end
                 end
+                if (strcmp(list, 'independent'))
+                    obj.(list) = sort(obj.(list));
+                end
             end
         end
         
