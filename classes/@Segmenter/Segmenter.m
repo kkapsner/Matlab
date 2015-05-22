@@ -62,7 +62,7 @@ classdef Segmenter < handle & Configable
         areaRange = [-Inf, Inf]
         
         % additional filters for the segmentation
-        filters
+        filters = SegmentFilter.empty()
     end
     
     methods

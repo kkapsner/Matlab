@@ -1,4 +1,4 @@
-classdef SegmentFilter < handle & Abstract.Filter
+classdef SegmentFilter < handle & Abstract.Filter & ConfigableProperty
     properties (SetAccess=protected)
         property
         range = [0, 1]
@@ -59,6 +59,18 @@ classdef SegmentFilter < handle & Abstract.Filter
                 isnumeric(range) && ...
                 numel(range) == 2 && ...
                 range(1) <= range(2);
+        end
+    end
+    
+    % ConfigableProperty interface
+    methods
+        function str = toConfigString(this)
+            str = this.toJSON();
+        end
+    end
+    methods (Static)
+        function obj = fromConfigString(str)
+            obj = JSON.parse(str);
         end
     end
 end
