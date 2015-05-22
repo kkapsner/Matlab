@@ -290,11 +290,27 @@ classdef ROI < Selectable & Binable & handle
             end
         end
         
-        function sameColor = separateToColorize(this, numColors, colorDist)
+        function image = toSeparateColorImage(this, numColors, colorDist)
             if (nargin < 2)
-                numColors = 20;
+                numColors = [];
             end
             if (nargin < 3)
+                colorDist = [];
+            end
+            
+            colorROIS = this.separateToColorize(numColors, colorDist);
+            colors = hsv(numel(colorROIS));
+            image = [];
+            for colorIdx = 1:numel(colorROIS)
+                image = colorROIS{colorIdx}.toImage(image, colors(colorIdx, :));
+            end
+        end
+        
+        function sameColor = separateToColorize(this, numColors, colorDist)
+            if (nargin < 2 || isempty(numColors))
+                numColors = 20;
+            end
+            if (nargin < 3 || isempty(colorDist))
                 colorDist = 5;
             end
             
