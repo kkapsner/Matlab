@@ -9,9 +9,10 @@ classdef Configable < handle
     %   see also: ConfigFile
     
     methods(Access=private)
-        function props = getProperties(obj)
+        function [props, defaults] = getProperties(obj)
             props_ = properties(obj);
             props = cell(size(props_));
+            defaults = cell(size(props_));
             j = 0;
             for i = 1:numel(props_)
                 prop = props_{i};
@@ -19,6 +20,7 @@ classdef Configable < handle
                 if (~mp.Transient && ~mp.Dependent && ~mp.Constant)
                     j = j + 1;
                     props{j} = prop;
+                    defaults{j} = mp.DefaultValue;
                 end
             end
             props = props(1:j);
@@ -49,13 +51,17 @@ classdef Configable < handle
                 end
             end
             
-            props = obj.getProperties();
+            [props, defaults] = obj.getProperties();
             
             for i = 1:numel(props)
                 prop = props{i};
                 if isfield(s, prop)
                     value = s.(prop);
-                    if ischar(value) && all(regexpi(value, '^([+-]?\d+(?:\.\d*)?(?:e[+-]?\d+)?\|)+$') == 1)
+                    if (isa(defaults{i}, 'ConfigableProperty'))
+                        value = feval( ...
+                            sprintf('%s.fromConfigString', class(defaults{i})), value ...
+                        );
+                    elseif ischar(value) && all(regexpi(value, '^([+-]?\d+(?:\.\d*)?(?:e[+-]?\d+)?\|)+$') == 1)
                         value = sscanf(value, '%g|')';
                     end
                     obj.(prop) = value;
@@ -91,6 +97,8 @@ classdef Configable < handle
                 value = obj.(prop);
                 if isnumeric(value) && isvector(value) && ~isscalar(value)
                     value = sprintf('%g|', value);
+                elseif isa(value, 'ConfigableProperty')
+                    value = value.toConfigString();
                 end
                 
                 if isscalar(value) || (ischar(value) && isvector(value))
