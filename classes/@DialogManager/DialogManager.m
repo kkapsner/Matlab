@@ -257,6 +257,7 @@ classdef DialogManager < handle
                 panel.BackgroundColor = this.container.Color;
             else
                 panel.BackgroundColor = this.container.BackgroundColor;
+                this.bindBackgroundColorToParent(panel);
             end
             
             this.remainingHeight = this.remainingHeight - this.innerPadding;
@@ -353,9 +354,20 @@ classdef DialogManager < handle
                 if (~isempty(dynX))
                     element.Position(1) = dynX(parentWidth);
                 end
-                element.Position(3) = dynWidth(parentWidth);
+                element.Position(3) = max(1, dynWidth(parentWidth));
             end
         end
+        
+        function bindBackgroundColorToParent(~, element)
+            parent = get(element, 'Parent');
+            addlistener(parent, 'BackgroundColor', 'PostSet', @setBackgroundColor);
+            setBackgroundColor();
+            function setBackgroundColor(~,~)
+                set(element, 'BackgroundColor', get(parent, 'BackgroundColor'));
+            end
+        end
+        
+        % add... functions
         
         function addElement(this, element, pos)
             if (nargin < 3)
@@ -402,7 +414,6 @@ classdef DialogManager < handle
             text = handle( ...
                 uicontrol( ...
                     'Parent', this.currentPanel, ...
-                    'BackgroundColor', this.currentPanel.BackgroundColor, ...
                     'Style', 'edit', ...'text', ...
                     'Enable', 'inactive', ...
                     'String', str, ...
@@ -411,6 +422,7 @@ classdef DialogManager < handle
                     'HorizontalAlignment', 'left' ...
                 ) ...
             );
+            this.bindBackgroundColorToParent(text);
             
             l = addlistener(this, 'showWin', @removeBorder); 
             this.addElement(text, pos);
@@ -446,7 +458,7 @@ classdef DialogManager < handle
             [prop, propIndex, value] = this.parsePropName(prop, obj);
             
             box = this.addCheckbox(str, value, pos, @callback);
-            this.listen(prop, @reverseCallback, obj);
+            this.listen(prop, @reverseCallback, obj, box);
             function callback(value)
                 obj.(prop)(propIndex) = value;
                 if (value)
@@ -470,7 +482,6 @@ classdef DialogManager < handle
             
             box = handle(uicontrol( ...
                 'Parent', this.currentPanel, ...
-                'BackgroundColor', this.currentPanel.BackgroundColor, ...
                 'Style', 'checkbox', ...
                 'String', str, ...
                 'Value', value, ...
@@ -478,6 +489,7 @@ classdef DialogManager < handle
                 ...'Position', pos, ...
                 ...'Callback', @callback, ...
             ));
+            this.bindBackgroundColorToParent(box);
             addlistener(box, 'Value', 'PostSet', @callback);
             this.addElement(box, pos);
             
@@ -524,7 +536,7 @@ classdef DialogManager < handle
             end
             
             slider = this.addSlider(value, minValue, maxValue, pos, @callback);
-            this.listen(prop, @reverseCallback, obj);
+            this.listen(prop, @reverseCallback, obj, slider);
             function callback(value)
                 obj.(prop)(propIndex) = a * value;
                 userCallback(value);
@@ -552,7 +564,6 @@ classdef DialogManager < handle
             maxValue = max(maxValue, value);
             slider = handle(uicontrol( ...
                 'Parent', this.currentPanel, ...
-                ...'BackgroundColor', panel.BackgroundColor, ...
                 'Style', 'slider', ...
                 'Min', minValue, ...
                 'Value', value, ...
@@ -562,6 +573,7 @@ classdef DialogManager < handle
                 ...'Position', pos, ...
                 'HandleVisibility', 'off' ...
             ));
+%             this.bindBackgroundColorToParent(slider);
             this.addElement(slider, pos);
             
             Gui.addSliderContextMenu(slider);
@@ -598,7 +610,7 @@ classdef DialogManager < handle
             
             isnum = isnumeric(value);
             input = this.addInput(value, pos, @callback);
-            this.listen(prop, @reverseCallback, obj);
+            this.listen(prop, @reverseCallback, obj, input);
             
             function callback(value)
                 obj.(prop)(propIndex) = value;
@@ -756,7 +768,7 @@ classdef DialogManager < handle
             popupmenu = this.addPopupmenu(str, pos, @callback);
             popupmenu.Value = value;
             
-            this.listen(prop, @reverseCallback, obj);
+            this.listen(prop, @reverseCallback, obj, popupmenu);
             
             function callback(value)
                 obj.(prop) = value;
@@ -801,6 +813,20 @@ classdef DialogManager < handle
                         struct('Object', popupmenu) ...
                     ));
                 end
+            end
+        end
+        
+        
+        function connectRangeSliders(~, lowerSlider, upperSlider)
+            addlistener(lowerSlider, 'Value', 'PostSet', @setUpperMin);
+            addlistener(upperSlider, 'Value', 'PostSet', @setLowerMax);
+            setUpperMin();
+            setLowerMax();
+            function setUpperMin(~,~)
+                set(upperSlider, 'Min', get(lowerSlider, 'Value'));
+            end
+            function setLowerMax(~,~)
+                set(lowerSlider, 'Max', get(upperSlider, 'Value'));
             end
         end
         
@@ -853,14 +879,18 @@ classdef DialogManager < handle
             end
         end
         
-        function listen(this, prop, func, obj)
+        function listener = listen(this, prop, func, obj, involvedElement)
             if (nargin < 4 || isempty(obj))
                 obj = this.obj;
             end
             try
-                this.addDeleteListener( ...
-                    addlistener(obj, prop, 'PostSet', func) ...
-                );
+                listener = addlistener(obj, prop, 'PostSet', func);
+                this.addDeleteListener(listener);
+            catch
+                listener = [];
+            end
+            if (nargin > 4 && ~isempty(involvedElement))
+                addlistener(involvedElement, 'ObjectBeingDestroyed', @(~,~)delete(listener));
             end
         end
         
