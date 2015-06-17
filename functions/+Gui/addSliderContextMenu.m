@@ -174,24 +174,39 @@ function menu = addSliderContextMenu(slider, menu)
     end
 
     %% enable scroll wheel
+    wheelHandler = get(f, 'WindowScrollWheelFcn');
+    if (iscell(wheelHandler))
+        wheelHandler{end + 1} = @scrollWheel;
+    elseif (isa(wheelHandler,'function_handle'))
+        wheelHandler = {@wheel, wheelHandler, @scrollWheel};
+    else
+        wheelHandler = {@wheel, @scrollWheel};
+    end
+    set(f, 'WindowScrollWheelFcn', wheelHandler)
     
-    oldWindowScrollWheel = get(f, 'WindowScrollWheelFcn');
-    set(f, 'WindowScrollWheelFcn', @scrollWheel)
-    
-    function scrollWheel(hObject,eventData)
-        if (isa(oldWindowScrollWheel, 'function_handle'))
-            oldWindowScrollWheel(hObject, eventData);
+    function wheel(hObject,eventData, varargin)
+        for i = 1:numel(varargin)
+            varargin{i}(hObject, eventData);
         end
-        if (Gui.isMouseOver(slider))
-            range = slider.Max - slider.Min;
-            steps = slider.SliderStep;
-            newValue = slider.Value +  steps(1) * range * eventData.VerticalScrollCount;
-            if (newValue < slider.Min)
-                newValue = slider.Min;
-            elseif (newValue > slider.Max)
-                newValue = slider.Max;
+    end
+    
+    function scrollWheel(~,eventData)
+        if (ishghandle(slider) && isvalid(slider))
+            if (Gui.isMouseOver(slider))
+                range = slider.Max - slider.Min;
+                steps = slider.SliderStep;
+                newValue = slider.Value +  steps(1) * range * eventData.VerticalScrollCount;
+                if (newValue < slider.Min)
+                    newValue = slider.Min;
+                elseif (newValue > slider.Max)
+                    newValue = slider.Max;
+                end
+                slider.Value = newValue;
             end
-            slider.Value = newValue;
+        else
+            currentWheelHandler = get(f, 'WindowScrollWheelFcn');
+            filter = cellfun(@(f)~isequal(f, @scrollWheel), currentWheelHandler);
+            set(f, 'WindowScrollWheelFcn', currentWheelHandler(filter));
         end
     end
 end
