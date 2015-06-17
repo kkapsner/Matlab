@@ -1,10 +1,12 @@
 classdef SegmentFilter < handle & Abstract.Filter & ConfigableProperty
-    properties (SetAccess=protected)
+    properties (SetObservable)
         property
+    end
+    properties (SetAccess=protected)
         range = [0, 1]
     end
     
-    properties (Dependent)
+    properties (Dependent,SetObservable)
         lowerRangeLimit
         upperRangeLimit
     end
