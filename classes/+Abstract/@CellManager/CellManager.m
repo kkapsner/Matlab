@@ -12,6 +12,8 @@ classdef (Abstract) CellManager < handle
     events
         entryAdded
         entryRemoved
+        winClose
+        winOpen
     end
     
     methods

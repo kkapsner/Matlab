@@ -1,18 +1,17 @@
-classdef StackManager < handle
+classdef StackManager < Abstract.CellManager
     %STACKMANAGER a GUI for managing stacks
-    %   Detailed explanation goes here
     
     properties(SetObservable)
-        title
-        stacks
-    end
-    properties(Access=protected)
-        handles
+        preselect
     end
     
     events
         stackAdded
         stackRemoved
+    end
+    
+    properties(Dependent, SetObservable)
+        stacks
     end
     
     methods
@@ -26,33 +25,24 @@ classdef StackManager < handle
             if (nargin < 3)
                 preselect = [];
             end
-%             if (~iscell(stacks))
-%                 stacks = mat2cell(stacks, ones(size(stacks, 1), 1), ones(size(stacks, 2), 1)); %#ok<MMTC>
-%             end
-            this.title = title;
-            this.stacks = {};%stacks;
-            this.open(preselect);
-            this.addStack(stacks);
+            this@Abstract.CellManager(title, stacks);
+            this.preselect = preselect;
+            addlistener(this, 'entryAdded', @(~, evt)notify(this, 'stackAdded', evt));
+            addlistener(this, 'entryRemoved', @(~, evt)notify(this, 'stackRemoved', evt));
         end
         
-        function wait(this)
-            uiwait(this.handles.figure);
+        function stacks = get.stacks(this)
+            stacks = this.content;
         end
-        
-        function delete(this)
-            this.close();
+        function set.stacks(this, stacks)
+            this.content = stacks;
         end
-        
-        open(this, preselect)
-        close(this, ~,~)
-        addStack(this, stack)
-        removeStack(this, stack)
     end
     
     methods (Access=protected)
-        panel = addStackPanel(this, stack)
-        arrangeStackContainer(this)
+        entry = createEntry(this)
+        fillEntryPanel(this, entry, panel)
+        header = createHeader(this)
     end
-    
 end
 

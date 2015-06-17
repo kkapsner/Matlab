@@ -37,6 +37,7 @@ function open(this)
     this.handles.entryPanels = {};
     movegui(this.handles.figure, 'center');
     arrangeFigure();
+    notify(this, 'winOpen');
     
     function [outerContainer, innerContainer] = createContainer()
         outerContainer = handle(uipanel( ...

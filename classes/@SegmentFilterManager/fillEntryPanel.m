@@ -1,4 +1,4 @@
-function entry = fillEntryPanel(this, entry, panel)
+function fillEntryPanel(this, entry, panel)
     dm = DialogManager(entry);
     dm.open([], panel);
     dm.addPanel(1);
