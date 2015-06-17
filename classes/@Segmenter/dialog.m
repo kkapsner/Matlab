@@ -89,7 +89,7 @@ function [varargout] = dialog(seg)
     dm.checkboxHides(performWatershed, watershedFilterSlider);
     
     %% area panel
-    dm.addPanel(2, 'Area Range');
+    dm.addPanel(3, 'Area Range');
     
     % create controlls
     dm.addText('min', [0 0 30 20]);
@@ -105,7 +105,7 @@ function [varargout] = dialog(seg)
     
     %% filter
     dm.newLine();
-    dm.addText('ToDo: filter configuration');
+    dm.addButton('set other filters', 0, @changeFilters);
     
     %%
 
@@ -118,5 +118,12 @@ function [varargout] = dialog(seg)
     function maxAreaCallback(~,~)
         maxAreaSlider.Value = round(maxAreaSlider.Value);
         minAreaSlider.Max = maxAreaSlider.Value - 1.6;
+    end
+
+    function changeFilters(~,~)
+        filterManager = SegmentFilterManager('Segment filters', seg.filters);
+        filterManager.wait();
+        seg.filters = [filterManager.content{:}];
+        notify(dm, 'propertyChange');
     end
 end

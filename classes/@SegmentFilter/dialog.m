@@ -36,12 +36,14 @@ function dm = dialog(this, dm)
 
         dm.newLine();
         dm.addText('Min', [0, 0, 100]);
-        dm.addPropertySlider('lowerRangeLimit', 0, 100, {@(w)100, @(w)w-100});
+        lowerSlider = dm.addPropertySlider('lowerRangeLimit', 0, 100, {@(w)100, @(w)w-100});
 
         dm.newLine();
         dm.addText('Max', [0, 0, 100]);
-        dm.addPropertySlider('upperRangeLimit', 0, 100, {@(w)100, @(w)w-100});
-
+        upperSlider = dm.addPropertySlider('upperRangeLimit', 0, 100, {@(w)100, @(w)w-100});
+        
+        dm.connectRangeSliders(lowerSlider, upperSlider);
+        
         dm.show();
     end
 end
