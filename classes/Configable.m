@@ -20,7 +20,11 @@ classdef Configable < handle
                 if (~mp.Transient && ~mp.Dependent && ~mp.Constant)
                     j = j + 1;
                     props{j} = prop;
-                    defaults{j} = mp.DefaultValue;
+                    try
+                        defaults{j} = mp.DefaultValue;
+                    catch
+                        defaults{j} = [];
+                    end
                 end
             end
             props = props(1:j);
