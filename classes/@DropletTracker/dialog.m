@@ -10,9 +10,31 @@ function [varargout] = dialog(tracker)
     dm.open();
     
     %% data size
-    dm.addPanel(1);
+    dm.addPanel(3);
     
     % create controlls
+    dm.addText('start index', 80);
+    startIndexSlider = dm.addPropertySlider('startIndex', 0, max(100, tracker.startIndex), ...
+        [80, 0, dm.innerWidth - 80, 20], @startIndexCallback ...
+    );
+
+    function startIndexCallback(value)
+        startIndexSlider.Value = round(value);
+        tracker.startIndex = round(value);
+    end
+
+    dm.newLine();
+    dm.addText('stop index', 80);
+    stopIndexSlider = dm.addPropertySlider('stopIndex', 0, max(100, tracker.stopIndex), ...
+        [80, 0, dm.innerWidth - 80, 20], @stopIndexCallback ...
+    );
+
+    function stopIndexCallback(value)
+        stopIndexSlider.Value = round(value);
+        tracker.stopIndex = round(value);
+    end
+
+    dm.newLine();
     dm.addText('data size', 80);
     dataSizeSlider = dm.addPropertySlider('dataSize', 0, max(100, tracker.dataSize), ...
         [80, 0, dm.innerWidth - 80, 20], @dataSizeCallback ...

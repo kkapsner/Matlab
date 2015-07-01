@@ -1,6 +1,8 @@
 classdef DropletTracker < handle & Configable
     properties (SetObservable)
         dataSize
+        startIndex = 1
+        stopIndex
         numIntensities
         
         maxBorderDistance = 5
@@ -26,13 +28,14 @@ classdef DropletTracker < handle & Configable
             end
             
             obj.dataSize = dataSize;
+            obj.stopIndex = dataSize;
             obj.numIntensities = numIntensities;
         end
         
         function addFirstDroplets(obj, roi)
             obj.p1 = vertcat(roi.Centroid);
             obj.r1 = vertcat(roi.EquivDiameter) / 2;
-            obj.currentIndex = 1;
+            obj.currentIndex = obj.startIndex;
             
             obj.droplets = roi.Droplet(obj.dataSize, obj.currentIndex);
             obj.currentDropletIndices = 1:numel(roi);

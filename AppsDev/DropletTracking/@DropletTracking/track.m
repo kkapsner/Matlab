@@ -32,7 +32,7 @@ function track(this)
         numIntensityStacks = numel(intensityStacks);
         this.tracker.numIntensities = numIntensityStacks;
         
-        segmentImage = segmentStack.getImage(1);
+        segmentImage = segmentStack.getImage(this.tracker.startIndex);
         roi = this.segmenter.segment(segmentImage, segmentStack);
         
         for filterIdx = 1:numel(this.filters)
@@ -41,15 +41,16 @@ function track(this)
         end
         
         for stackIndex = 1:numIntensityStacks
-            intensityImage = intensityStacks{stackIndex}.getImage(1);
+            intensityImage = intensityStacks{stackIndex}.getImage(this.tracker.startIndex);
             roi.loadIntensity(intensityImage, 5, stackIndex, intensityStacks{stackIndex})
         end
         this.tracker.addFirstDroplets(roi);
         
         dataSize = min(this.tracker.dataSize, segmentStack.size);
-        wbar{i}.Value = 1/dataSize;
+        stopIndex = min(dataSize, this.tracker.stopIndex);
+        wbar{i}.Value = 1/(stopIndex + 1 - this.tracker.startIndex);
 
-        for imageIndex = 2:dataSize;
+        for imageIndex = (1 + this.tracker.startIndex):stopIndex;
 
             segmentImage = segmentStack.getImage(imageIndex);
             roi = this.segmenter.segment(segmentImage, segmentStack);
@@ -60,7 +61,7 @@ function track(this)
             end
 
             this.tracker.addDroplets(roi);
-            wbar{i}.Value = imageIndex/dataSize;
+            wbar{i}.Value = (imageIndex - this.tracker.startIndex + 1)/(stopIndex + 1 - this.tracker.startIndex);
         end
         saveFile = this.getDropletFile(segmentStack);
         
