@@ -29,5 +29,9 @@ classdef FunctionTiffStack < TiffStackDecorator
             image = this.func(this.stack.getImage(index), index);
         end
     end
+    
+    methods(Static)
+        [panel, getParameter] = getGUIParameterPanel(parent)
+    end
 end
 
