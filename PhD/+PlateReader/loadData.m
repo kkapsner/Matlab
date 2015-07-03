@@ -87,11 +87,13 @@ function traces = loadData(file)
             numCols = currentNumCols;
         end
     end
-    if (numCols ~= 0)
+    if (numCols ~= 0 && numel(traces) == numJunks * numRows * numCols)
         if (numJunks ~= 1)
             traces = reshape(traces, numJunks, numRows, numCols);
         else
             traces = reshape(traces,numRows, numCols);
         end
+    elseif numJunks ~= 1
+        traces = reshape(traces, numJunks, []);
     end
 end
