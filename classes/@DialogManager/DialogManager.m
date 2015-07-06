@@ -583,6 +583,10 @@ classdef DialogManager < handle
             oldValue = value;
             function callback(~,~)
                 newValue = slider.Value;
+                if (isnan(newValue))
+                    newValue = oldValue;
+                    slider.Value = oldValue;
+                end
                 if (newValue ~= oldValue)
                     userCallback(newValue);
                     notify(this, 'propertyChange', ArbitraryEventData( ...
