@@ -257,13 +257,13 @@ classdef DialogManager < handle
                 panel.BackgroundColor = this.container.Color;
             else
                 panel.BackgroundColor = this.container.BackgroundColor;
-                this.bindBackgroundColorToParent(panel);
+                Gui.bindBackgroundColorToParent(panel);
             end
             
             this.remainingHeight = this.remainingHeight - this.innerPadding;
             
             % set up panel properties
-            this.currentPanel = panel; 
+            this.currentPanel = panel;
             this.currentVerticalPanelPosition = panelHeight + this.linePadding;
             this.newLine();
             
@@ -283,6 +283,26 @@ classdef DialogManager < handle
             else
                 this.normalPanel(panel);
             end
+        end
+        
+        function [outerScrollPanel, innerScrollPanel] = addScrollPanel(this, outerRowNum, innerRowNum)
+            panel = this.addPanel(outerRowNum);
+            [outerScrollPanel, innerScrollPanel] = Gui.createScrollablePanel(panel);
+            outerScrollPanel.Position = [0, 0, panel.Position(3), panel.Position(4)];
+            Gui.makeFullWidth(outerScrollPanel);
+            innerScrollPanel.Position(4) = innerRowNum * this.lineHeight + ...
+                    (innerRowNum - 1) * this.linePadding;
+            this.currentPanel = innerScrollPanel;
+            this.currentVerticalPanelPosition = innerScrollPanel.Position(4) + this.linePadding;
+            this.newLine();
+        end
+        
+        function setCurrentPanel(this, panel)
+            warning('DialogManager:handleWithCare', ...
+                'Setting the current panel has to be handled with care!');
+            this.currentPanel = panel;
+            this.currentVerticalPanelPosition = panel.Position(4) + this.linePadding;
+            this.newLine();
         end
         
         function springPanel(this, panel)
@@ -335,38 +355,6 @@ classdef DialogManager < handle
             value = obj.(prop)(propIndex);
         end
         
-        function makeFullWidth(this, element, dynX, dynWidth)
-            if (nargin < 3)
-                dynX = [];
-            end
-            if (nargin < 4 || isempty(dynWidth))
-                dynWidth = @(a)a;
-            end
-            try
-                addlistener(element.Parent, 'SizeChanged', @callback);
-            catch
-                addlistener(element.Parent, 'SizeChange', @callback);
-            end
-            callback();
-            
-            function callback(~,~)
-                parentWidth = handle(element.Parent).Position(3);
-                if (~isempty(dynX))
-                    element.Position(1) = dynX(parentWidth);
-                end
-                element.Position(3) = max(1, dynWidth(parentWidth));
-            end
-        end
-        
-        function bindBackgroundColorToParent(~, element)
-            parent = get(element, 'Parent');
-            addlistener(parent, 'BackgroundColor', 'PostSet', @setBackgroundColor);
-            setBackgroundColor();
-            function setBackgroundColor(~,~)
-                set(element, 'BackgroundColor', get(parent, 'BackgroundColor'));
-            end
-        end
-        
         % add... functions
         
         function addElement(this, element, pos)
@@ -391,7 +379,7 @@ classdef DialogManager < handle
             if (pos(3) <= 0)
                 pos(3) = this.innerWidth;
                 set(element, 'Position', pos);
-                this.makeFullWidth(element, dynFunc{:});
+                Gui.makeFullWidth(element, dynFunc{:});
             else
                 set(element, 'Position', pos);
             end
@@ -422,7 +410,7 @@ classdef DialogManager < handle
                     'HorizontalAlignment', 'left' ...
                 ) ...
             );
-            this.bindBackgroundColorToParent(text);
+            Gui.bindBackgroundColorToParent(text);
             
             l = addlistener(this, 'showWin', @removeBorder); 
             this.addElement(text, pos);
@@ -489,7 +477,7 @@ classdef DialogManager < handle
                 ...'Position', pos, ...
                 ...'Callback', @callback, ...
             ));
-            this.bindBackgroundColorToParent(box);
+            Gui.bindBackgroundColorToParent(box);
             addlistener(box, 'Value', 'PostSet', @callback);
             this.addElement(box, pos);
             
@@ -573,7 +561,7 @@ classdef DialogManager < handle
                 ...'Position', pos, ...
                 'HandleVisibility', 'off' ...
             ));
-%             this.bindBackgroundColorToParent(slider);
+%             Gui.bindBackgroundColorToParent(slider);
             this.addElement(slider, pos);
             
             Gui.addSliderContextMenu(slider);
