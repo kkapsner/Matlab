@@ -1,5 +1,9 @@
 classdef RawDataTrace < AbstractTrace & handle
     
+    properties (Dependent)
+        meta
+    end
+    
     properties (SetObservable)
         timeUnit = 's'
         timeName = 'Time'
@@ -12,6 +16,8 @@ classdef RawDataTrace < AbstractTrace & handle
     properties (Access=private)
         rawValue
         rawTime
+        
+        rawMeta
     end
     
     methods
@@ -70,6 +76,19 @@ classdef RawDataTrace < AbstractTrace & handle
                 addlistener(this(i), 'valueName', 'PostSet', @(~,~)this(i).notify('change'));
                 addlistener(this(i), 'name', 'PostSet', @(~,~)this(i).notify('change'));
             end
+        end
+        
+        function meta = get.meta(this)
+            meta = this.getMeta();
+        end
+        function meta = getMeta(this)
+            meta = this.rawMeta;
+        end
+        function set.meta(this, meta)
+            this.setMeta(meta);
+        end
+        function setMeta(this, meta)
+            this.rawMeta = meta;
         end
         
         function value = getValue(this)
