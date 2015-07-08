@@ -1,4 +1,4 @@
-classdef (Abstract) TraceDecorator < AbstractTrace & handle
+classdef (Abstract) TraceDecorator < AbstractTraceDecorator & handle
     
     properties (SetAccess=protected)
         trace

@@ -16,7 +16,7 @@ function [varargout] = dialog(this)
         propertyDm = [];
         for i = 1:numel(traceStack)
             lastTrace = traceStack{i};
-            if (isa(lastTrace, 'TraceDecorator'))
+            if (isa(lastTrace, 'AbstractTraceDecorator'))
                 if (isempty(propertyDm))
                     propertyDm = DialogManager(this);
                     propertyDm.open('Settings');
@@ -48,8 +48,14 @@ function [varargout] = dialog(this)
     xlabel(a, sprintf('%s (%s)', this(1).getTimeName(), this(1).getTimeUnit()));
     ylabel(a, sprintf('%s (%s)', this(1).getValueName(), this(1).getValueUnit()));
     
-    dm.addPanel(numel(traceStack));
-    for i = 1:numel(traceStack)
+    numTraceStack = numel(traceStack);
+    if (numTraceStack > 5)
+        dm.addScrollPanel(5, numTraceStack);
+    else
+        dm.addPanel(numTraceStack);
+    end
+    
+    for i = 1:numTraceStack
         trace = traceStack{i};
         if (numel(this) ~= 1)
             h = handle(trace.plot('Parent', a, 'keepUpdated', true));
@@ -63,7 +69,7 @@ function [varargout] = dialog(this)
             );
             checkbox = dm.addCheckbox(trace.traceName, 1, [30, 0, 0]);
             dm.checkboxHides(checkbox, dialogButton);
-            
+
             l = [ ...
                 addlistener( ...
                     trace, 'change', ...
@@ -73,7 +79,7 @@ function [varargout] = dialog(this)
         else
             h = handle(trace.plot('Parent', a, 'keepValuesUpdated', true, 'DisplayName', trace.char()));
             checkbox = dm.addCheckbox(trace.char(), 1);
-            
+
             l = [ ...
                 addlistener( ...
                     trace, 'change', ...
@@ -87,7 +93,7 @@ function [varargout] = dialog(this)
         end
         addlistener(dm, 'closeWin', @(~,~)delete(l));
         dm.checkboxHides(checkbox, h);
-        
+
         dm.newLine();
     end
     legend(a, 'show');
