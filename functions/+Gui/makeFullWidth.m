@@ -9,10 +9,10 @@ function makeFullWidth(element, dynX, dynWidth)
 %   Gui.makeFullWidth(..., dynWidth) if the dynWidth-parameter is set the
 %       return value of this function (called with the width of the parent
 %       element) is used to set the width.
-    if (nargin < 3)
+    if (nargin < 2)
         dynX = [];
     end
-    if (nargin < 4 || isempty(dynWidth))
+    if (nargin < 3 || isempty(dynWidth))
         dynWidth = @(a)a;
     end
     try
