@@ -36,7 +36,10 @@ function [times, meta] = parseTimeRow(row)
     meta = struct('type', [], 'exitation', [], 'emission', []);
     for junkIndex = 1:numJunks
         cellContent = row{junkEnds(junkIndex)};
-        meta(junkIndex) = regexp(cellContent, '^(?<type>.*)\s+\(\s*(?<exitation>\d+)\s*,\s*(?<emission>\d+)(?:\s+\d+)?\s*\)\s*\d+\s*-', 'names');
+        junkMeta = regexp(cellContent, '^(?<type>.*)\s+\(\s*(?<exitation>\d+)\s*,\s*(?<emission>\d+)(?:\s+\d+)?\s*\)\s*\d+\s*-', 'names');
+        junkMeta.exitation = str2double(junkMeta.exitation);
+        junkMeta.emission = str2double(junkMeta.emission);
+        meta(junkIndex) = junkMeta;
     end
     junkSizes = mat2cell(junkSizes, ones(numJunks, 1));
     [meta.length] = deal(junkSizes{:});

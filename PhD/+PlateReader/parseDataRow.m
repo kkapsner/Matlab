@@ -26,6 +26,7 @@ function [traces, metaOut] = parseDataRow(row, time, metaIn)
         meta.row = rowIndex;
         meta.col = colIndex;
         trace = RawDataTrace(time{metaIndex}, data((1:meta.length) + startIndex), name);
+        trace.nameExtensionFunc = @(this)sprintf('(Ex %d, Em %d)', this.meta.exitation, this.meta.emission);
         startIndex = startIndex + meta.length;
         trace.meta = meta;
         traces(metaIndex) = trace;
