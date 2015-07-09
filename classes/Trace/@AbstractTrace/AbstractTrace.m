@@ -6,6 +6,10 @@ classdef (Abstract) AbstractTrace < handle & Selectable & Binable & matlab.mixin
         change
     end
     
+    properties
+        nameExtensionFunc = []
+    end
+    
     properties (Dependent)
         time
         value
@@ -25,6 +29,10 @@ classdef (Abstract) AbstractTrace < handle & Selectable & Binable & matlab.mixin
         
         function name = get.traceName(this)
             name = this.getName();
+    
+            if (isa(this.nameExtensionFunc, 'function_handle'))
+                name = [name, ' ', this.nameExtensionFunc(this)];
+            end
         end
         
         function dataSize = get.dataSize(this)
