@@ -702,6 +702,17 @@ classdef DialogManager < handle
             end
         end
         
+        function buttons = addButtonRow(this, varargin)
+            numButtons = floor(numel(varargin) / 2);
+            for i = numButtons:-1:1
+                buttons(i) = this.addButton( ...
+                    varargin{i * 2 - 1}, ...
+                    {@(w)(i - 1) * w / numButtons, @(w)w / numButtons}, ...
+                    varargin{i * 2} ...
+                );
+            end
+        end
+        
         function button = addToggleButton(this, str, pos, userCallbackDown, userCallbackUp)
             if (nargin < 3)
                 pos = 0;

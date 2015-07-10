@@ -29,7 +29,7 @@ function [selection, antiSelection, filter] = guiDirectSelect(obj, colNames, row
     
     
     dm.addPanel(1);
-    dm.addButton('OK', [], @dm.close);
+    dm.addButtonRow('OK', @dm.close);
     
     dm.show();
     dm.wait();
