@@ -114,4 +114,8 @@ classdef RawDataTrace < AbstractTrace & handle
             name = this.name;
         end
     end
+    
+    methods (Static)
+        trace = createFromClipboard();
+    end
 end
