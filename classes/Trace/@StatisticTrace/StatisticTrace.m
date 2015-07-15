@@ -10,7 +10,8 @@ classdef StatisticTrace < AbstractTraceDecorator
     end
     
     properties(Access=private,Transient)
-        calculatedValue
+        mean
+        std
     end
     
     methods
@@ -46,7 +47,7 @@ classdef StatisticTrace < AbstractTraceDecorator
             for i = 1:numel(this)
                 trace = this(i);
                 
-                l = addlistener(trace, 'operation', 'PostSet', @this.resetCalculated);
+                l = addlistener(trace, 'operation', 'PostSet', @(~,~)trace.notify('change'));
                 
                 for traceIndex = 1:numel(trace.traces)
                     l(traceIndex) = addlistener(trace.traces(traceIndex), 'change', @this.resetCalculated);
@@ -64,7 +65,23 @@ classdef StatisticTrace < AbstractTraceDecorator
             if (isempty(this.calculatedValue))
                 this.calculate();
             end
-            value = this.calculatedValue;
+            
+            switch o.operation
+                case 'mean'
+                    value = o.mean;
+                case 'std'
+                    value = o.std;
+                case 'mean + std'
+                    value = o.mean + o.std;
+                case 'mean - std'
+                    value = o.mean - o.std;
+                otherwise
+                    error( ...
+                        'StatisticTrace:unknownOperation', ...
+                        'Unknown operation %s', ...
+                        o.operation ...
+                    );
+            end
         end
         
         function timeUnit = getTimeUnit(this)
@@ -83,13 +100,13 @@ classdef StatisticTrace < AbstractTraceDecorator
             name = this.operation;
         end
         
-        function newTrace = mean(this)
+        function newTrace = meanTrace(this)
             newTrace = copy(this);
             for o = newTrace
                 o.operation = 'mean';
             end
         end
-        function newTrace = std(this)
+        function newTrace = stdTrace(this)
             newTrace = copy(this);
             for o = newTrace
                 o.operation = 'std';
@@ -112,25 +129,16 @@ classdef StatisticTrace < AbstractTraceDecorator
     methods (Access=private)
         function resetCalculated(this, ~, ~)
             for o = this
-                o.calculatedValue = [];
+                o.mean = [];
+                o.std = [];
                 o.notify('change');
             end
         end
         function calculate(this)
             for o = this
                 values = [o.traces.value];
-                switch o.operation
-                    case 'mean'
-                        value = mean(values, 2);
-                    case 'std'
-                        value = std(values, [], 2);
-                    case 'mean + std'
-                        value = mean(values, 2) + std(values, [], 2);
-                    case 'mean - std'
-                        value = mean(values, 2) - std(values, [], 2);
-                end
-                
-                o.calculatedValue = value;
+                o.mean = mean(values, 2);
+                o.std = std(values, [], 2);
             end
         end
     end

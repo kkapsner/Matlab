@@ -50,8 +50,9 @@ function dm = dialog(this, waitForClose, segmenter)
         dm.checkboxHides(handles.bwOn, [handles.closeOn, handles.fillingOn, handles.thinningOn, handles.segmentingOn]);
     else
         handles.segmentColorsOn = dm.addCheckbox('colorise', false, [80, 0, 100, 20]);
+        handles.exportROIs = dm.addButton('export ROI', [180, 0, 100, 20], @exportROI);
         
-        dm.checkboxHides(handles.bwOn, handles.segmentColorsOn);
+        dm.checkboxHides(handles.bwOn, [handles.segmentColorsOn,  handles.exportROIs]);
         
         lastROI = [];
         createROIContextMenu();
@@ -170,6 +171,10 @@ function dm = dialog(this, waitForClose, segmenter)
     %             image = imageSeg;
             end
         end
+    end
+
+    function exportROI(~,~)
+        assignin('base', 'exportedROIs', lastROI);
     end
 
     function menu = createROIContextMenu()
