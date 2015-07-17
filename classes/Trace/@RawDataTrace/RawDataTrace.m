@@ -117,5 +117,6 @@ classdef RawDataTrace < AbstractTrace & handle
     
     methods (Static)
         trace = createFromClipboard();
+        trace = createFromGraphicalObject(line);
     end
 end
