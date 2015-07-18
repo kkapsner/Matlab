@@ -49,10 +49,15 @@ function dm = dialog(this, waitForClose, segmenter)
 
         dm.checkboxHides(handles.bwOn, [handles.closeOn, handles.fillingOn, handles.thinningOn, handles.segmentingOn]);
     else
-        handles.segmentColorsOn = dm.addCheckbox('colorise', false, [80, 0, 100, 20]);
-        handles.exportROIs = dm.addButton('export ROI', [180, 0, 100, 20], @exportROI);
-        
-        dm.checkboxHides(handles.bwOn, [handles.segmentColorsOn,  handles.exportROIs]);
+        handles.segmentColorsOn = dm.addCheckbox('colorise', false, [80, 0, 60, 20]);
+        segmenterButtonOffset = 160;
+        segmenterPanel = dm.currentPanel;
+        handles.addSegmenterButton = @addSegmenterButton;
+        handles.setROIs = @setROIs;
+        handles.getROIs = @getROIs;
+        handles.setBWImage = @setBWImage;
+        handles.getBWImage = @getDisplayedBWImage;
+        handles.exportROIs = addSegmenterButton('export ROI', @exportROI);
         
         lastROI = [];
         createROIContextMenu();
@@ -99,13 +104,28 @@ function dm = dialog(this, waitForClose, segmenter)
 
     function updateBWImage()
         if (get(handles.bwOn, 'Value'))
-            handles.display.overlayImage = getBWImage(this.getImage(currentIndex));
+            setBWImage(getBWImage(this.getImage(currentIndex)));
             handles.display.overlayVisible = true;
         else
             handles.display.overlayVisible = false;
         end
     end
-
+    
+    function image = roi2Img(roi)
+        if (get(handles.segmentColorsOn, 'Value'))
+            colorROIS = roi.separateToColorize();
+            colors = hsv(numel(colorROIS));
+            image = [];
+            for colorIdx = 1:numel(colorROIS)
+                image = colorROIS{colorIdx}.toImage(image, colors(colorIdx, :));
+            end
+%                 for roiIdx = 1:6
+%                     image = lastROI(roiIdx:6:end).toImage(image, colors(roiIdx,:));
+%                 end
+        else
+            image = roi.toImage();
+        end
+    end
     function image = getBWImage(image)
         if (~isempty(segmenter))
             lastROI = segmenter.segment(image, this);
@@ -124,19 +144,7 @@ function dm = dialog(this, waitForClose, segmenter)
 %                     'Concavity', ...
 %                 } ...
 %             );
-            if (get(handles.segmentColorsOn, 'Value'))
-                colorROIS = lastROI.separateToColorize();
-                colors = hsv(numel(colorROIS));
-                image = [];
-                for colorIdx = 1:numel(colorROIS)
-                    image = colorROIS{colorIdx}.toImage(image, colors(colorIdx, :));
-                end
-%                 for roiIdx = 1:6
-%                     image = lastROI(roiIdx:6:end).toImage(image, colors(roiIdx,:));
-%                 end
-            else
-                image = lastROI.toImage();
-            end
+            image = roi2Img(lastROI);
         else
             minV = double(min(image(:)));
             maxV = double(max(image(:)));
@@ -210,6 +218,31 @@ function dm = dialog(this, waitForClose, segmenter)
                 currentROI(1).dialog();
             end
         end
+    end
+    
+    function roi = getROIs()
+        roi = lastROI;
+    end
+    function setROIs(roi)
+        lastROI = roi;
+        handles.display.overlayImage = roi2Img(roi);
+    end
+    function setBWImage(image)
+        handles.display.overlayImage = image;
+    end
+    function image = getDisplayedBWImage()
+        image = handles.display.overlayImage;
+    end
+    function button = addSegmenterButton(str, action)
+        w = warning('off', 'DialogManager:handleWithCare');
+        dm.setCurrentPanel(segmenterPanel);
+        warning(w);
+        dm.newLine();
+        button = dm.addButton(str, [segmenterButtonOffset, 0, 20, 20], action);
+        size = button.Extent;
+        button.Position(3) = size(3) + 10;
+        segmenterButtonOffset = segmenterButtonOffset + button.Position(3);
+        dm.checkboxHides(handles.bwOn, button);
     end
 end
 
