@@ -6,6 +6,7 @@ Apps/
 AppsDev/*
 !AppsDev/DropletTracking
 !AppsDev/TrackBacteriaByHand
+!AppsDev/BakteriaSizeEstimation
 fileexchange/
 *.zip
 *.asv
