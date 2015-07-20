@@ -2,12 +2,30 @@ function hull = convexHull(image)
 %CONVEXHULL 
     [y, x] = find(image);
     
-    hullIdx = convhull(x, y);
-    
-    hullX = x(hullIdx);
-    hullY = y(hullIdx);
-    
-    hull = Image.convexHull_cpp(double(image), hullX - 1, hullY - 1);
+    try
+        hullIdx = convhull(x, y);
+
+        hullX = x(hullIdx);
+        hullY = y(hullIdx);
+
+        hull = Image.convexHull_cpp(double(image), hullX - 1, hullY - 1);
+    catch
+        hull = double(image);
+        if (numel(x) > 1)
+            for i = 2:numel(x)
+                dx = x(i) - x(i - 1);
+                dy = y(i) - y(i - 1);
+                if (dx > dy)
+                    xPos = (1:dx) + min(x(i), x(i - 1));
+                    yPos = round(interp1(x([i, i - 1]), y([i, i - 1]), xPos, 'linear'));
+                else
+                    yPos = (1:dx) + min(y(i), y(i - 1));
+                    xPos = round(interp1(y([i, i - 1]), x([i, i - 1]), yPos, 'linear'));
+                end
+                hull(xPos, yPos) = 1;
+            end
+        end
+    end
     
 %     minX = min(hullX);
 %     maxX = max(hullX);
