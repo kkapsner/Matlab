@@ -100,5 +100,9 @@ classdef CroppedTiffStack < TiffStackDecorator
             image = image(this.yRange(1):this.yRange(2), this.xRange(1):this.xRange(2));
         end
     end
+    
+    methods (Static)
+        [panel, getParameter] = getGUIParameterPanel(parent)
+    end
 end
 
