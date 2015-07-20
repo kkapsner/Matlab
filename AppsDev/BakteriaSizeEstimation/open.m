@@ -1,10 +1,15 @@
-function open()
+function data = open()
     seg = Segmenter();
     stacksManager = StackManager();
     stacksManager.wait();
     tiffStacks = stacksManager.content;
     
+    data = struct('frames', [], 'rois', {});
+    
     for i = 1:numel(tiffStacks)
+        currentData = struct();
+        currentData.frames = [];
+        currentData.rois = {};
         bfDm = tiffStacks{1}.dialog(false, seg);
         paintMode = false;
         paintImage = [];
@@ -19,6 +24,8 @@ function open()
         set(bfDm.api.display.bwImage, 'ButtonDownFcn', @imageButtonDown);
         set(bfDm.api.display.overlay, 'ButtonDownFcn', @imageButtonDown, 'Hit', 'on');
         
+        exportButton = bfDm.api.addSegmenterButton('save ROIs', @saveROIs);
+        
         sDm = seg.dialog();
 
         listeners = [
@@ -31,8 +38,10 @@ function open()
         dms.arrange([1, 1]);
 
         bfDm.wait();
+        data(i) = currentData;
     end
     
+    % paint logic
     function togglePaint(~,~)
         if (~paintMode)
             rois = bfDm.api.getROIs();
@@ -43,10 +52,12 @@ function open()
             end
             bfDm.api.setBWImage(paintImage);
             paintMode = true;
+            exportButton.Visible = 'off';
         else
             bfDm.api.setROIs(seg.segmentEnhancedBW(paintImage));
             paintImage = [];
             paintMode = false;
+            exportButton.Visible = 'on';
         end
     end
 
@@ -85,6 +96,14 @@ function open()
     end
     function stopPaint()
         painting = -1;
+    end
+
+    function saveROIs()
+       if (~paintMode)
+           currentData.frames(end + 1) = bfDm.api.display.currentImageIndex;
+           currentData.rois{end + 1} = bfDm.api.getROIs();
+           bfDm.api.indexSlider.Value = bfDm.api.display.currentImageIndex + 1;
+       end
     end
 end
 
