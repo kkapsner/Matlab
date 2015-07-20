@@ -402,7 +402,7 @@ classdef DialogManager < handle
             text = handle( ...
                 uicontrol( ...
                     'Parent', this.currentPanel, ...
-                    'Style', 'edit', ...'text', ...
+                    'Style', 'text', ...'edit', ...
                     'Enable', 'inactive', ...
                     'String', str, ...
                     'Units', 'pixels', ...
@@ -412,21 +412,22 @@ classdef DialogManager < handle
             );
             Gui.bindBackgroundColorToParent(text);
             
-            l = addlistener(this, 'showWin', @removeBorder); 
+%             l = addlistener(this, 'showWin', @removeBorder); 
             this.addElement(text, pos);
+            text.Position(2) = text.Position(2) - 3;
             
-            function removeBorder(varargin)
-                try
-                    jText = findjobj(text, 'persist');
-                    for idx = 1:numel(jText)
-                        jT = jText(idx);
-                        jT.Border = [];
-                        jT.setOpaque(0);
-                        jT.repaint();
-                        delete(l);
-                    end
-                end
-            end
+%             function removeBorder(varargin)
+%                 try
+%                     jText = findjobj(text, 'persist');
+%                     for idx = 1:numel(jText)
+%                         jT = jText(idx);
+%                         jT.Border = [];
+%                         jT.setOpaque(0);
+%                         jT.repaint();
+%                         delete(l);
+%                     end
+%                 end
+%             end
         end
         
         function box = addPropertyCheckbox(this, str, prop, pos, posCallback, negCallback, obj)
