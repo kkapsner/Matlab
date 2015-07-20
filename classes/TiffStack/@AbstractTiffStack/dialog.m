@@ -32,7 +32,9 @@ function dm = dialog(this, waitForClose, segmenter)
     aPanel = dm.addPanel();
     handles.display = TiffStackDisplay(aPanel, this, currentIndex);
     
-    dm.addPanel(1, this.char());
+%     dm.addPanel(1, this.char());
+    this.getNamePanel(dm);
+    dm.addPanel(1);
     
     %% create bw control
     
@@ -50,6 +52,7 @@ function dm = dialog(this, waitForClose, segmenter)
         dm.checkboxHides(handles.bwOn, [handles.closeOn, handles.fillingOn, handles.thinningOn, handles.segmentingOn]);
     else
         handles.segmentColorsOn = dm.addCheckbox('colorise', false, [80, 0, 60, 20]);
+        dm.checkboxHides(handles.bwOn, handles.segmentColorsOn);
         segmenterButtonOffset = 160;
         segmenterPanel = dm.currentPanel;
         handles.addSegmenterButton = @addSegmenterButton;
@@ -57,7 +60,6 @@ function dm = dialog(this, waitForClose, segmenter)
         handles.getROIs = @getROIs;
         handles.setBWImage = @setBWImage;
         handles.getBWImage = @getDisplayedBWImage;
-        handles.exportROIs = addSegmenterButton('export ROI', @exportROI);
         
         lastROI = [];
         createROIContextMenu();
@@ -234,10 +236,15 @@ function dm = dialog(this, waitForClose, segmenter)
         image = handles.display.overlayImage;
     end
     function button = addSegmenterButton(str, action)
+        if (nargin < 2)
+            if (strcmp(str, 'export'))
+                button = addSegmenterButton('export ROI', @exportROI);
+                return;
+            end
+        end
         w = warning('off', 'DialogManager:handleWithCare');
         dm.setCurrentPanel(segmenterPanel);
         warning(w);
-        dm.newLine();
         button = dm.addButton(str, [segmenterButtonOffset, 0, 20, 20], action);
         size = button.Extent;
         button.Position(3) = size(3) + 10;

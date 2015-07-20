@@ -27,6 +27,7 @@ classdef (Abstract) AbstractTiffStack  < handle & matlab.mixin.Heterogeneous
         image = getUncachedImage(this, index);
         
         str = char(this);
+        panel = getNamePanel(this);
     end
     
     methods
