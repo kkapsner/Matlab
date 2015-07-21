@@ -2,27 +2,41 @@ function hull = convexHull(image)
 %CONVEXHULL 
     [y, x] = find(image);
     
-    try
-        hullIdx = convhull(x, y);
-
-        hullX = x(hullIdx);
-        hullY = y(hullIdx);
-
-        hull = Image.convexHull_cpp(double(image), hullX - 1, hullY - 1);
-    catch
+    numPixels = numel(x);
+    
+    if (numPixels < 2)
         hull = double(image);
-        if (numel(x) > 1)
+    else
+        colinear = false;
+        if (numPixels == 2)
+            colinear = true;
+        else
+            try
+                hullIdx = convhull(x, y);
+
+                hullX = x(hullIdx);
+                hullY = y(hullIdx);
+
+                hull = Image.convexHull_cpp(double(image), hullX - 1, hullY - 1);
+            catch
+                colinear = true;
+            end
+        end
+        
+        if (colinear)
+            hull = double(image);
+            imageSize = size(image);
             for i = 2:numel(x)
                 dx = x(i) - x(i - 1);
                 dy = y(i) - y(i - 1);
-                if (dx > dy)
-                    xPos = (1:dx) + min(x(i), x(i - 1));
+                if (abs(dx) > abs(dy))
+                    xPos = x(i - 1):sign(dx):x(i);
                     yPos = round(interp1(x([i, i - 1]), y([i, i - 1]), xPos, 'linear'));
                 else
-                    yPos = (1:dx) + min(y(i), y(i - 1));
+                    yPos = y(i - 1):sign(dy):y(i);
                     xPos = round(interp1(y([i, i - 1]), x([i, i - 1]), yPos, 'linear'));
                 end
-                hull(xPos, yPos) = 1;
+                hull(sub2ind2D(imageSize, yPos, xPos)) = 1;
             end
         end
     end
