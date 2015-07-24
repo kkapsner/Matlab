@@ -1,4 +1,4 @@
-function data = open()
+function data = start()
     seg = Segmenter();
     stacksManager = StackManager();
     stacksManager.wait();
@@ -25,6 +25,7 @@ function data = open()
         set(bfDm.api.display.overlay, 'ButtonDownFcn', @imageButtonDown, 'Hit', 'on');
         
         exportButton = bfDm.api.addSegmenterButton('save ROIs', @saveROIs);
+        showLengthButton = bfDm.api.addSegmenterButton('show length', @showLength);
         
         sDm = seg.dialog();
 
@@ -53,11 +54,13 @@ function data = open()
             bfDm.api.setBWImage(paintImage);
             paintMode = true;
             exportButton.Visible = 'off';
+            showLengthButton.Visible = 'off';
         else
             bfDm.api.setROIs(seg.segmentEnhancedBW(paintImage));
             paintImage = [];
             paintMode = false;
             exportButton.Visible = 'on';
+            showLengthButton.Visible = 'on';
         end
     end
 
@@ -104,6 +107,27 @@ function data = open()
            currentData.rois{end + 1} = bfDm.api.getROIs();
            bfDm.api.indexSlider.Value = bfDm.api.display.currentImageIndex + 1;
        end
+    end
+
+    function showLength()
+        if (~paintMode)
+            rois = bfDm.api.getROIs();
+            image = false(size(bfDm.api.display.image));
+            for roi = rois(:)'
+                rImage = Image.localConvexHull(roi.Image, 2);
+%                 skel = logical(rImage);
+%                 skel = bwmorph(rImage, 'skel', Inf);
+                skel = bwmorph(rImage, 'thin', Inf);
+                skel = Image.elongateEndPoints(skel, rImage, 4);
+                [~, idx1, idx2] = Image.getMaxContour(skel);
+                skel = Image.getShortestPath(skel, idx1, idx2);
+                image(roi.minY:roi.maxY, roi.minX:roi.maxX) = ...
+                    image(roi.minY:roi.maxY, roi.minX:roi.maxX) | ...
+                    skel;
+            end
+            
+            bfDm.api.setBWImage(image);
+        end
     end
 end
 
