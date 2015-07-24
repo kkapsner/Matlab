@@ -46,6 +46,7 @@ function path = getShortestPath(mask, idx1, idx2, conn)
         path(idx) = true;
         idx = backtracks(idx);
     end
+    path(idx) = true;
     
     function setBacktrack(y, x, idx)
         if (y > 0 && y <= maskSize(1) && x > 0 && x <= maskSize(2) && mask(y, x) && backtracks(y, x) == 0)
