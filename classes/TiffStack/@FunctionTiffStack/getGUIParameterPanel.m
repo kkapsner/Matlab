@@ -44,8 +44,9 @@ function [panel, getParameter] = getGUIParameterPanel(parent)
     
     function img = medianBased(img, ~)
         img = double(img);
-        [min, max] = minmax(img(:));
-        img = (max - abs(img - median(img(:)))) ./ (max - min);
+        med =  abs(img - median(img(:)));
+        [min, max] = minmax(med);
+        img = (max - med) ./ (max - min);
     end
     function img = inverted(img, ~)
         img = double(img);
