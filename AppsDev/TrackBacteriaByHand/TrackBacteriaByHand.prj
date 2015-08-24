@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="1765662833" file="D:\korbinian\Programmieren\Matlab\AppsDev\TrackBacteriaByHand\TrackBacteriaByHand.prj" location="D:\korbinian\Programmieren\Matlab\AppsDev\TrackBacteriaByHand" name="TrackBacteriaByHand" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="3652116384" file="D:\korbinian\Programmieren\Matlab\AppsDev\TrackBacteriaByHand\TrackBacteriaByHand.prj" location="D:\korbinian\Programmieren\Matlab\AppsDev\TrackBacteriaByHand" name="TrackBacteriaByHand" target="target.mlapps" target-name="Package App">
     <param.appname>TrackBacteriaByHand</param.appname>
     <param.authnamewatermark>Korbinian Kapsner</param.authnamewatermark>
     <param.email>korbinian.kapsner@ph.tum.de</param.email>
@@ -9,17 +9,20 @@
     <param.summary />
     <param.description />
     <param.screenshot />
-    <param.version>1.1</param.version>
+    <param.version>1.1.1</param.version>
     <param.products.name>
       <item>MATLAB</item>
       <item>Image Processing Toolbox</item>
+      <item>Statistics Toolbox</item>
     </param.products.name>
     <param.products.id>
       <item>'1'</item>
       <item>'17'</item>
+      <item>'19'</item>
     </param.products.id>
     <param.products.version>
       <item>8.4</item>
+      <item>9.1</item>
       <item>9.1</item>
     </param.products.version>
     <param.platforms>
@@ -42,15 +45,28 @@
       <file>${PROJECT_ROOT}\Bacterium.m</file>
       <file>${PROJECT_ROOT}\ROIBacterium.m</file>
       <file>${PROJECT_ROOT}\trackByHand.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\+Abstract\@CellManager\addEntry.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\+Abstract\@CellManager\addEntryPanel.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\+Abstract\@CellManager\adjustInnerContainerHeight.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\+Abstract\@CellManager\arrangeContainer.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\+Abstract\@CellManager\CellManager.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\+Abstract\@CellManager\close.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\+Abstract\@CellManager\createHeader.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\+Abstract\@CellManager\open.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\+Abstract\@CellManager\removeEntry.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\+Abstract\@Filter\Filter.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\+JSON\@JSONObject\dialog.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\+JSON\@JSONObject\getDialogSchema.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\+JSON\@JSONObject\JSONObject.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\+JSON\objectStringify.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\+JSON\objectToMap.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\+JSON\parse.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\+JSON\stringify.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\@DialogManager\DialogManager.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\@ROI\calculateEllipse.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\@ROI\dialog.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\@ROI\Droplet.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\@ROI\paint.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\@ROI\private\getSub.cpp</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\@ROI\private\getSub.mexmaci64</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\@ROI\private\getSub.mexw64</file>
@@ -60,11 +76,20 @@
       <file>D:\korbinian\Programmieren\Matlab\classes\@Segmenter\segment.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\@Segmenter\segmentEnhancedBW.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\@Segmenter\Segmenter.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\@SegmentFilter\dialog.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\@SegmentFilter\filter.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\@SegmentFilter\SegmentFilter.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\@SegmentFilter\toJSON.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\@SegmentFilterManager\createEntry.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\@SegmentFilterManager\fillEntryPanel.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\@SegmentFilterManager\SegmentFilterManager.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\@Selectable\guiDirectSelect.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\@Selectable\guiSelect.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\@Selectable\Selectable.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\ArbitraryEventData.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Binable.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Configable.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\ConfigableProperty.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\ConfigFile.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\File.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\AbstractTiffStack.m</file>
@@ -76,6 +101,7 @@
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\getVideo.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\getXYProjection.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\getZProjection.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\getZProjectionWithROI.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\guiCrop.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\minus.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\mrdivide.m</file>
@@ -83,6 +109,10 @@
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\plus.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\showImage.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\subsindex.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@BackgroundCorrectedTiffStack\BackgroundCorrectedTiffStack.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@BackgroundCorrectedTiffStack\char.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@BackgroundCorrectedTiffStack\getDialogPanel.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@BackgroundCorrectedTiffStack\getGUIParameterPanel.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@CachedTiffStack\CachedTiffStack.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@CachedTiffStack\getGUIParameterPanel.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@CachedTiffStack\getVideo.m</file>
@@ -94,6 +124,7 @@
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@CroppedTiffStack\char.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@CroppedTiffStack\CroppedTiffStack.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@CroppedTiffStack\getDialogPanel.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@CroppedTiffStack\getGUIParameterPanel.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@DistributedTiffStack\char.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@DistributedTiffStack\DistributedTiffStack.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@DistributedTiffStack\getGUIParameterPanel.m</file>
@@ -103,23 +134,25 @@
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@FilteredTiffStack\getDialogPanel.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@FilteredTiffStack\getGUIParameterPanel.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@FunctionTiffStack\FunctionTiffStack.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@FunctionTiffStack\getGUIParameterPanel.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@MatrixTiffStack\char.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@MatrixTiffStack\getUncachedImage.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@MatrixTiffStack\MatrixTiffStack.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@MultiChannelTiffStack\char.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@MultiChannelTiffStack\getGUIParameterPanel.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@MultiChannelTiffStack\MultiChannelTiffStack.m</file>
-      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@StackManager\addStack.m</file>
-      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@StackManager\addStackPanel.m</file>
-      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@StackManager\adjustInnerStackContainerHeight.m</file>
-      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@StackManager\arrangeStackContainer.m</file>
-      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@StackManager\close.m</file>
-      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@StackManager\open.m</file>
-      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@StackManager\removeStack.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@StackManager\createEntry.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@StackManager\createHeader.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@StackManager\fillEntryPanel.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@StackManager\StackManager.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@TiffStack\char.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@TiffStack\getGUIParameterPanel.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@TiffStack\getNamePanel.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@TiffStack\getUncachedImage.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@TiffStack\guiCreateStack.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@TiffStack\TiffStack.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@TiffStackDecorator\char.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@TiffStackDecorator\getNamePanel.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@TiffStackDecorator\guiAddDecorator.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@TiffStackDecorator\TiffStackDecorator.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@TiffStackDisplay\TiffStackDisplay.m</file>
@@ -137,10 +170,13 @@
       <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\@Waitbar\Waitbar.m</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\addSliderContextMenu.m</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\arrangeFigures.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\bindBackgroundColorToParent.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\createScrollablePanel.m</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\enableWheelZoom.m</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\getGlobalPosition.m</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\getParentFigure.m</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\isMouseOver.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\makeFullWidth.m</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\maximizeFigure.m</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Image\borderFill.mexw64</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Image\bridge.m</file>
@@ -159,17 +195,21 @@
       <file>D:\korbinian\Programmieren\Matlab\functions\maxk.mexw64</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\mink.mexw64</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\minmax.mexw64</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\sub2ind2D.mexw64</file>
     </fileset.depfun>
     <fileset.resources>
       <file>D:\korbinian\Programmieren\Matlab\classes\@ROI</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@BackgroundCorrectedTiffStack</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@CachedTiffStack</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@CalculationTiffStack</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@ConvolutedTiffStack</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@CroppedTiffStack</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@DistributedTiffStack</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@EmptyTiffStack</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@FilteredTiffStack</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@FunctionTiffStack</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@MatrixTiffStack</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@MultiChannelTiffStack</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@StackManager</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@TiffStack</file>
@@ -185,6 +225,7 @@
       <file>D:\korbinian\Programmieren\Matlab\functions\maxk.mexmaci64</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\mink.mexmaci64</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\minmax.mexmaci64</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\sub2ind2D.mexmaci64</file>
     </fileset.resources>
     <fileset.package />
     <build-deliverables>
