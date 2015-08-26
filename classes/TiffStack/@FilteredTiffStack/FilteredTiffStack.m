@@ -9,6 +9,7 @@ classdef FilteredTiffStack < TiffStackDecorator
     end
     properties(SetObservable)
         filterOn = true
+        normalise = true
     end
     
     methods
@@ -49,10 +50,12 @@ classdef FilteredTiffStack < TiffStackDecorator
             if (obj.filterOn)
                 fImage = fft2(image);
                 image = ifft2(fImage .* obj.filter);
-                minValue = min(image(:));
-                maxValue = max(image(:));
-                if (minValue ~= maxValue)
-                    image = (image - minValue) / (maxValue - minValue);
+                if (obj.normalise)
+                    minValue = min(image(:));
+                    maxValue = max(image(:));
+                    if (minValue ~= maxValue)
+                        image = (image - minValue) / (maxValue - minValue);
+                    end
                 end
             end
         end
