@@ -13,8 +13,8 @@ function [panel, getParameter] = getGUIParameterPanel(parent)
         'max - image' ...
     };
     functions = { ...
-        @medianBased, ...
-        @inverted ...
+        @FunctionTiffStack.medianBased, ...
+        @FunctionTiffStack.inverted ...
     };
 
     funcInput = handle(uicontrol( ...
@@ -40,18 +40,6 @@ function [panel, getParameter] = getGUIParameterPanel(parent)
     getParameter = @readParameter;
     function param = readParameter()
         param = functions(funcInput.Value);
-    end
-    
-    function img = medianBased(img, ~)
-        img = double(img);
-        med =  abs(img - median(img(:)));
-        [min, max] = minmax(med);
-        img = (max - med) ./ (max - min);
-    end
-    function img = inverted(img, ~)
-        img = double(img);
-        [min, max] = minmax(img(:));
-        img = (max - img)./(max - min);
     end
 end
 
