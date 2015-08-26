@@ -1,4 +1,10 @@
-function trackBacteriaByHand()
+function trackBacteriaByHand(invert, filter)
+	if (nargin < 1)
+		invert = true;
+	end
+	if (nargin < 2)
+		filter = true;
+	end
     bfFile = File.get({'*.tif;*.tiff', 'TIFF stacks';'*.mat', 'MATLAB data file';'*.*', 'All files'}, 'Select bright field TIFF stack');
     if (bfFile ~= 0)
         if (strcmpi(bfFile.extension, '.mat'))
@@ -8,25 +14,30 @@ function trackBacteriaByHand()
                 fluoStack = data.fluoStack;
             else
                 errordlg('Data file does not contain stacks.');
+                return;
             end
         else
-            rawBF = FunctionTiffStack( ...
-                FilteredTiffStack( ...
-                    TiffStack.guiCreateStack(bfFile), [1.2, 10] ...
-                ), ...
-                @(img, ~)(1-img)...
-            );
-            croppedBG = rawBF.guiCrop('Select bacteria region');
-            background = rawBF.guiCrop('Select background region');
+            rawBF = TiffStack.guiCreateStack(bfFile);
+            if (filter)
+                rawBF = rawBF.filter([1.2, 10]);
+            end
+            if (invert)
+                rawBF = rawBF.invert();
+            else
+                rawBF = rawBF.normalise();
+            end
+%             croppedBG = rawBF.guiCrop('Select bacteria region');
+%             background = rawBF.guiCrop('Select background region');
 %             croppedBG = CroppedTiffStack(rawBF);
 %             croppedBG.dialog().wait();
 %             background = CroppedTiffStack(rawBF);
 %             background.dialog().wait();
 
-            bfStack = FunctionTiffStack( ...
-                croppedBG, ...
-                @(img, idx)0.5*img/mean(mean(background.getImage(idx)))...
-            );
+%             bfStack = FunctionTiffStack( ...
+%                 croppedBG, ...
+%                 @(img, idx)0.5*img/mean(mean(background.getImage(idx)))...
+%             );
+            bfStack = rawBF;
 
             fluoFile = File.get({'*.tif;*.tiff', 'TIFF stacks'}, 'Select fluorescence TIFF stack', 'on');
             fluoStack = CroppedTiffStack( ...
