@@ -37,8 +37,11 @@ classdef TiffStackDisplay < handle
                 'HandleVisibility', 'callback', ...
                 'Position', [0, 0, 1, 1] ...
             ));
-
-            firstImage = TiffStackDisplay.mat2rgb(stack.getImage(index));
+        
+            firstImage = stack.getImage(index);
+            if (ismatrix(firstImage))
+                firstImage = TiffStackDisplay.mat2rgb(firstImage);
+            end
             this.bwImage = handle(image('CData', firstImage, 'Parent', this.axes, 'Clipping', 'off'));
             hold(this.axes, 'on');
             this.overlay = handle(image('Parent', this.axes, 'CData', firstImage, 'Visible', 'off', 'Hit', 'off', 'Clipping', 'off'));
@@ -154,12 +157,14 @@ classdef TiffStackDisplay < handle
                 this.setEvent = true;
             end 
             
-            this.bwImage.CData = TiffStackDisplay.mat2rgb(...
-                image, ...
-                [1, 1, 1], ...
-                [this.minIntensity, this.maxIntensity]...
-            );
-        
+            if (ismatrix(image))
+                image = TiffStackDisplay.mat2rgb(...
+                    image, ...
+                    [1, 1, 1], ...
+                    [this.minIntensity, this.maxIntensity]...
+                );
+            end
+            this.bwImage.CData = image;
         end
         
         function point = getCurrentPoint(this, dim)
