@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="3652116384" file="D:\korbinian\Programmieren\Matlab\AppsDev\TrackBacteriaByHand\TrackBacteriaByHand.prj" location="D:\korbinian\Programmieren\Matlab\AppsDev\TrackBacteriaByHand" name="TrackBacteriaByHand" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="1279151543" file="D:\korbinian\Programmieren\Matlab\AppsDev\TrackBacteriaByHand\TrackBacteriaByHand.prj" location="D:\korbinian\Programmieren\Matlab\AppsDev\TrackBacteriaByHand" name="TrackBacteriaByHand" target="target.mlapps" target-name="Package App">
     <param.appname>TrackBacteriaByHand</param.appname>
     <param.authnamewatermark>Korbinian Kapsner</param.authnamewatermark>
     <param.email>korbinian.kapsner@ph.tum.de</param.email>
@@ -9,7 +9,7 @@
     <param.summary />
     <param.description />
     <param.screenshot />
-    <param.version>1.1.1</param.version>
+    <param.version>1.1.2</param.version>
     <param.products.name>
       <item>MATLAB</item>
       <item>Image Processing Toolbox</item>
@@ -96,6 +96,7 @@
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\dialog.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\dialog_.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\dialog_old.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\filter.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\getDialogPanel.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\getImage.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\getVideo.m</file>
@@ -103,9 +104,11 @@
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\getZProjection.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\getZProjectionWithROI.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\guiCrop.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\invert.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\minus.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\mrdivide.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\mtimes.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\normalise.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\plus.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\showImage.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@AbstractTiffStack\subsindex.m</file>
@@ -149,6 +152,7 @@
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@TiffStack\getGUIParameterPanel.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@TiffStack\getNamePanel.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@TiffStack\getUncachedImage.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@TiffStack\guiCreateStack.asv</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@TiffStack\guiCreateStack.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@TiffStack\TiffStack.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\TiffStack\@TiffStackDecorator\char.m</file>

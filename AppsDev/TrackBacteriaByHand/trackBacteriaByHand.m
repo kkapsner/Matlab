@@ -26,7 +26,7 @@ function trackBacteriaByHand(invert, filter)
             else
                 rawBF = rawBF.normalise();
             end
-%             croppedBG = rawBF.guiCrop('Select bacteria region');
+            croppedBG = rawBF.guiCrop('Select bacteria region');
 %             background = rawBF.guiCrop('Select background region');
 %             croppedBG = CroppedTiffStack(rawBF);
 %             croppedBG.dialog().wait();
@@ -37,7 +37,7 @@ function trackBacteriaByHand(invert, filter)
 %                 croppedBG, ...
 %                 @(img, idx)0.5*img/mean(mean(background.getImage(idx)))...
 %             );
-            bfStack = rawBF;
+            bfStack = croppedBG;
 
             fluoFile = File.get({'*.tif;*.tiff', 'TIFF stacks'}, 'Select fluorescence TIFF stack', 'on');
             fluoStack = CroppedTiffStack( ...

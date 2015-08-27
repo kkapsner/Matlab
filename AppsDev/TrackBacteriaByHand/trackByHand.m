@@ -9,6 +9,9 @@ function startBac = trackByHand(stack, fluorescenceStack, segmenter, currentImag
     painting = -1;
     paintBW = [];
     
+    currentMarker = [];
+    currentEndBacMarker = [];
+    
     
     if (nargin < 4 || isempty(currentImageIndex))
         currentImageIndex = 1;
@@ -154,6 +157,9 @@ function startBac = trackByHand(stack, fluorescenceStack, segmenter, currentImag
         ));
     end
     function selectROI(roi)
+        if (~isempty(currentMarker))
+            delete(currentMarker);
+        end
         if (numel(roi) > 0)
             if (isempty(currentROI))
                 currentROI = roi;
@@ -171,14 +177,27 @@ function startBac = trackByHand(stack, fluorescenceStack, segmenter, currentImag
         else
             currentROI = [];
         end
+        if (~isempty(currentROI))
+            centroid = vertcat(currentROI.Centroid);
+            currentMarker = plot(centroid(:, 1), centroid(:, 2), 'ob', ...
+                'Parent', display.axes, ...
+                'HitTest', 'off', ...
+                'LineWidth', 2, ...
+                'MarkerSize', 10 ...
+            );
+        end
         displayOverlays();
     end
 
     function displayOverlays()
-        if (~isempty(currentROI))
-            display.overlayImage = {lastROI.toImage(), previousFrameOverlay, currentROI.toImage()};
+        if (~isempty(lastROI))
+            if (~isempty(currentROI))
+                display.overlayImage = {lastROI.toImage(), previousFrameOverlay, currentROI.toImage()};
+            else
+                display.overlayImage = {lastROI.toImage(), previousFrameOverlay, false(size(previousFrameOverlay))};
+            end
         else
-            display.overlayImage = {lastROI.toImage(), previousFrameOverlay, false(size(previousFrameOverlay))};
+            display.overlayImage = {false(size(previousFrameOverlay)), previousFrameOverlay, false(size(previousFrameOverlay))};
         end
     end
     
@@ -273,6 +292,16 @@ function startBac = trackByHand(stack, fluorescenceStack, segmenter, currentImag
         showCurrentImage();
         nextButton.String = sprintf('next (%d)', currentImageIndex + 1);
         previousFrameOverlay = endBac(endBacIdx).rois(end).toImage();
+        if (~isempty(currentEndBacMarker))
+            delete(currentEndBacMarker);
+        end
+        centroid = vertcat(endBac(endBacIdx).rois(end).Centroid);
+        currentEndBacMarker = plot(centroid(:, 1), centroid(:, 2), 'og', ...
+            'Parent', display.axes, ...
+            'HitTest', 'off', ...
+            'LineWidth', 2, ...
+            'MarkerSize', 10 ...
+        );
         
         autoTrack();
     end
