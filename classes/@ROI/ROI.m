@@ -344,6 +344,10 @@ classdef ROI < Selectable & Binable & handle
         end
         
         function obj = findByPosition(this, x, y)
+            if (numel(this) == 0)
+                obj = ROI.empty();
+                return;
+            end
             idx = y + (x - 1) * this(1).height;
             
             filter = false(size(this));
