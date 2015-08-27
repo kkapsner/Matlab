@@ -23,7 +23,8 @@ function trackBacteriaByHand(invert, filter)
             end
             if (invert)
                 rawBF = rawBF.invert();
-            else
+            end
+            if (~invert && ~filter)
                 rawBF = rawBF.normalise();
             end
             croppedBG = rawBF.guiCrop('Select bacteria region');

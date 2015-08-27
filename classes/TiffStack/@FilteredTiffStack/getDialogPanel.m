@@ -10,7 +10,7 @@ function panel = getDialogPanel(this, dm, handles)
     
     %% create filter control
     handles.filterOn = dm.addPropertyCheckbox('Filter on', 'filterOn', 70);
-    handles.normalise = dm.addPropertyCheckbox('normalise', 'normalise', [70, 0, 70, 20]);
+    handles.normalise = dm.addPropertyCheckbox('normalise', 'normalisationOn', [70, 0, 70, 20]);
     
     highestCutOff = max( ...
         [this.width, ...
