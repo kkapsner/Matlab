@@ -19,15 +19,17 @@ classdef CroppedTiffStack < TiffStackDecorator
             this = this@TiffStackDecorator(stack);
             
             if (nargin > 0)
-                if (nargin < 2)
-                    xRange = [1, stack.width];
+                for o = this
+                    if (nargin < 2)
+                        xRange = [1, o.stack.width];
+                    end
+                    if (nargin < 3)
+                        yRange = [1, o.stack.height];
+                    end
+
+                    o.setXRange(xRange);
+                    o.setYRange(yRange);
                 end
-                if (nargin < 3)
-                    yRange = [1, stack.height];
-                end
-                
-                this.setXRange(xRange);
-                this.setYRange(yRange);
             end
         end
         
