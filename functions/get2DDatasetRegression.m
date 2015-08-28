@@ -22,8 +22,8 @@ function [cx, cy, alpha, var1, var2] = get2DDatasetRegression(x, y, w)
     cx = sum(x .* w) / wSum;
     cy = sum(y .* w) / wSum;
     
-    x = x - cx;
-    y = y - cy;
+    x = (x - cx) .* w;
+    y = (y - cy) .* w;
     
     A = sum(x.^2);
     B = sum(y.^2);
@@ -31,12 +31,14 @@ function [cx, cy, alpha, var1, var2] = get2DDatasetRegression(x, y, w)
     
     alpha = atan(2*C / (A - B)) / 2;
     
-    var1 = sin(alpha).^ 2 * A + cos(alpha) .^ 2 - 2 * sin(alpha) * cos(alpha) * C;
-    var2 = cos(alpha).^ 2 * A + sin(alpha) .^ 2 + 2 * sin(alpha) * cos(alpha) * C;
+    var1 = sin(alpha).^ 2 * A + cos(alpha) .^ 2 * B - 2 * sin(alpha) * cos(alpha) * C;
+    var2 = cos(alpha).^ 2 * A + sin(alpha) .^ 2 * B + 2 * sin(alpha) * cos(alpha) * C;
     
     if (var1 > var2)
         alpha = alpha + pi/2;
-        [var1, var2] = deal(var1, var2);
+        [var1, var2] = deal(var2, var1);
     end
     
+    var1 = var1 / wSum;
+    var2 = var2 / wSum;
 end
