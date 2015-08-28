@@ -1,4 +1,4 @@
-function path = getShortestPath(mask, idx1, idx2, conn)
+function [path, pathIdx] = getShortestPath(mask, idx1, idx2, conn)
 %IMAGE.GETSHORTESTPATH draws the shortest path between two pixels
 %
 %   PATH = Image.getShortestPath(MASK, IDX1, IDX2) returns the image of the
@@ -7,6 +7,8 @@ function path = getShortestPath(mask, idx1, idx2, conn)
 %       the two pixels an error is thrown.
 %   ... = Image.getShortestPath(..., CONN) specifies if an 4 or 8
 %       connectivity should be used (default 8)
+%   [PATH, PATHIDX] = Image.getShortestPath(...) returns also the indices
+%       of the path pixels in the right ordering.
 %
 % SEE ALSO: IMAGE.GETMAXCONTOUR
     if (nargin < 4)
@@ -14,6 +16,7 @@ function path = getShortestPath(mask, idx1, idx2, conn)
     end
     maskSize = size(mask);
     path = false(maskSize);
+    pathSteps = zeros(maskSize);
     path(idx1) = true;
     
     backtracks = zeros(maskSize);
@@ -41,16 +44,22 @@ function path = getShortestPath(mask, idx1, idx2, conn)
     assert(path(idx2), 'Image:getShortestPath:notConnected', 'Points are not connected.');
     
     path = false(maskSize);
+    pathIdx = zeros(pathSteps(idx2), 1);
     idx = idx2;
+    i = pathSteps(idx2);
     while (idx ~= idx1)
+        pathIdx(i) = idx;
+        i = i - 1;
         path(idx) = true;
         idx = backtracks(idx);
     end
+    pathIdx(1) = idx;
     path(idx) = true;
     
     function setBacktrack(y, x, idx)
         if (y > 0 && y <= maskSize(1) && x > 0 && x <= maskSize(2) && mask(y, x) && backtracks(y, x) == 0)
             backtracks(y, x) = idx;
+            pathSteps(y, x) = pathSteps(idx) + 1;
             path(y, x) = true;
         end
     end
