@@ -35,7 +35,12 @@ function [xC, yC] = getHalfLineCoordinates(x, y, dx, dy, w, h)
             xBorder = x + (h - y) * dx / dy;
             yBorder = h;
         end
-        xC = x:sign(dx):xBorder;
-        yC = round(interp1([x, xBorder], [y, yBorder], xC, 'linear'));
+        if (x == xBorder)
+            xC = x;
+            yC = y;
+        else
+            xC = x:sign(dx):xBorder;
+            yC = round(interp1([x, xBorder], [y, yBorder], xC, 'linear'));
+        end
     end
 end
