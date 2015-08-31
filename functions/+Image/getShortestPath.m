@@ -11,6 +11,7 @@ function [path, pathIdx] = getShortestPath(mask, idx1, idx2, conn)
 %       of the path pixels in the right ordering.
 %
 % SEE ALSO: IMAGE.GETMAXCONTOUR
+    warning('Compile getShortestPath.cpp to get a faster version.');
     if (nargin < 4)
         conn = 8;
     end
