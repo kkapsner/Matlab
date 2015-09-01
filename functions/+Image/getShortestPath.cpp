@@ -132,6 +132,8 @@ void mexFunction( int nlhs, mxArray *plhs[],
 				}
 			}
 		}
+		delete[] trackCopy;
+		trackCopy = nullptr;
 	}
 	
 	if (!track[idx2]){
@@ -162,4 +164,16 @@ void mexFunction( int nlhs, mxArray *plhs[],
 	}
 	pathIdx[0] = idx + 1;
 	path[idx] = true;
+	
+	/* free memory */
+	delete[] track;
+	track = nullptr;
+	delete[] pathSteps;
+	pathSteps = nullptr;
+	delete[] backtracks;
+	backtracks = nullptr;
+	if (nlhs > 2){
+		delete[] pathIdx;
+		pathIdx = nullptr;
+	}
 }
