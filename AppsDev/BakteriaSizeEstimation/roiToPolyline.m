@@ -2,43 +2,60 @@ function [xs, ys] = roiToPolyline(roi)
 %ROITOPOLYLINE Creates a polyline that approximates a ROI.
 %   [XS, YS] = roiToPolyline(ROI)
 %
+% Idea is based on:
+% @article{furferi2011unordered,
+%   title={From unordered point cloud to weighted B-spline-A novel PCA-based method},
+%   author={Furferi, Rocco and Governi, Lapo and Palai, Matteo and Volpe, Yary},
+%   journal={Proceedings of the 2011 American conference on applied mathematics and the 5th WSEAS international conference on Computer engineering and applications},
+%   pages={146--151},
+%   year={2011},
+%   publisher={World Scientific and Engineering Academy and Society (WSEAS)}
+% }
+% https://www.researchgate.net/publication/228913048_From_unordered_point_cloud_to_weighted_B-spline_a_novel_PCA-based_method
+% 
 % SEE ALSO: ROI
     
 %     rImage = Image.localConvexHull(roi.Image, 2);
-    rImage = roi.toImage();
+    rImage = roi.Image;
     skel = bwmorph(rImage, 'thin', Inf);
     skel = Image.elongateEndPoints(skel, rImage, 4);
     [~, idx1, idx2] = Image.getMaxContour(skel);
     [skel, skelIdx] = Image.getShortestPath(skel, idx1, idx2);
     [skelY, skelX] = ind2sub2D(size(rImage), skelIdx);
-    skelIdx = arrayfun(@(idx)find(idx == roi.PixelIdxList), skelIdx);
-    distMap = rImage .* bwdist(skel, 'euclidean');
-    radius = max(distMap(:));
+    PixelIdxList = find(rImage);
+    skelIdx = arrayfun(@(idx)find(idx == PixelIdxList, 1, 'first'), skelIdx);
+    distMap = bwdist(skel, 'euclidean');
+    distMap = distMap(bwperim(rImage));
+    radius = max(quantile(distMap, 0.9) * 1.5, max(distMap));
 
 
     distImage = bwdistgeodesic(rImage, idx1, 'quasi-euclidean');
-    distances = double(distImage(roi.PixelIdxList));
+    distances = double(distImage(PixelIdxList));
 
 %     ax = Paper.Axes();
-%     ax2 = Paper.Axes();
 %     Image.show(roi.toImage(), ax.ax);
 %     ax.xlim([roi.minX - 5, roi.maxX + 5]);
 %     ax.ylim([roi.minY - 5, roi.maxY + 5]);
+%     ax2 = Paper.Axes();
     
-    x = roi.subX(1);
-    y = roi.subY(1);
+    subX = roi.subX - roi.minX + 1;
+    subY = roi.subY - roi.minY + 1;
+    width = roi.maxX - roi.minX + 1;
+    height = roi.maxY - roi.minY + 1;
+    x = subX(1);
+    y = subY(1);
     
 %     ax.plot(x, y, '+r');
-    considered = false(size(roi.subX));
+    considered = false(size(subX));
     
     % find a proper starting point
     [groupX, groupY] = getInRadius(x, y, radius);
     [centerX, centerY] = getCenter(groupX, groupY);
-    while (abs(centerX - x) > 0.1 || abs(centerY - y) > 0.1)
+    while (abs(centerX - x) > 0.01 || abs(centerY - y) > 0.01)
         x = centerX;
         y = centerY;
 %         ax.plot(x, y, '+g');
-        considered = false(size(roi.subX));
+        considered = false(size(subX));
         [groupX, groupY] = getInRadius(x, y, radius);
         [centerX, centerY] = getCenter(groupX, groupY);
     end
@@ -56,61 +73,119 @@ function [xs, ys] = roiToPolyline(roi)
     [leftLineX, leftLineY] = getLine(leftX, leftY, startX, startY);
     [rightLineX, rightLineY] = getLine(rightX, rightY, startX, startY);
     
-    xs = [leftLineX(end:-1:1), startX, rightLineX];
-    ys = [leftLineY(end:-1:1), startY, rightLineY];
+    xs = [leftLineX(end:-1:1), startX, rightLineX] + roi.minX - 1;
+    ys = [leftLineY(end:-1:1), startY, rightLineY] + roi.minY - 1;
     
 %     ax.plot(xs, ys);
     
     function [lineX, lineY] = getLine(x, y, lastX, lastY)
-        lineX = [];
-        lineY = [];
-        unconsidered = true;
-        while (unconsidered)
-            [groupX, groupY, unconsidered] = getInRadius(x, y, radius);
+        lineX = zeros(1, roi.Area);
+        lineY = zeros(1, roi.Area);
+        lineIdx = 0;
+        filter = getInRadiusFilter(x, y, radius);
+        while (true)
+            [groupX, groupY] = getInRadius(filter);
             if (~isempty(groupX))
                 [centerX, centerY, alpha] = get2DDatasetRegression(groupX, groupY);
-                lineX(end + 1) = centerX;
-                lineY(end + 1) = centerY;
+                lineIdx = lineIdx + 1;
+                lineX(lineIdx) = centerX;
+                lineY(lineIdx) = centerY;
                 [nextX1, nextY1, nextX2, nextY2] = getIntersection(x, y, centerX, centerY, alpha, radius);
                 filter1 = getInRadiusFilter(nextX1, nextY1, radius);
                 filter2 = getInRadiusFilter(nextX2, nextY2, radius);
                 unconsidered1 = sum(~considered(filter1));
                 unconsidered2 = sum(~considered(filter2));
 %                 debug(x, y, centerX, centerY, nextX1, nextY1, nextX2, nextY2, alpha)
-
-                if ( ...
-                    unconsidered1 > unconsidered2 || ...
-                    ( ...
-                        unconsidered1 == unconsidered2 && ...
-                        (nextX1 - lastX)^2 + (nextY1 - lastY)^2 > (nextX2 - lastX)^2 + (nextY2 - lastY)^2 ...
-                    ) ...
-                )
-                    lastX = x;
-                    lastY = y;
-                    x = nextX1;
-                    y = nextY1;
+                
+                if (unconsidered1 + unconsidered2 == 0)
+                    % reached end
+                    in = 0;
+                    out = 1;
+                    dX = x - lastX;
+                    dY = y - lastY;
+                    length = sqrt(dX * dX + dY * dY);
+                    threshold = 0.1 / length;
+                    % restriction to image borders
+                    if (dY < 0)
+                        maxOut = (1 - centerY) / dY;
+                    else
+                        maxOut = (height - centerY) / dY;
+                    end
+                    if (dX < 0)
+                        maxOut = min(maxOut, (1 - centerX) / dX);
+                    else
+                        maxOut = min(maxOut, (width - centerX) / dX);
+                    end
+                    
+                    restricted = false;
+                    if (out > maxOut)
+                        out = maxOut;
+                        restricted = true;
+                    end
+                    
+                    
+                    while (rImage(round(centerY + out * dY), round(centerX + out * dX)))
+                        in = out;
+                        if (restricted)
+                            break
+                        else
+                            out = out + 1;
+                        end
+                        if (out > maxOut)
+                            out = maxOut;
+                            restricted = true;
+                        end
+                    end
+                    while out - in > threshold
+                        if (rImage(round(centerY + (in + out) / 2 * dY), round(centerX + (in + out) / 2 * dX)))
+                            in = (in + out) / 2;
+                        else
+                            out = (in + out) / 2;
+                        end
+                    end
+                    
+                    
+                    lineIdx = lineIdx + 1;
+                    lineX(lineIdx) = centerX + in * dX;
+                    lineY(lineIdx) = centerY + in * dY;
+                    break;
                 else
-                    lastX = x;
-                    lastY = y;
-                    x = nextX2;
-                    y = nextY2;
+                    if ( ...
+                        unconsidered1 > unconsidered2 || ...
+                        ( ...
+                            unconsidered1 == unconsidered2 && ...
+                            (nextX1 - lastX)^2 + (nextY1 - lastY)^2 > (nextX2 - lastX)^2 + (nextY2 - lastY)^2 ...
+                        ) ...
+                    )
+                        lastX = x;
+                        lastY = y;
+                        x = nextX1;
+                        y = nextY1;
+                        filter = filter1;
+                    else
+                        lastX = x;
+                        lastY = y;
+                        x = nextX2;
+                        y = nextY2;
+                        filter = filter2;
+                    end
                 end
+            else
+                break;
             end
         end
+        
+        lineX = lineX(1:lineIdx);
+        lineY = lineY(1:lineIdx);
     end
-    function filter = getInRadiusFilter(x, y, radius, pdfOutput)
-        filter = (roi.subX - x) .^ 2 + (roi.subY - y) .^ 2 <= radius * radius;
+    function filter = getInRadiusFilter(x, y, radius)
+        filter = (subX - x) .^ 2 + (subY - y) .^ 2 <= radius * radius;
         dist = distances(filter);
         if (~isempty(dist))
-            [minDist, maxDist] = minmax(dist);
+            minDist = min(dist);
+            maxDist = max(dist);
             if (maxDist - minDist > 2 * radius + 1)
-                threshold = minDist + maxDist * graythresh((dist - minDist) / (maxDist - minDist));
-%                 if (nargin > 3)
-%                     ax2.clear();
-%                     ax2.plot(1:numel(dist), sort(dist));
-%                     ax2.plot([1, numel(dist)], [1, 1] * threshold);
-%                     waitforbuttonpress();
-%                 end
+                threshold = otsu(dist);
                 [~, nextSkelIdx] = Polyline.getDistance(skelX, skelY, x, y);
                 skelDist = distances(skelIdx(round(nextSkelIdx)));
                 filterIdx = find(filter);
@@ -124,12 +199,15 @@ function [xs, ys] = roiToPolyline(roi)
             end
         end
     end
-    function [xs, ys, unconsidered] = getInRadius(x, y, radius)
-        filter = getInRadiusFilter(x, y, radius, true);
-        unconsidered = any(filter) && ~all(considered(filter));
+    function [xs, ys] = getInRadius(x, y, radius)
+        if (nargin == 1)
+            filter = x;
+        else
+            filter = getInRadiusFilter(x, y, radius);
+        end
         considered(filter) = true;
-        xs = roi.subX(filter);
-        ys = roi.subY(filter);
+        xs = subX(filter);
+        ys = subY(filter);
     end
     function [x, y] = getCenter(xs, ys)
         x = mean(xs);
@@ -187,7 +265,7 @@ function [xs, ys] = roiToPolyline(roi)
             ax.plot(centerX + (-50:0.1:50), centerY + (-50:0.1:50) * tan(alpha), '--'),
             ax.plot([nextX1, nextX2], [nextY1, nextY2], 'o')
         ];
-%         waitforbuttonpress();
+        waitforbuttonpress();
         delete(deleteAble);
     end
 end
