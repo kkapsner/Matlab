@@ -90,6 +90,15 @@ classdef ROIBacterium < Bacterium
                 if (strcmp(property(1:min(end,10)), 'Intensity.'))
                     intensities = [this.allRois.Intensity];
                     value = [intensities.(property(11:end))];
+                elseif (strcmp(property(1:min(end, 6)), 'Length'))
+                    rois = [this.allRois];
+                    value = zeros(size(rois));
+                    for i = 1:numel(rois)
+                        [xs, ys] = Polyline.roiToPolyline(rois(i));
+                        dx = diff(xs);
+                        dy = diff(ys);
+                        value(i) = sqrt(sum(dx.*dx + dy.*dy));
+                    end
                 else
                     value = [this.allRois.(property)];
                 end
