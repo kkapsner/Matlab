@@ -19,7 +19,7 @@ function elongated = elongateEndPoints(skel, mask, hops)
     
     imSize = size(skel);
     elongated = skel;
-    endpoints = bwmorph(skel, 'endpoints');
+    endpoints = bwmorph(skel, 'endpoints') & skel; %bug in endpoints...
     branchpoints = bwmorph(skel, 'branchpoints');
     
     [endY, endX] = find(endpoints);

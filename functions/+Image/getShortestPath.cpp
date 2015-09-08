@@ -147,15 +147,15 @@ void mexFunction( int nlhs, mxArray *plhs[],
 	path = mxGetLogicals(plhs[0]);
 	
 	if (nlhs > 1){
-		plhs[1] = mxCreateDoubleMatrix(pathSteps[idx2], 1, mxREAL);
+		plhs[1] = mxCreateDoubleMatrix(pathSteps[idx2] + 1, 1, mxREAL);
 		pathIdx = mxGetPr(plhs[1]);
 	}
 	else {
-		pathIdx = new double(pathSteps[idx2]);
+		pathIdx = new double(pathSteps[idx2] + 1);
 	}
 	
 	mwSize idx = idx2;
-	i = pathSteps[idx2] - 1;
+	i = pathSteps[idx2];
 	while (idx != idx1){
 		pathIdx[i] = idx + 1;
 		i = i - 1;

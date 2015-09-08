@@ -45,9 +45,9 @@ function [path, pathIdx] = getShortestPath(mask, idx1, idx2, conn)
     assert(path(idx2), 'Image:getShortestPath:notConnected', 'Points are not connected.');
     
     path = false(maskSize);
-    pathIdx = zeros(pathSteps(idx2), 1);
+    pathIdx = zeros(pathSteps(idx2) + 1, 1);
     idx = idx2;
-    i = pathSteps(idx2);
+    i = pathSteps(idx2) + 1;
     while (idx ~= idx1)
         pathIdx(i) = idx;
         i = i - 1;

@@ -26,16 +26,16 @@ function [xs, ys] = roiToPolyline(roi)
     skelIdx = arrayfun(@(idx)find(idx == PixelIdxList, 1, 'first'), skelIdx);
     distMap = bwdist(skel, 'euclidean');
     distMap = distMap(bwperim(rImage));
-    radius = max(quantile(distMap, 0.9) * 1.5, max(distMap));
+    radius = max(quantile(distMap, 0.9) + 2, max(distMap));
 
 
     distImage = bwdistgeodesic(rImage, idx1, 'quasi-euclidean');
     distances = double(distImage(PixelIdxList));
 
 %     ax = Paper.Axes();
-%     Image.show(roi.toImage(), ax.ax);
-%     ax.xlim([roi.minX - 5, roi.maxX + 5]);
-%     ax.ylim([roi.minY - 5, roi.maxY + 5]);
+%     Image.show(rImage, ax.ax);
+%     ax.xlim([-5, roi.maxX - roi.minX + 5]);
+%     ax.ylim([-5, roi.maxY - roi.minY + 5]);
 %     ax2 = Paper.Axes();
     
     subX = roi.subX - roi.minX + 1;
@@ -76,7 +76,7 @@ function [xs, ys] = roiToPolyline(roi)
     xs = [leftLineX(end:-1:1), startX, rightLineX] + roi.minX - 1;
     ys = [leftLineY(end:-1:1), startY, rightLineY] + roi.minY - 1;
     
-%     ax.plot(xs, ys);
+%     ax.plot(xs - roi.minX + 1, ys - roi.minY + 1);
     
     function [lineX, lineY] = getLine(x, y, lastX, lastY)
         lineX = zeros(1, roi.Area);
