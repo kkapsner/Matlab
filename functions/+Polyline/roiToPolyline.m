@@ -1,5 +1,5 @@
 function [xs, ys] = roiToPolyline(roi)
-%ROITOPOLYLINE Creates a polyline that approximates a ROI.
+%POLYLINE.ROITOPOLYLINE Creates a polyline that approximates a ROI.
 %   [XS, YS] = roiToPolyline(ROI)
 %
 % Idea is based on:
@@ -13,7 +13,7 @@ function [xs, ys] = roiToPolyline(roi)
 % }
 % https://www.researchgate.net/publication/228913048_From_unordered_point_cloud_to_weighted_B-spline_a_novel_PCA-based_method
 % 
-% SEE ALSO: ROI
+% SEE ALSO: ROI, POLYLINE
     
 %     rImage = Image.localConvexHull(roi.Image, 2);
     rImage = roi.Image;
