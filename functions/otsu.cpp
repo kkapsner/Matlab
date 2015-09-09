@@ -165,12 +165,12 @@ void mexFunction( int nlhs, mxArray *plhs[],
 
     /* Create matrix for the return argument. */
     plhs[0] = mxCreateDoubleScalar(((double) dataDiff *  maxKSum) / L / maxKCount + dataMin);
-	if (nrhs == 2){
+	if (nlhs == 2){
 		double sigma2 = 0;
 		for (mwSize k = 0; k < L; k += 1){
 			sigma2 += (double) n[k] / N * ((double) k + 1) * ((double) k + 1);
 		}
-		prhs[1] = mxCreateDoubleScalar(maxSigma2_B / (sigma2 - mu_T * mu_T));
+		plhs[1] = mxCreateDoubleScalar(maxSigma2_B / (sigma2 - mu_T * mu_T));
 	}
 	
 	/* free memory */
