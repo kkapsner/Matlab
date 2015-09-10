@@ -31,19 +31,20 @@ function [xs, ys] = roiToPolyline(roi)
 
     distImage = bwdistgeodesic(rImage, idx1, 'quasi-euclidean');
     distances = double(distImage(PixelIdxList));
+    distImage2 = bwdistgeodesic(rImage, idx2, 'quasi-euclidean');
+    distances2 = double(distImage2(PixelIdxList));
 
 %     ax = Paper.Axes();
-%     Image.show(rImage, ax.ax);
+%     Image.show(rImage + skel, ax.ax);
 %     ax.xlim([-5, roi.maxX - roi.minX + 5]);
 %     ax.ylim([-5, roi.maxY - roi.minY + 5]);
-%     ax2 = Paper.Axes();
     
     subX = roi.subX - roi.minX + 1;
     subY = roi.subY - roi.minY + 1;
+    
     width = roi.maxX - roi.minX + 1;
     height = roi.maxY - roi.minY + 1;
-    x = subX(1);
-    y = subY(1);
+    [y, x] = ind2sub2D(size(rImage), idx1);
     
 %     ax.plot(x, y, '+r');
     considered = false(size(subX));
@@ -58,6 +59,9 @@ function [xs, ys] = roiToPolyline(roi)
         considered = false(size(subX));
         [groupX, groupY] = getInRadius(x, y, radius);
         [centerX, centerY] = getCenter(groupX, groupY);
+%         del = ax.plot(groupX, groupY, '.');
+%         debug(x, y, centerX, centerY, centerX, centerY, centerX, centerY, 0);
+%         delete(del);
     end
     
     startX = centerX;
@@ -68,21 +72,27 @@ function [xs, ys] = roiToPolyline(roi)
     % get starting points of the two lines
     [centerX, centerY, alpha] = get2DDatasetRegression(groupX, groupY);
     [leftX, leftY, rightX, rightY] = getIntersection(x, y, centerX, centerY, alpha, radius);
+    leftFilter = getInRadiusFilter(leftX, leftY, radius);
+    rightFilter = getInRadiusFilter(rightX, rightY, radius);
+    considered(leftFilter | rightFilter) = true;
+    
 %     debug(x, y, centerX, centerY, leftX, leftY, rightX, rightY, alpha)
     
-    [leftLineX, leftLineY] = getLine(leftX, leftY, startX, startY);
-    [rightLineX, rightLineY] = getLine(rightX, rightY, startX, startY);
+    [leftLineX, leftLineY] = getLine(leftX, leftY, startX, startY, leftFilter);
+    [rightLineX, rightLineY] = getLine(rightX, rightY, startX, startY, rightFilter);
     
     xs = [leftLineX(end:-1:1), startX, rightLineX] + roi.minX - 1;
     ys = [leftLineY(end:-1:1), startY, rightLineY] + roi.minY - 1;
     
 %     ax.plot(xs - roi.minX + 1, ys - roi.minY + 1);
     
-    function [lineX, lineY] = getLine(x, y, lastX, lastY)
+    function [lineX, lineY] = getLine(x, y, lastX, lastY, filter)
         lineX = zeros(1, roi.Area);
         lineY = zeros(1, roi.Area);
         lineIdx = 0;
-        filter = getInRadiusFilter(x, y, radius);
+        if (nargin < 5)
+            filter = getInRadiusFilter(x, y, radius);
+        end
         while (true)
             [groupX, groupY] = getInRadius(filter);
             if (~isempty(groupX))
@@ -95,7 +105,12 @@ function [xs, ys] = roiToPolyline(roi)
                 filter2 = getInRadiusFilter(nextX2, nextY2, radius);
                 unconsidered1 = sum(~considered(filter1));
                 unconsidered2 = sum(~considered(filter2));
+%                 del = [...
+%                     ax.plot(subX(filter1 & ~considered), subY(filter1 & ~considered), '+r'), ...
+%                     ax.plot(subX(filter2 & ~considered), subY(filter2 & ~considered), 'xg') ...
+%                 ];
 %                 debug(x, y, centerX, centerY, nextX1, nextY1, nextX2, nextY2, alpha)
+%                 delete(del);
                 
                 if (unconsidered1 + unconsidered2 == 0)
                     % reached end
@@ -184,8 +199,27 @@ function [xs, ys] = roiToPolyline(roi)
         if (~isempty(dist))
             minDist = min(dist);
             maxDist = max(dist);
+            dist2 = distances2(filter);
+            minDist2 = min(dist2);
+            maxDist2 = max(dist2);
+            if (maxDist2 - minDist2 > maxDist - minDist)
+                maxDist = maxDist2;
+                minDist = minDist2;
+            end
+            
             if (maxDist - minDist > 2 * radius + 1)
-                threshold = otsu(dist);
+                % 
+                [threshold, quality] = otsu(dist);
+                if (quality < 0.8)
+                    dist = sort(dist);
+                    ddist = diff(dist);
+                    [maxDDist, idx] = max(ddist);
+                    if (maxDDist < 0.5)
+                        return;
+                    else
+                        threshold = (dist(idx) + dist(idx + 1)) / 2;
+                    end
+                end
                 [~, nextSkelIdx] = Polyline.getDistance(skelX, skelY, x, y);
                 skelDist = distances(skelIdx(round(nextSkelIdx)));
                 filterIdx = find(filter);
