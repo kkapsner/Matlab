@@ -97,7 +97,7 @@ classdef ROIBacterium < Bacterium
                         [xs, ys] = Polyline.roiToPolyline(rois(i));
                         dx = diff(xs);
                         dy = diff(ys);
-                        value(i) = sqrt(sum(dx.*dx + dy.*dy));
+                        value(i) = sum(sqrt(dx.*dx + dy.*dy));
                     end
                 else
                     value = [this.allRois.(property)];
