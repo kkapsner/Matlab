@@ -1,7 +1,7 @@
 classdef FilteredTiffStack < TiffStackDecorator
     %FilteredTiffStack
     
-    properties(SetAccess=private)
+    properties(SetAccess=private, Transient)
         filter
     end
     properties(SetAccess=private, SetObservable)
@@ -63,6 +63,17 @@ classdef FilteredTiffStack < TiffStackDecorator
     
     methods (Static)
         [panel, getParameter] = getGUIParameterPanel(parent)
+    
+        function obj = loadobj(A)
+            obj = FilteredTiffStack(A.stack, A.cutoffs);
+            for name = fieldnames(A)
+                if (~strcmp(name{1}, 'filter'))
+                    try
+                        obj.(name{1}) = A.(name{1});
+                    end
+                end
+            end
+        end
     end
 end
 
