@@ -9,7 +9,7 @@ function roi = segmentEnhancedBW(seg, image, stack)
     imageSize = size(image);
     
     % get regions
-    roiOrig = bwconncomp(image, 4);
+    roiOrig = bwconncomp(image, seg.connectivity);
 
 
     roi = ROI(roiOrig.PixelIdxList, imageSize, stack);

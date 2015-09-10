@@ -58,6 +58,9 @@ classdef Segmenter < handle & Configable
         % whether white areas touching the border should be removed
         clearBorder = true
         
+        % connectivity
+        connectivity = 4
+        
         % range within the found segments have to be
         areaRange = [-Inf, Inf]
         
