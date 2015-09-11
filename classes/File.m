@@ -136,16 +136,36 @@ classdef File < handle
     
     properties (Constant, Transient)
         fileMap = containers.Map;
+        fileMapFeatures = containers.Map({'enabled', 'useSameFilename'}, [true, false]);
     end
     
     methods(Static)
+        function oldEnable = enableMapFeature(featureName, enable)
+            features = File.fileMapFeatures;
+            oldEnable = features(featureName);
+            if (nargin < 2)
+                enable = true;
+            end
+            features(featureName) = enable;
+        end
         function file = getMappedFile(oldFile)
-            map = File.fileMap;
-            if (map.isKey(oldFile.fullpath))
-                file = map(oldFile.fullpath);
+            features = File.fileMapFeatures;
+            if (features('enabled'))
+                map = File.fileMap;
+                if (map.isKey(oldFile.fullpath))
+                    file = map(oldFile.fullpath);
+                else
+                    if (features('useSameFilename'))
+                        file = File('', oldFile.filename);
+                        if (file.exists())
+                            return;
+                        end
+                    end
+                    file = File.get([], ['Select new location of ', oldFile.filename]);
+                    map(oldFile.fullpath) = file;
+                end
             else
-                file = File.get([], ['Select new location of ', oldFile.filename]);
-                map(oldFile.fullpath) = file;
+                file = File.empty();
             end
         end
         function file = loadobj(file)
