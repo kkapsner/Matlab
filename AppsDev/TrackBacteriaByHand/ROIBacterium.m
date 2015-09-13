@@ -3,9 +3,13 @@ classdef ROIBacterium < Bacterium
     properties (SetAccess=private)
         rois
     end
+    properties (Transient, SetAccess=private)
+        lengths
+    end
     
     properties (Dependent)
         allRois
+        allLengths
     end
     
     methods
@@ -64,7 +68,75 @@ classdef ROIBacterium < Bacterium
             end
         end
         
-        function value = getValue(this, property)
+        function [bacs, innerFrames] = getBacByFrame(this, frame)
+            assert(frame > 0, 'ROIBacterium:getBacByFrame:invalidFrame', 'Invalid frame index');
+            bacs = this.empty(1, 0);
+            innerFrames = zeros(1, 0);
+            for o = this
+                if (frame <= numel(o.rois))
+                    bac = o;
+                    innerFrame = frame;
+                elseif (~isempty(o.children))
+                    [bac, innerFrame] = o.children.getBacByFrame(frame - numel(o.rois));
+                else
+                    bac = this.empty(1, 0);
+                    innerFrame = zeros(1, 0);
+                end
+                if (~isempty(bac))
+                    bacs = [bacs, bac];
+                    innerFrames = [innerFrames, innerFrame];
+                end
+            end
+        end
+        function rois = getRoiByFrame(this, frame)
+            [bacs, innerFrames] = this.getBacByFrame(frame);
+            rois(numel(bacs)) = bacs(end).rois(innerFrames(end));
+            for i = 1:numel(bacs)
+                rois(i) = bacs(i).rois(innerFrames(i));
+            end
+        end
+        function lengths = getLengthByFrame(this, frame)
+            [bacs, innerFrames] = this.getBacByFrame(frame);
+            lengths(numel(bacs)) = bacs(end).lengths(innerFrames(end));
+            for i = 1:numel(bacs)
+                lengths(i) = bacs(i).lengths(innerFrames(i));
+            end
+        end
+        
+        function calculateLengths(this)
+            for o = this
+                r = o.rois;
+                l = zeros(size(r));
+                for i = 1:numel(r)
+                    [xs, ys] = Polyline.roiToPolyline(r(i));
+                    dx = diff(xs);
+                    dy = diff(ys);
+                    l(i) = sum(sqrt(dx.*dx + dy.*dy));
+                end
+                o.lengths = l;
+                if (~isempty(o.children))
+                    o.children.calculateLengths();
+                end
+            end
+        end
+        
+        function allLenghts = get.allLengths(this)
+            allLenghts = this.getAllLengths();
+        end
+        function allLenghts = getAllLengths(this)
+            if (~isempty(this.parent))
+                allLenghts = [this.parent.allLengths, this.lengths];
+            else
+                allLenghts = this.lengths;
+            end
+        end
+        
+        
+        function value = getValue(this, property, getAll)
+            if (nargin < 3)
+                getAll = true;
+            end
+            
             property = strtrim(property);
             if (any(property == '*'))
                 splitIdx = find(property == '*', 1, 'first');
@@ -88,30 +160,87 @@ classdef ROIBacterium < Bacterium
                     this.getValue(property((splitIdx + 1):end));
             else
                 if (strcmp(property(1:min(end,10)), 'Intensity.'))
-                    intensities = [this.allRois.Intensity];
+                    if (getAll)
+                        intensities = [this.allRois.Intensity];
+                    else
+                        intensities = [this.rois.Intensity];
+                    end
                     value = [intensities.(property(11:end))];
                 elseif (strcmp(property(1:min(end, 6)), 'Length'))
-                    rois = [this.allRois];
-                    value = zeros(size(rois));
-                    for i = 1:numel(rois)
-                        [xs, ys] = Polyline.roiToPolyline(rois(i));
-                        dx = diff(xs);
-                        dy = diff(ys);
-                        value(i) = sum(sqrt(dx.*dx + dy.*dy));
+                    if (getAll)
+                        value = this.allLengths;
+                    else
+                        value = this.lengths;
                     end
                 else
-                    value = [this.allRois.(property)];
+                    if (getAll)
+                        value = [this.allRois.(property)];
+                    else
+                        value = [this.rois.(property)];
+                    end
                 end
             end
         end
         
-        function plot(this, property, varargin)
-            arguments = cell(2 * numel(this));
-            for i = 1:numel(this)
-                arguments{1 + (i - 1) * 2} = 1:this(i).dataSize;
-                arguments{2 + (i - 1) * 2} = this(i).getValue(property);
+        function traces = Trace(this, property)
+            endBac = this.getEndBacteria();
+            maxLength = max([endBac.dataSize]);
+            fullX = 1:maxLength;
+            traces = RawDataTrace.empty(1, 0);
+            for o = this
+                traces = [traces, getTraces(o)];
             end
-            plot(arguments{:}, varargin{:});
+            function traces = getTraces(bac)
+                if (isempty(bac.parent))
+                    x = 1:bac.dataSize;
+                else
+                    x = (bac.parent.dataSize + 1):bac.dataSize;
+                end
+                y = bac.getValue(property, false);
+                fullY = NaN(maxLength, 1);
+                fullY(x) = y;
+                traces = RawDataTrace(fullX, fullY);
+                traces.valueName = property;
+                traces.timeName = 'Frame';
+                traces.timeUnit = '#';
+                for c = bac.children
+                    traces = [traces, getTraces(c)];
+                end
+            end
+        end
+        
+        function lines = plot(this, property, varargin)
+            arguments = cell(4 * numel(this), 1);
+            for i = 1:numel(this)
+                [x, y, xC, yC] = getData(this(i), 0, [], [], [NaN], [NaN]);
+                arguments{1 + (i - 1) * 4} = x;
+                arguments{2 + (i - 1) * 4} = y;
+                arguments{3 + (i - 1) * 4} = xC;
+                arguments{4 + (i - 1) * 4} = yC;
+            end
+            lines = plot(arguments{:}, varargin{:});
+            for i = 1:numel(this)
+                try
+                    idxOffset = (i - 1) * 2;
+                    lines(2 + idxOffset).Color = lines(1 + idxOffset).Color;
+                    lines(2 + idxOffset).LineStyle = ':';
+                catch e
+                end
+            end
+            
+            function [x, y, xC, yC] = getData(bac, offsetX, x, y, xC, yC)
+                x = [x, NaN, (offsetX + 1):bac.dataSize];
+                y = [y, NaN, bac.getValue(property, false)];
+                offsetX = bac.dataSize;
+                endX = x(end);
+                endY = y(end);
+                for child = bac.children
+                    startIdx = numel(x) + 2;
+                    [x, y, xC, yC] = getData(child, offsetX, x, y, xC, yC);
+                    xC = [xC, NaN, endX, x(startIdx)];
+                    yC = [yC, NaN, endY, y(startIdx)];
+                end
+            end
         end
     end
 end

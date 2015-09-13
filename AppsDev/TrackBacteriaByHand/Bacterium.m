@@ -6,6 +6,7 @@ classdef (Abstract) Bacterium < handle
     end
     properties (Dependent)
         dataSize
+        divisions
     end
     
     methods
@@ -25,9 +26,21 @@ classdef (Abstract) Bacterium < handle
         end
         
         
+        function divisions = get.divisions(this)
+            divisions = this.getDivisions();
+        end
+        function divisions = getDivisions(this)
+            if (~isempty(this.parent))
+                divisions = 1 + this.parent.getDivisions();
+            else
+                divisions = 0;
+            end
+        end
+        
+        
         function bac = getEndBacteria(this)
             if (numel(this) > 1)
-                bac = this(1).getEndBacteria();
+                bac = this.empty(1, 0);
                 for b = this
                     bac = [bac, b.getEndBacteria()];
                 end
