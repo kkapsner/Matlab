@@ -62,24 +62,24 @@ classdef StatisticTrace < AbstractTraceDecorator
         end
         
         function value = getValue(this)
-            if (isempty(this.calculatedValue))
+            if (isempty(this.mean))
                 this.calculate();
             end
             
-            switch o.operation
+            switch this.operation
                 case 'mean'
-                    value = o.mean;
+                    value = this.mean;
                 case 'std'
-                    value = o.std;
+                    value = this.std;
                 case 'mean + std'
-                    value = o.mean + o.std;
+                    value = this.mean + this.std;
                 case 'mean - std'
-                    value = o.mean - o.std;
+                    value = this.mean - this.std;
                 otherwise
                     error( ...
                         'StatisticTrace:unknownOperation', ...
                         'Unknown operation %s', ...
-                        o.operation ...
+                        this.operation ...
                     );
             end
         end
@@ -137,8 +137,8 @@ classdef StatisticTrace < AbstractTraceDecorator
         function calculate(this)
             for o = this
                 values = [o.traces.value];
-                o.mean = mean(values, 2);
-                o.std = std(values, [], 2);
+                o.mean = nanmean(values, 2);
+                o.std = nanstd(values, [], 2);
             end
         end
     end
