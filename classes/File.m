@@ -1,7 +1,7 @@
 classdef File < handle
     properties
-        path
-        filename
+        path = ''
+        filename = ''
     end
     
     properties (Dependent)
@@ -30,6 +30,8 @@ classdef File < handle
                     elseif (isa(path, 'File'))
                         this.path = path.path;
                         this.filename = this.filename;
+                    else
+                        error('File:invalidParameter', 'Invalid path parameter.');
                     end
                 else
                     this.path = path;
