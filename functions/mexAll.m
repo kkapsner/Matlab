@@ -23,9 +23,10 @@ function mexAll(dir, recursive, varargin)
             % if there is no header file
             try
                 disp(['mex ' file.fullpath]);
-                mex('-outdir', dir.path, varargin{:}, file.fullpath)
-            catch
+                mex('-outdir', dir.path, 'CXXFLAGS=$CXXFLAGS -std=c++11', varargin{:}, file.fullpath)
+            catch e
                 disp(['mex failed for ' file.fullpath]);
+                fprintf(2, [e.message 10]);
             end
         else
             disp(['<a href="matlab:disp([10 ''' file.fullpath ' has a header file.''])">no</a> mex ' file.fullpath]);
