@@ -103,7 +103,10 @@ classdef ROIBacterium < Bacterium
             end
         end
         
-        function calculateLengths(this)
+        function calculateLengths(this, pixelSize)
+            if (nargin < 2 || isempty(pixelSize))
+                pixelSize = 1;
+            end
             for o = this
                 r = o.rois;
                 l = zeros(size(r));
@@ -111,11 +114,11 @@ classdef ROIBacterium < Bacterium
                     [xs, ys] = Polyline.roiToPolyline(r(i));
                     dx = diff(xs);
                     dy = diff(ys);
-                    l(i) = sum(sqrt(dx.*dx + dy.*dy));
+                    l(i) = sum(sqrt(dx.*dx + dy.*dy)) * pixelSize;
                 end
                 o.lengths = l;
                 if (~isempty(o.children))
-                    o.children.calculateLengths();
+                    o.children.calculateLengths(pixelSize);
                 end
             end
         end
@@ -182,10 +185,28 @@ classdef ROIBacterium < Bacterium
             end
         end
         
-        function traces = Trace(this, property)
+        function traces = Trace(this, propertyOrTimeStep, property)
+            if (nargin < 3)
+                property = propertyOrTimeStep;
+                timeStep = [];
+            else
+                timeStep = propertyOrTimeStep;
+            end
+            
+            if (isempty(timeStep))
+                timeStep = 1;
+                timeOffset = 0;
+                timeUnit = '#';
+                timeName = 'Frame';
+            else
+                timeOffset = 1;
+                timeUnit = 's';
+                timeName = 'time';
+            end
+            
             endBac = this.getEndBacteria();
             maxLength = max([endBac.dataSize]);
-            fullX = 1:maxLength;
+            fullX = ((1:maxLength) - timeOffset) * timeStep;
             traces = RawDataTrace.empty(1, 0);
             for o = this
                 traces = [traces, getTraces(o)];
@@ -201,21 +222,35 @@ classdef ROIBacterium < Bacterium
                 fullY(x) = y;
                 traces = RawDataTrace(fullX, fullY);
                 traces.valueName = property;
-                traces.timeName = 'Frame';
-                traces.timeUnit = '#';
+                traces.timeName = timeName;
+                traces.timeUnit = timeUnit;
                 for c = bac.children
                     traces = [traces, getTraces(c)];
                 end
             end
         end
         
-        function lines = plot(this, property, varargin)
+        function lines = plot(this, propertyOrTimeStep, property, varargin)
+            if (nargin < 3)
+                property = propertyOrTimeStep;
+                timeStep = [];
+            else
+                timeStep = propertyOrTimeStep;
+            end
+            
+            if (isempty(timeStep))
+                timeStep = 1;
+                timeOffset = 0;
+            else
+                timeOffset = 1;
+            end
+            
             arguments = cell(4 * numel(this), 1);
             for i = 1:numel(this)
                 [x, y, xC, yC] = getData(this(i), 0, [], [], [NaN], [NaN]);
-                arguments{1 + (i - 1) * 4} = x;
+                arguments{1 + (i - 1) * 4} = (x - timeOffset) * timeStep;
                 arguments{2 + (i - 1) * 4} = y;
-                arguments{3 + (i - 1) * 4} = xC;
+                arguments{3 + (i - 1) * 4} = (xC - timeOffset) * timeStep;
                 arguments{4 + (i - 1) * 4} = yC;
             end
             lines = plot(arguments{:}, varargin{:});
