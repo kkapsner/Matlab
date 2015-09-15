@@ -111,10 +111,8 @@ classdef ROIBacterium < Bacterium
                 r = o.rois;
                 l = zeros(size(r));
                 for i = 1:numel(r)
-                    [xs, ys] = Polyline.roiToPolyline(r(i));
-                    dx = diff(xs);
-                    dy = diff(ys);
-                    l(i) = sum(sqrt(dx.*dx + dy.*dy)) * pixelSize;
+                    [~, ~, length] = Polyline.roiToPolyline(r(i));
+                    l(i) = length * pixelSize;
                 end
                 o.lengths = l;
                 if (~isempty(o.children))
@@ -144,23 +142,23 @@ classdef ROIBacterium < Bacterium
             if (any(property == '*'))
                 splitIdx = find(property == '*', 1, 'first');
                 value = ...
-                    this.getValue(property(1:(splitIdx - 1))) .* ...
-                    this.getValue(property((splitIdx + 1):end));
+                    this.getValue(property(1:(splitIdx - 1)), getAll) .* ...
+                    this.getValue(property((splitIdx + 1):end), getAll);
             elseif (any(property == '/'))
                 splitIdx = find(property == '/', 1, 'first');
                 value = ...
-                    this.getValue(property(1:(splitIdx - 1))) ./ ...
-                    this.getValue(property((splitIdx + 1):end));
+                    this.getValue(property(1:(splitIdx - 1)), getAll) ./ ...
+                    this.getValue(property((splitIdx + 1):end), getAll);
             elseif (any(property == '+'))
                 splitIdx = find(property == '+', 1, 'first');
                 value = ...
-                    this.getValue(property(1:(splitIdx - 1))) + ...
-                    this.getValue(property((splitIdx + 1):end));
+                    this.getValue(property(1:(splitIdx - 1)), getAll) + ...
+                    this.getValue(property((splitIdx + 1):end), getAll);
             elseif (any(property == '-'))
                 splitIdx = find(property == '-', 1, 'first');
                 value = ...
-                    this.getValue(property(1:(splitIdx - 1))) - ...
-                    this.getValue(property((splitIdx + 1):end));
+                    this.getValue(property(1:(splitIdx - 1)), getAll) - ...
+                    this.getValue(property((splitIdx + 1):end), getAll);
             else
                 if (strcmp(property(1:min(end,10)), 'Intensity.'))
                     if (getAll)

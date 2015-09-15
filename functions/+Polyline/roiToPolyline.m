@@ -1,6 +1,6 @@
-function [xs, ys] = roiToPolyline(roi)
+function [xs, ys, polylineLength] = roiToPolyline(roi)
 %POLYLINE.ROITOPOLYLINE Creates a polyline that approximates a ROI.
-%   [XS, YS] = roiToPolyline(ROI)
+%   [XS, YS, LENGTH] = roiToPolyline(ROI)
 %
 % Idea is based on:
 % @article{furferi2011unordered,
@@ -19,7 +19,10 @@ function [xs, ys] = roiToPolyline(roi)
     rImage = roi.Image;
     skel = bwmorph(rImage, 'thin', Inf);
     skel = Image.elongateEndPoints(skel, rImage, 4);
-    [~, idx1, idx2] = Image.getMaxContour(skel);
+    [upperLengthBoundary, idx1, idx2] = Image.getMaxContour(skel);
+    % polyline reaches very end of pixels
+    upperLengthBoundary = upperLengthBoundary + sqrt(2); 
+    
     [skel, skelIdx] = Image.getShortestPath(skel, idx1, idx2);
     [skelY, skelX] = ind2sub2D(size(rImage), skelIdx);
     PixelIdxList = find(rImage);
@@ -27,6 +30,7 @@ function [xs, ys] = roiToPolyline(roi)
     distMap = bwdist(skel, 'euclidean');
     distMap = distMap(bwperim(rImage));
     radius = max(quantile(distMap, 0.9) + 2, max(distMap));
+    lowerLengthBoundary = roi.Area / 2 / radius;
 
 
     distImage = bwdistgeodesic(rImage, idx1, 'quasi-euclidean');
@@ -34,10 +38,10 @@ function [xs, ys] = roiToPolyline(roi)
     distImage2 = bwdistgeodesic(rImage, idx2, 'quasi-euclidean');
     distances2 = double(distImage2(PixelIdxList));
 
-%     ax = Paper.Axes();
-%     Image.show(rImage + skel, ax.ax);
-%     ax.xlim([-5, roi.maxX - roi.minX + 5]);
-%     ax.ylim([-5, roi.maxY - roi.minY + 5]);
+    ax = Paper.Axes();
+    Image.show(rImage + skel, ax.ax);
+    ax.xlim([-5, roi.maxX - roi.minX + 5]);
+    ax.ylim([-5, roi.maxY - roi.minY + 5]);
     
     subX = roi.subX - roi.minX + 1;
     subY = roi.subY - roi.minY + 1;
@@ -76,15 +80,36 @@ function [xs, ys] = roiToPolyline(roi)
     rightFilter = getInRadiusFilter(rightX, rightY, radius);
     considered(leftFilter | rightFilter) = true;
     
-%     debug(x, y, centerX, centerY, leftX, leftY, rightX, rightY, alpha)
+    debug(x, y, centerX, centerY, leftX, leftY, rightX, rightY, alpha)
     
     [leftLineX, leftLineY] = getLine(leftX, leftY, startX, startY, leftFilter);
     [rightLineX, rightLineY] = getLine(rightX, rightY, startX, startY, rightFilter);
     
     xs = [leftLineX(end:-1:1), startX, rightLineX] + roi.minX - 1;
     ys = [leftLineY(end:-1:1), startY, rightLineY] + roi.minY - 1;
+    dx = diff(xs);
+    dy = diff(ys);
+    segmentLenghts = sqrt(dx.*dx + dy.*dy);
+    polylineLength = sum(segmentLenghts);
+    if (polylineLength - min(segmentLenghts) / 2 > upperLengthBoundary)
+        ax = Paper.Axes();
+        Image.show(rImage + skel, ax.ax);
+        ax.xlim([-5, roi.maxX - roi.minX + 5]);
+        ax.ylim([-5, roi.maxY - roi.minY + 5]);
+        ax.plot(xs - roi.minX + 1, ys - roi.minY + 1);
+        warning('Polyline:roiToPolyline:suspiciousResult:tooLong', ...
+            'The resulting polyline is suspicious. It seems to be too long.');
+    elseif (polylineLength < lowerLengthBoundary)
+        ax = Paper.Axes();
+        Image.show(rImage + skel, ax.ax);
+        ax.xlim([-5, roi.maxX - roi.minX + 5]);
+        ax.ylim([-5, roi.maxY - roi.minY + 5]);
+        ax.plot(xs - roi.minX + 1, ys - roi.minY + 1);
+        warning('Polyline:roiToPolyline:suspiciousResult:tooShort', ...
+            'The resulting polyline is suspicious. It seems to be too short.');
+    end
     
-%     ax.plot(xs - roi.minX + 1, ys - roi.minY + 1);
+    ax.plot(xs - roi.minX + 1, ys - roi.minY + 1);
     
     function [lineX, lineY] = getLine(x, y, lastX, lastY, filter)
         lineX = zeros(1, roi.Area);
@@ -93,10 +118,18 @@ function [xs, ys] = roiToPolyline(roi)
         if (nargin < 5)
             filter = getInRadiusFilter(x, y, radius);
         end
+        lastAlpha = 0;
         while (true)
             [groupX, groupY] = getInRadius(filter);
             if (~isempty(groupX))
-                [centerX, centerY, alpha] = get2DDatasetRegression(groupX, groupY);
+                [centerX, centerY, alpha, var1, var2] = get2DDatasetRegression(groupX, groupY);
+                if (var1 / var2 > 0.9)
+                    alpha = lastAlpha;
+                    useFarest = true;
+                else
+                    useFarest = mod(abs(radtodeg(alpha - lastAlpha)), 360) < 10;
+                    lastAlpha = alpha; 
+                end
                 lineIdx = lineIdx + 1;
                 lineX(lineIdx) = centerX;
                 lineY(lineIdx) = centerY;
@@ -105,12 +138,23 @@ function [xs, ys] = roiToPolyline(roi)
                 filter2 = getInRadiusFilter(nextX2, nextY2, radius);
                 unconsidered1 = sum(~considered(filter1));
                 unconsidered2 = sum(~considered(filter2));
-%                 del = [...
-%                     ax.plot(subX(filter1 & ~considered), subY(filter1 & ~considered), '+r'), ...
-%                     ax.plot(subX(filter2 & ~considered), subY(filter2 & ~considered), 'xg') ...
-%                 ];
-%                 debug(x, y, centerX, centerY, nextX1, nextY1, nextX2, nextY2, alpha)
-%                 delete(del);
+                
+                if (useFarest)
+                    if ((nextX1 - lastX)^2 + (nextY1 - lastY)^2 > (nextX2 - lastX)^2 + (nextY2 - lastY)^2)
+                        unconsidered2 = 0;
+                    else
+                        unconsidered1 = 0;
+                    end
+                end
+                
+                del = [...
+                    ax.plot(subX(filter1), subY(filter1), '+r'), ...
+                    ax.plot(subX(filter1 & ~considered), subY(filter1 & ~considered), 'xr'), ...
+                    ax.plot(subX(filter2), subY(filter2), '+g') ...
+                    ax.plot(subX(filter2 & ~considered), subY(filter2 & ~considered), 'xg') ...
+                ];
+                debug(x, y, centerX, centerY, nextX1, nextY1, nextX2, nextY2, alpha)
+                delete(del);
                 
                 if (unconsidered1 + unconsidered2 == 0)
                     % reached end
@@ -202,28 +246,34 @@ function [xs, ys] = roiToPolyline(roi)
             dist2 = distances2(filter);
             minDist2 = min(dist2);
             maxDist2 = max(dist2);
-            if (maxDist2 - minDist2 > maxDist - minDist)
+            useDist2 = maxDist2 - minDist2 > maxDist - minDist;
+            if (useDist2)
                 maxDist = maxDist2;
                 minDist = minDist2;
+                dist = dist2;
             end
             
             if (maxDist - minDist > 2 * radius + 1)
                 % 
                 [threshold, quality] = otsu(dist);
                 if (quality < 0.8)
-                    dist = sort(dist);
-                    ddist = diff(dist);
-                    [maxDDist, idx] = max(ddist);
-                    if (maxDDist < 0.5)
+                    sortedDist = sort(dist);
+                    diffDist = diff(dist);
+                    [maxDDist, idx] = max(diffDist);
+                    if (maxDDist <= 1)
                         return;
                     else
-                        threshold = (dist(idx) + dist(idx + 1)) / 2;
+                        threshold = (sortedDist(idx) + sortedDist(idx + 1)) / 2;
                     end
                 end
                 [~, nextSkelIdx] = Polyline.getDistance(skelX, skelY, x, y);
-                skelDist = distances(skelIdx(round(nextSkelIdx)));
+                if (~useDist2)
+                    skelDist = distances(skelIdx(round(nextSkelIdx)));
+                else
+                    skelDist = distances2(skelIdx(round(nextSkelIdx)));
+                end
                 filterIdx = find(filter);
-                if (abs(maxDist - skelDist) > abs(minDist - skelDist))
+                if (skelDist < threshold)
                     % use lower population
                     filter(filterIdx(dist > threshold)) = false;
                 else
