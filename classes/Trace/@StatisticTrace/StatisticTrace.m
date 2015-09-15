@@ -12,6 +12,9 @@ classdef StatisticTrace < AbstractTraceDecorator
     properties(Access=private,Transient)
         mean
         std
+        min
+        max
+        median
     end
     
     methods
@@ -101,27 +104,30 @@ classdef StatisticTrace < AbstractTraceDecorator
         end
         
         function newTrace = meanTrace(this)
-            newTrace = copy(this);
-            for o = newTrace
-                o.operation = 'mean';
-            end
+            newTrace = this.copyWithOperation('mean');
         end
         function newTrace = stdTrace(this)
-            newTrace = copy(this);
-            for o = newTrace
-                o.operation = 'std';
-            end
+            newTrace = this.copyWithOperation('std');
         end
         function newTrace = meanPlusStd(this)
-            newTrace = copy(this);
-            for o = newTrace
-                o.operation = 'mean + std';
-            end
+            newTrace = this.copyWithOperation('mean + std');
         end
         function newTrace = meanMinusStd(this)
+            newTrace = this.copyWithOperation('mean - std');
+        end
+        function newTrace = minTrace(this)
+            newTrace = this.copyWithOperation('min');
+        end
+        function newTrace = maxTrace(this)
+            newTrace = this.copyWithOperation('max');
+        end
+        function newTrace = medianTrace(this)
+            newTrace = this.copyWithOperation('median');
+        end
+        function newTrace = copyWithOperation(this, operation)
             newTrace = copy(this);
-            for o = newTrace
-                o.operation = 'mean - std';
+            for o = newTace
+                o.operation = operation;
             end
         end
     end
@@ -131,6 +137,9 @@ classdef StatisticTrace < AbstractTraceDecorator
             for o = this
                 o.mean = [];
                 o.std = [];
+                o.min = [];
+                o.max = [];
+                o.median = [];
                 o.notify('change');
             end
         end
@@ -139,6 +148,9 @@ classdef StatisticTrace < AbstractTraceDecorator
                 values = [o.traces.value];
                 o.mean = nanmean(values, 2);
                 o.std = nanstd(values, [], 2);
+                o.min = nanmin(values, [], 2);
+                o.max = nanmin(values, [], 2);
+                o.median = nanmedian(values, 2);
             end
         end
     end
