@@ -58,7 +58,7 @@
 
 void error(const char *errorid, const char *errormsg){
 	char *completeErrorId;
-	sprintf(completeErrorId, "MATLAB:ind2sub2D:%s", errorid);
+	sprintf(completeErrorId, "MATLAB:otsu:%s", errorid);
 	mexErrMsgIdAndTxt(completeErrorId, errormsg);
 }
 void assert(int expression, const char *errorid, const char *errormsg){
