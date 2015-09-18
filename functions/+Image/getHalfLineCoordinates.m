@@ -40,7 +40,8 @@ function [xC, yC] = getHalfLineCoordinates(x, y, dx, dy, w, h)
             yC = y;
         else
             xC = x:sign(dx):xBorder;
-            yC = round(interp1([x, xBorder], [y, yBorder], xC, 'linear'));
+            yC = round(y + (xC - x) * (yBorder - y)/(xBorder - x));
+%             yC = round(interp1([x, xBorder], [y, yBorder], xC, 'linear'));
         end
     end
 end

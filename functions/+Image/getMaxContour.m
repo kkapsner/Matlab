@@ -15,6 +15,16 @@ function [dist, idx, newIdx] = getMaxContour(image, method)
     if (nargin < 2)
         method = 'quasi-euclidean';
     end
+    switch (method)
+        case 'cityblock'
+            conn = 4;
+        case 'chessboard'
+            conn = 6;
+        case 'quasi-euclidean'
+            conn = 8;
+        otherwise
+            error('Image:getMaxContour:unknownMethod', 'Unknown distance method.');
+    end
     dist = -1;
     newDist = 0;
     newIdx = find(image, 1, 'first');
@@ -22,7 +32,8 @@ function [dist, idx, newIdx] = getMaxContour(image, method)
         while (newDist > dist)
             idx = newIdx;
             dist = newDist;
-            distImage = bwdistgeodesic(image, idx, method);
+%             distImage = bwdistgeodesic(image, idx, method);
+            distImage = Image.distgeodesic(image, idx, conn);
             [newDist, newIdx] = max(distImage(:));
         end
     end
