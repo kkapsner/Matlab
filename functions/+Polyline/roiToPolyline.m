@@ -1,4 +1,4 @@
-function [xs, ys, polylineLength] = roiToPolyline(roi)
+function [xs, ys, polylineLength] = roiToPolyline(roi, verboseLevel)
 %POLYLINE.ROITOPOLYLINE Creates a polyline that approximates a ROI.
 %   [XS, YS, LENGTH] = roiToPolyline(ROI)
 %
@@ -15,6 +15,10 @@ function [xs, ys, polylineLength] = roiToPolyline(roi)
 % 
 % SEE ALSO: ROI, POLYLINE
     
+    if (nargin < 2)
+        verboseLevel = 0;
+    end
+
 %     rImage = Image.localConvexHull(roi.Image, 2);
     rImage = roi.Image;
     skel = bwmorph(rImage, 'thin', Inf);
@@ -33,65 +37,68 @@ function [xs, ys, polylineLength] = roiToPolyline(roi)
     lowerLengthBoundary = roi.Area / 2 / radius;
 
 
-    distImage = bwdistgeodesic(rImage, idx1, 'quasi-euclidean');
+%     distImage = bwdistgeodesic(rImage, idx1, 'quasi-euclidean');
+    distImage = Image.distgeodesic(rImage, idx1, 8);
     distances = double(distImage(PixelIdxList));
-    distImage2 = bwdistgeodesic(rImage, idx2, 'quasi-euclidean');
+    
+%     distImage2 = bwdistgeodesic(rImage, idx2, 'quasi-euclidean');
+    distImage2 = Image.distgeodesic(rImage, idx2, 8);
     distances2 = double(distImage2(PixelIdxList));
-
-    ax = Paper.Axes();
-    Image.show(rImage + skel, ax.ax);
-    ax.xlim([-5, roi.maxX - roi.minX + 5]);
-    ax.ylim([-5, roi.maxY - roi.minY + 5]);
+    
+    if (verboseLevel > 0)
+        ax = Paper.Axes();
+        Image.show(rImage + skel, ax.ax);
+        ax.xlim([-5, roi.maxX - roi.minX + 5]);
+        ax.ylim([-5, roi.maxY - roi.minY + 5]);
+    end
     
     subX = roi.subX - roi.minX + 1;
     subY = roi.subY - roi.minY + 1;
     
     width = roi.maxX - roi.minX + 1;
     height = roi.maxY - roi.minY + 1;
-    [y, x] = ind2sub2D(size(rImage), idx1);
+    [startY, startX] = ind2sub2D(size(rImage), idx1);
     
-%     ax.plot(x, y, '+r');
+    if (verboseLevel > 2)
+        ax.plot(startX, startY, '+r');
+    end
     considered = false(size(subX));
     
-    % find a proper starting point
-    [groupX, groupY] = getInRadius(x, y, radius);
-    [centerX, centerY] = getCenter(groupX, groupY);
-    while (abs(centerX - x) > 0.01 || abs(centerY - y) > 0.01)
-        x = centerX;
-        y = centerY;
-%         ax.plot(x, y, '+g');
-        considered = false(size(subX));
-        [groupX, groupY] = getInRadius(x, y, radius);
-        [centerX, centerY] = getCenter(groupX, groupY);
-%         del = ax.plot(groupX, groupY, '.');
-%         debug(x, y, centerX, centerY, centerX, centerY, centerX, centerY, 0);
-%         delete(del);
-    end
-    
-    startX = centerX;
-    startY = centerY;
-    
-%     ax.plot(centerX, centerY, '+b');
     
     % get starting points of the two lines
-    [centerX, centerY, alpha] = get2DDatasetRegression(groupX, groupY);
-    [leftX, leftY, rightX, rightY] = getIntersection(x, y, centerX, centerY, alpha, radius);
+    cRadius = radius;
+    maxRadius = sqrt(width.^2 + height.^2);
+    while (true)
+        [startX, startY, groupX, groupY] = getStartingCenter(startX, startY, cRadius);
+        [centerX, centerY, firstAlpha, var1, var2] = get2DDatasetRegression(groupX, groupY);
+        if (var1 / var2 < 0.5 || cRadius > maxRadius)
+            break;
+        end
+        cRadius = cRadius + 1;
+    end
+    [leftX, leftY, rightX, rightY] = getIntersection(startX, startY, centerX, centerY, firstAlpha, radius);
     leftFilter = getInRadiusFilter(leftX, leftY, radius);
     rightFilter = getInRadiusFilter(rightX, rightY, radius);
     considered(leftFilter | rightFilter) = true;
     
-    debug(x, y, centerX, centerY, leftX, leftY, rightX, rightY, alpha)
-    
-    [leftLineX, leftLineY] = getLine(leftX, leftY, startX, startY, leftFilter);
-    [rightLineX, rightLineY] = getLine(rightX, rightY, startX, startY, rightFilter);
+    if (verboseLevel > 0)
+        debug(startX, startY, centerX, centerY, cRadius, leftX, leftY, rightX, rightY, firstAlpha)
+    end
+    [leftLineX, leftLineY] = getLine(leftX, leftY, startX, startY, leftFilter, firstAlpha);
+    [rightLineX, rightLineY] = getLine(rightX, rightY, startX, startY, rightFilter, firstAlpha);
     
     xs = [leftLineX(end:-1:1), startX, rightLineX] + roi.minX - 1;
     ys = [leftLineY(end:-1:1), startY, rightLineY] + roi.minY - 1;
+    
+    % calculate length
     dx = diff(xs);
     dy = diff(ys);
     segmentLenghts = sqrt(dx.*dx + dy.*dy);
     polylineLength = sum(segmentLenghts);
-    if (polylineLength - min(segmentLenghts) / 2 > upperLengthBoundary)
+    tollerance = min(segmentLenghts) / 2;
+    
+    % validate length
+    if (polylineLength - tollerance > upperLengthBoundary)
         ax = Paper.Axes();
         Image.show(rImage + skel, ax.ax);
         ax.xlim([-5, roi.maxX - roi.minX + 5]);
@@ -99,7 +106,7 @@ function [xs, ys, polylineLength] = roiToPolyline(roi)
         ax.plot(xs - roi.minX + 1, ys - roi.minY + 1);
         warning('Polyline:roiToPolyline:suspiciousResult:tooLong', ...
             'The resulting polyline is suspicious. It seems to be too long.');
-    elseif (polylineLength < lowerLengthBoundary)
+    elseif (polylineLength + tollerance < lowerLengthBoundary)
         ax = Paper.Axes();
         Image.show(rImage + skel, ax.ax);
         ax.xlim([-5, roi.maxX - roi.minX + 5]);
@@ -109,16 +116,17 @@ function [xs, ys, polylineLength] = roiToPolyline(roi)
             'The resulting polyline is suspicious. It seems to be too short.');
     end
     
-    ax.plot(xs - roi.minX + 1, ys - roi.minY + 1);
+    if (verboseLevel > 0)
+        ax.plot(xs - roi.minX + 1, ys - roi.minY + 1);
+    end
     
-    function [lineX, lineY] = getLine(x, y, lastX, lastY, filter)
+    function [lineX, lineY] = getLine(x, y, lastX, lastY, filter, lastAlpha)
         lineX = zeros(1, roi.Area);
         lineY = zeros(1, roi.Area);
         lineIdx = 0;
         if (nargin < 5)
             filter = getInRadiusFilter(x, y, radius);
         end
-        lastAlpha = 0;
         while (true)
             [groupX, groupY] = getInRadius(filter);
             if (~isempty(groupX))
@@ -127,7 +135,7 @@ function [xs, ys, polylineLength] = roiToPolyline(roi)
                     alpha = lastAlpha;
                     useFarest = true;
                 else
-                    useFarest = mod(abs(radtodeg(alpha - lastAlpha)), 360) < 10;
+                    useFarest = mod(abs(radtodeg(alpha - lastAlpha)), 180) < 25;
                     lastAlpha = alpha; 
                 end
                 lineIdx = lineIdx + 1;
@@ -147,14 +155,16 @@ function [xs, ys, polylineLength] = roiToPolyline(roi)
                     end
                 end
                 
-                del = [...
-                    ax.plot(subX(filter1), subY(filter1), '+r'), ...
-                    ax.plot(subX(filter1 & ~considered), subY(filter1 & ~considered), 'xr'), ...
-                    ax.plot(subX(filter2), subY(filter2), '+g') ...
-                    ax.plot(subX(filter2 & ~considered), subY(filter2 & ~considered), 'xg') ...
-                ];
-                debug(x, y, centerX, centerY, nextX1, nextY1, nextX2, nextY2, alpha)
-                delete(del);
+                if (verboseLevel > 0)
+                    del = [...
+                        ax.plot(subX(filter1), subY(filter1), '+r'), ...
+                        ax.plot(subX(filter1 & ~considered), subY(filter1 & ~considered), 'xr'), ...
+                        ax.plot(subX(filter2), subY(filter2), '+g') ...
+                        ax.plot(subX(filter2 & ~considered), subY(filter2 & ~considered), 'xg') ...
+                    ];
+                    debug(x, y, centerX, centerY, radius, nextX1, nextY1, nextX2, nextY2, alpha)
+                    delete(del);
+                end
                 
                 if (unconsidered1 + unconsidered2 == 0)
                     % reached end
@@ -293,10 +303,6 @@ function [xs, ys, polylineLength] = roiToPolyline(roi)
         xs = subX(filter);
         ys = subY(filter);
     end
-    function [x, y] = getCenter(xs, ys)
-        x = mean(xs);
-        y = mean(ys);
-    end
     function [x1, y1, x2, y2] = getIntersection(xr, yr, xg, yg, alpha, r)
         if (abs(tan(alpha)) > 1)
             [y1, x1, y2, x2] = getIntersection2(yr, xr, yg, xg, pi / 2 - alpha, r);
@@ -341,7 +347,40 @@ function [xs, ys, polylineLength] = roiToPolyline(roi)
 %         end
     end
 
-    function debug(x, y, centerX, centerY, nextX1, nextY1, nextX2, nextY2, alpha)
+    function [x, y, groupX, groupY] = getStartingCenter(x, y, radius)
+        % find a proper starting point
+        filter = getInRadiusFilter(x, y, radius);
+        groupX = subX(filter);
+        groupY = subY(filter);
+        numPoints = numel(groupX);
+        cX = sum(groupX) / numPoints;
+        cY = sum(groupY) / numPoints;
+        while (abs(cX - x) > 0.01 || abs(cY - y) > 0.01)
+            x = cX;
+            y = cY;
+            if (verboseLevel > 1)
+                ax.plot(x, y, '+g');
+            end
+            filter = getInRadiusFilter(x, y, radius);
+            groupX = subX(filter);
+            groupY = subY(filter);
+            numPoints = numel(groupX);
+            cX = sum(groupX) / numPoints;
+            cY = sum(groupY) / numPoints;
+            if (verboseLevel > 1)
+                del = ax.plot(groupX, groupY, '.');
+                debug(x, y, cX, cY, radius, [], [], [], [], NaN);
+                delete(del);
+            end
+        end
+        considered(filter) = true;
+    
+        if (verboseLevel > 0)
+            ax.plot(x, y, '+b');
+        end
+    end
+
+    function debug(x, y, centerX, centerY, radius, nextX1, nextY1, nextX2, nextY2, alpha)
         phi = 0:0.1:(2.1*pi);
         ax.plot(centerX, centerY, '+');
         deleteAble = [
