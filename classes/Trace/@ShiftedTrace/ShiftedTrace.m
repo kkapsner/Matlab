@@ -11,7 +11,7 @@ classdef ShiftedTrace < TraceDecorator & handle
     end
     
     methods
-        function this = ShiftedTrace(trace)
+        function this = ShiftedTrace(trace, valueShift, timeShift)
             if (nargin == 0)
                 trace = [];
             end
@@ -20,7 +20,14 @@ classdef ShiftedTrace < TraceDecorator & handle
             if (nargin ~= 0)
                 for i = 1:numel(this)
                     fTrace = this(i);
-                    fTrace.timeShift = - min(fTrace.trace.time);
+                    if (nargin < 3)
+                        fTrace.timeShift = - min(fTrace.trace.time);
+                    else
+                        fTrace.timeShift = timeShift;
+                    end
+                    if (nargin > 1)
+                        fTrace.valueShift = valueShift;
+                    end
                 end
                 this.registerListeners();
             end

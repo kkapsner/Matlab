@@ -48,6 +48,12 @@ classdef DifferentiatedTrace < TraceDecorator & handle
         function valueUnit = getValueUnit(this)
             valueUnit = sprintf('%s / %s', this.trace.getValueUnit(), this.trace.getTimeUnit());
         end
+        
+        function setDifferentiationWindowSize(this, size)
+            for o = this
+                o.differentiationWindowSize = size;
+            end
+        end
     end
     
     methods (Access=private)
