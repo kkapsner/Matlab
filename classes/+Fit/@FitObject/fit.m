@@ -1,11 +1,21 @@
 function [fitobj, goodness, output, warnstr, errstr, convmsg] = ...
         fit(obj, xData, yData, weights)
-    if (nargin < 3)
-        yData = xData;
-        xData = transpose(1:numel(xData));
-    end
-    if (nargin < 4)
-        weights = [];
+    if (isa(xData, 'AbstractTrace'))
+        if (nargin < 3)
+            weights = [];
+        else
+            weights = yData;
+        end
+        yData = xData.value;
+        xData = xData.time;
+    else
+        if (nargin < 3)
+            yData = xData;
+            xData = transpose(1:numel(xData));
+        end
+        if (nargin < 4)
+            weights = [];
+        end
     end
     
     

@@ -5,7 +5,7 @@ function result = guiFit(this, yData, varargin)
     
     isNumericVector = (@(d)isnumeric(d) && min(size(d)) == 1);
     p = inputParser;
-    p.addRequired('YData', isNumericVector);
+    p.addRequired('YData', @(i)isNumericVector(i) || isa(i, 'AbstractTrace'));
     p.addOptional('XData', Inf, isNumericVector);
     p.addOptional('Points', [], @isnumeric);
     p.addOptional('Buttons', defaultButtons);
@@ -15,12 +15,17 @@ function result = guiFit(this, yData, varargin)
     
     p.parse(yData, varargin{:});
     
-    yData = p.Results.YData;
-    if (p.Results.XData == Inf)
-        xData = transpose(1:numel(yData));
+    if (isa(p.Results.YData, 'AbstractTrace'))
+        yData = p.Results.YData.value;
+        xData = p.Results.YData.time;
     else
-        xData = p.Results.XData;
-        assert(all(size(xData) == size(yData)), 'x and y data must have same dimensions.');
+        yData = p.Results.YData;
+        if (p.Results.XData == Inf)
+            xData = transpose(1:numel(yData));
+        else
+            xData = p.Results.XData;
+            assert(all(size(xData) == size(yData)), 'x and y data must have same dimensions.');
+        end
     end
     
     minX = min(xData);
