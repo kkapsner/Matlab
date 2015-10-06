@@ -211,8 +211,9 @@ classdef ROI < Selectable & Binable & handle
                 stack = [];
             end
             for o = this
-                intensityValues = double(image(o.PixelIdxList));
+                intensityValues = image(o.PixelIdxList);
                 brightValues = im2bw(intensityValues, graythresh(intensityValues));
+                intensityValues = double(intensityValues);
 %                 properties = struct( ...
 %                     'sum', sum(intensityValues), ...
 %                     'min', sum(mink(intensityValues, numIntensityPoints) / numIntensityPoints), ...

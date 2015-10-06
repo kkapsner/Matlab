@@ -15,6 +15,7 @@ function h = show(image, h, varargin)
 %     mi = -10;
 %     ma = 480;
     s = warning('off', 'images:initSize:adjustingMag');
+    set(h, 'Clipping', 'off');
     h = imshow(image, [mi, ma], varargin{:}, 'Parent', h);
     warning(s.state, 'images:initSize:adjustingMag');
 end
