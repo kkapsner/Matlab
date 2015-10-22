@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="1551538148" file="D:\korbinian\Programmieren\Matlab\AppsDev\TrackBacteriaByHand\TrackBacteriaByHand.prj" location="D:\korbinian\Programmieren\Matlab\AppsDev\TrackBacteriaByHand" name="TrackBacteriaByHand" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="3804757080" file="D:\korbinian\Programmieren\Matlab\AppsDev\TrackBacteriaByHand\TrackBacteriaByHand.prj" location="D:\korbinian\Programmieren\Matlab\AppsDev\TrackBacteriaByHand" name="TrackBacteriaByHand" target="target.mlapps" target-name="Package App">
     <param.appname>TrackBacteriaByHand</param.appname>
     <param.authnamewatermark>Korbinian Kapsner</param.authnamewatermark>
     <param.email>korbinian.kapsner@ph.tum.de</param.email>
@@ -9,7 +9,7 @@
     <param.summary />
     <param.description />
     <param.screenshot />
-    <param.version>1.1.3</param.version>
+    <param.version>1.1.4</param.version>
     <param.products.name>
       <item>MATLAB</item>
       <item>Image Processing Toolbox</item>
@@ -167,8 +167,11 @@
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@AbstractTrace\filter.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@AbstractTrace\guiSlice.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@AbstractTrace\int.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@AbstractTrace\max.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@AbstractTrace\mean.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@AbstractTrace\meanTrace.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@AbstractTrace\median.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@AbstractTrace\min.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@AbstractTrace\minus.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@AbstractTrace\mrdivide.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@AbstractTrace\mtimes.m</file>
@@ -178,6 +181,7 @@
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@AbstractTrace\slice.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@AbstractTrace\std.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@AbstractTrace\stdTrace.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@AbstractTrace\uminus.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@AbstractTraceDecorator\AbstractTraceDecorator.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@CalculationTrace\CalculationTrace.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@CalculationTrace\char.m</file>
@@ -188,6 +192,9 @@
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@FilteredTrace\FilteredTrace.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@FilteredTrace\inspectFilteredProperties.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@FilteredTrace\propertyDialog.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@FunctionTrace\char.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@FunctionTrace\FunctionTrace.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@FunctionTrace\propertyDialog.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@IntegratedTrace\char.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@IntegratedTrace\IntegratedTrace.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@IntegratedTrace\propertyDialog.m</file>
@@ -198,6 +205,12 @@
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@ResampledTrace\char.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@ResampledTrace\propertyDialog.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@ResampledTrace\ResampledTrace.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@RescaledTrace\char.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@RescaledTrace\propertyDialog.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@RescaledTrace\RescaledTrace.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@ShiftedTrace\char.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@ShiftedTrace\propertyDialog.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@ShiftedTrace\ShiftedTrace.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@SlicedTrace\char.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@SlicedTrace\propertyDialog.m</file>
       <file>D:\korbinian\Programmieren\Matlab\classes\Trace\@SlicedTrace\SlicedTrace.m</file>
@@ -238,6 +251,7 @@
       <file>D:\korbinian\Programmieren\Matlab\functions\+Image\circle.m</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Image\convexHull.m</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Image\convexHull_cpp.mexw64</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Image\distgeodesic.mexw64</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Image\elongateEndPoints.m</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Image\fill.mexw64</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Image\getBandPassFilter.m</file>
@@ -245,19 +259,13 @@
       <file>D:\korbinian\Programmieren\Matlab\functions\+Image\getMaxContour.m</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Image\getPerimeter.m</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Image\getPerimeter.mexw64</file>
-      <file>D:\korbinian\Programmieren\Matlab\functions\+Image\getShortestPath.m</file>
-      <file>D:\korbinian\Programmieren\Matlab\functions\+Image\getShortestPath.mexw64</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Image\removeDeadEnds.mexw64</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Image\show.m</file>
-      <file>D:\korbinian\Programmieren\Matlab\functions\+Polyline\getDistance.m</file>
-      <file>D:\korbinian\Programmieren\Matlab\functions\+Polyline\roiToPolyline.m</file>
-      <file>D:\korbinian\Programmieren\Matlab\functions\get2DDatasetRegression.m</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\getFunctionArguments.m</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\ind2sub2D.mexw64</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\maxk.mexw64</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\mink.mexw64</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\minmax.mexw64</file>
-      <file>D:\korbinian\Programmieren\Matlab\functions\otsu.mexw64</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\sub2ind2D.mexw64</file>
     </fileset.depfun>
     <fileset.resources>
@@ -282,6 +290,7 @@
       <file>D:\korbinian\Programmieren\Matlab\functions\+Image\borderFill.mexmaci64</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Image\bridge.mexmaci64</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Image\convexHull_cpp.mexmaci64</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Image\distgeodesic.mexmaci64</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Image\fill.mexmaci64</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Image\getPerimeter.mexmaci64</file>
       <file>D:\korbinian\Programmieren\Matlab\functions\+Image\getShortestPath.mexmaci64</file>
