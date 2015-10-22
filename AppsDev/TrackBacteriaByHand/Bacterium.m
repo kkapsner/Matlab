@@ -7,6 +7,8 @@ classdef (Abstract) Bacterium < handle
     properties (Dependent)
         dataSize
         divisions
+        divisionRate
+        averageChildrenDivisionRate
     end
     
     methods
@@ -35,6 +37,13 @@ classdef (Abstract) Bacterium < handle
             else
                 divisions = 0;
             end
+        end
+        function divisionRate = get.divisionRate(this)
+            divisionRate = this.divisions / this.dataSize;
+        end
+        function averageChildrenDivisionRate = get.averageChildrenDivisionRate(this)
+            endBac = this.getEndBacteria();
+            averageChildrenDivisionRate = mean([endBac.divisionRate]);
         end
         
         

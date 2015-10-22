@@ -111,7 +111,12 @@ classdef ROIBacterium < Bacterium
                 r = o.rois;
                 l = zeros(size(r));
                 for i = 1:numel(r)
-                    [~, ~, length] = Polyline.roiToPolyline(r(i));
+%                     [~, ~, length] = Polyline.roiToPolyline(r(i));
+                    rImage = r(i).Image;
+                    skel = bwmorph(rImage, 'thin', Inf);
+                    skel = Image.elongateEndPoints(skel, rImage, 4);
+                    length = Image.getMaxContour(skel);
+                    
                     l(i) = length * pixelSize;
                 end
                 o.lengths = l;
