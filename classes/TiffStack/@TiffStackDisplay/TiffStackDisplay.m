@@ -26,6 +26,10 @@ classdef TiffStackDisplay < handle
         setEvent = true
     end
     
+    events
+        imageLoad
+    end
+    
     methods
         function this = TiffStackDisplay(parentElement, stack, index)
             this.stack = stack;
@@ -165,6 +169,7 @@ classdef TiffStackDisplay < handle
                 );
             end
             this.bwImage.CData = image;
+            notify(this, 'imageLoad');
         end
         
         function point = getCurrentPoint(this, dim)
@@ -187,6 +192,8 @@ classdef TiffStackDisplay < handle
                     [0 0 0 20], @indexSliderCallback ...
                 );
                 set(indexSlider, 'SliderStep', [1, 10]./(this.stack.size - 1));
+            else
+                indexSlider = [];
             end
             function indexSliderCallback(varargin)
                 index = round(get(indexSlider, 'Value'));
@@ -244,8 +251,7 @@ classdef TiffStackDisplay < handle
                 addlistener(maxLine, 'newPosition', @maxLineCallback);
                 
                 l = [ ...
-                    addlistener(this, 'stack', 'PostSet', @updateHist), ...
-                    addlistener(this, 'currentImageIndex', 'PostSet', @updateHist), ...
+                    addlistener(this, 'imageLoad', @updateHist), ...
                     addlistener(this, 'minIntensity', 'PostSet', @updateMinLine), ...
                     addlistener(this, 'maxIntensity', 'PostSet', @updateMaxLine), ...
                 ];
