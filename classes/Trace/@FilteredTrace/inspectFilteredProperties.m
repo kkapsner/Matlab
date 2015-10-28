@@ -7,7 +7,7 @@ function dm = inspectFilteredProperties(this, referenceTrace)
     dm.open();
     
     dm.addPanel(2);
-    valueName = dm.addPopupmenu({'Noise', 'first derivative', 'second derivative'}, 0, @update);
+    valueName = dm.addPopupmenu({'Noise', 'first derivative', 'second derivative'}, 1, 0, @update);
     dm.newLine();
     name = dm.addTitle('Noise');
     

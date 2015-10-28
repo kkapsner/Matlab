@@ -769,8 +769,7 @@ classdef DialogManager < handle
             
             value = find(strcmp(obj.(prop), str), 1, 'first');
             
-            popupmenu = this.addPopupmenu(str, pos, @callback);
-            popupmenu.Value = value;
+            popupmenu = this.addPopupmenu(str, value, pos, @callback);
             
             this.listen(prop, @reverseCallback, obj, popupmenu);
             
@@ -790,7 +789,7 @@ classdef DialogManager < handle
             end
         end
         
-        function popupmenu = addPopupmenu(this, str, pos, userCallback)
+        function popupmenu = addPopupmenu(this, str, value, pos, userCallback)
             if (nargin < 3)
                 pos = 0;
             end
@@ -798,11 +797,19 @@ classdef DialogManager < handle
                 userCallback = @(a)a;
             end
             
+            if (ischar(value))
+                value = find(strcmp(str, value), 1, 'first');
+                if (isempty(value))
+                    warning('DialogManager:popupmenu:valueNotFound', 'Value not found in list.');
+                    value = 1;
+                end
+            end
             
             popupmenu = handle(uicontrol( ...
                 'Parent', this.currentPanel, ...
                 'Style', 'popupmenu', ...
                 'String', str, ...
+                'Value', value, ...
                 'HandleVisibility', 'off', ...
                 'Units', 'pixels', ...
                 ...'Position', pos, ...
@@ -810,12 +817,17 @@ classdef DialogManager < handle
             ));
             this.addElement(popupmenu, pos);
             
+            oldValue = value;
             function callback(~,~)
-                userCallback(popupmenu.String{popupmenu.Value});
-                if (ishandle(this))
+                newValue = popupmenu.Value;
+                if (oldValue ~= newValue)
+                    userCallback(popupmenu.String{newValue});
                     notify(this, 'propertyChange', ArbitraryEventData( ...
-                        struct('Object', popupmenu) ...
+                        struct('Object', popupmenu, ...
+                        'OldValue', popupmenu.String{oldValue}, ...
+                        'NewValue', popupmenu.String{newValue}) ...
                     ));
+                    oldValue = newValue;
                 end
             end
         end
