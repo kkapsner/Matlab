@@ -93,9 +93,9 @@ classdef Droplet < handle & Selectable
                 obj.minIntensity(idx, :) = [intensity.min];
                 obj.maxIntensity(idx, :) = [intensity.max];
                 obj.intensitySum(idx, :) = [intensity.sum];
+                obj.brightIntensitySum(idx, :) = [intensity.brightSum];
+                obj.brightArea(idx, :) = [intensity.brightArea];
             end
-            obj.brightIntensitySum(idx, :) = [intensity.brightSum];
-            obj.brightArea(idx, :) = [intensity.brightArea];
             
             obj.lastIndex = idx;
         end
