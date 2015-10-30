@@ -1,6 +1,7 @@
 function data = start()
     seg = Segmenter();
     stacksManager = StackManager();
+    stacksManager.open();
     stacksManager.wait();
     tiffStacks = stacksManager.content;
     

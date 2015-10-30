@@ -40,6 +40,8 @@ function fillEntryPanel(this, stack, panel)
         'Callback', @(~,~)this.removeEntry(stack) ...
     ));
     
+    arrange();
+
     function arrange(~,~)
         pos = panel.Position;
         name.Position = [ ...

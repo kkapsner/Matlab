@@ -10,10 +10,12 @@ function addEntry(this, entry)
             entryIndex = find(filter, 1);
             if (isempty(entryIndex))
                 this.content{end + 1} = entry{i};
-                this.handles.entryPanels{end + 1} = this.addEntryPanel(entry{i});
+                if (this.isOpen)
+                    this.handles.entryPanels{end + 1} = this.addEntryPanel(entry{i});
+                end
             end
         end
-        this.adjustInnerContainerHeight();
+        this.colorizePanels();
         
         notify(this, 'entryAdded');
     end

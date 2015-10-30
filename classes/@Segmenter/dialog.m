@@ -122,6 +122,7 @@ function [varargout] = dialog(seg)
 
     function changeFilters(~,~)
         filterManager = SegmentFilterManager('Segment filters', seg.filters);
+        filterManager.open();
         filterManager.wait();
         seg.filters = [filterManager.content{:}];
         notify(dm, 'propertyChange');

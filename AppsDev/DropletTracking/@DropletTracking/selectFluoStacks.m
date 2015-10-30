@@ -15,6 +15,7 @@ function selectFluoStacks(this)
             this.fluoStacks{i}, ...
             this.folder ...
         );
+        stackManager.open();
         stackManager.wait();
 
         this.fluoStacks{i} = stackManager.stacks;

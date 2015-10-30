@@ -4,9 +4,13 @@ classdef (Abstract) CellManager < handle
     properties(SetObservable)
         title
         content
+        expandToFit = false
     end
     properties(Access=protected)
         handles
+    end
+    properties(Dependent)
+        isOpen
     end
     
     events
@@ -14,6 +18,7 @@ classdef (Abstract) CellManager < handle
         entryRemoved
         winClose
         winOpen
+        reset
     end
     
     methods
@@ -26,7 +31,6 @@ classdef (Abstract) CellManager < handle
             end
             this.title = title;
             this.content = {};
-            this.open();
             this.addEntry(content);
         end
         
@@ -34,13 +38,25 @@ classdef (Abstract) CellManager < handle
             uiwait(this.handles.figure);
         end
         
+        function resetHandles(this)
+            notify(this, 'reset');
+            this.handles = struct();
+        end
+        
         function delete(this)
             this.close();
         end
         
+        function isOpen = get.isOpen(this)
+            isOpen = isfield(this.handles, 'figure') && ishandle(this.handles.figure);
+        end
+        
         close(this, ~,~)
+        open(this, parent)
         addEntry(this, entry)
         removeEntry(this, entry)
+        
+        colorizePanels(this, startIndex)
     end
     
     methods (Abstract, Access=protected)
@@ -49,7 +65,6 @@ classdef (Abstract) CellManager < handle
     end
     
     methods (Access=protected)
-        open(this)
         panel = addEntryPanel(this, entry)
         arrangeContainer(this)
         adjustInnerContainerHeight(this)

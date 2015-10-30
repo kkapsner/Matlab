@@ -4,10 +4,10 @@ function removeEntry(this, entry)
     
     if (~isempty(entryIndex))
         this.content = this.content(filter);
-        delete(this.handles.entryPanels{entryIndex});
+        this.handles.innerAPI.removePanel(this.handles.entryPanels{entryIndex});
         this.handles.entryPanels = this.handles.entryPanels(filter);
         
-        this.adjustInnerContainerHeight();
+        this.colorizePanels();
         
         notify(this, 'entryRemoved');
     end

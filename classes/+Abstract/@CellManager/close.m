@@ -1,7 +1,7 @@
 function close(this, ~,~)
-    if (isfield(this.handles, 'figure') && ishandle(this.handles.figure))
+    if (this.isOpen)
         delete(this.handles.figure);
         notify(this, 'winClose');
     end
-    this.handles = struct();
+    this.resetHandles();
 end
