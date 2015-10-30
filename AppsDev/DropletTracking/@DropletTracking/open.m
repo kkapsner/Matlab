@@ -14,17 +14,13 @@ function dm = open(this)
     
     dm.open();
     
-    dm.addPanel(6);
+    dm.addPanel(5);
     selFolder = dm.addButton('select folder', @(a)a-35, @this.selectFolder);
     [~, okFolder] = addOK('folder');
     
     dm.newLine();
-    selBF = dm.addButton('select BF stacks', @(a)a-35, @this.selectBFStacks);
-    [~, okBF] = addOK('bfStacks');
-    
-    dm.newLine();
-    selFluo = dm.addButton('select fluorescence stacks', @(a)a-35, @this.selectFluoStacks);
-    [~, okFluo] = addOK('fluoStacks');
+    selPos = dm.addButton('select positions', @(a)a-35, @this.selectPositions);
+    [~, okPos] = addOK('positions');
     
     dm.newLine();
     configureSegmenter = dm.addButton('configure segmenter', @(a)a-35, @this.configureSegmenter);
@@ -41,8 +37,7 @@ function dm = open(this)
     
     listener([ ...
         addlistener(this, 'folder', 'PostSet', @handleEnable), ...
-        addlistener(this, 'bfStacks', 'PostSet', @handleEnable), ...
-        addlistener(this, 'fluoStacks', 'PostSet', @handleEnable), ...
+        addlistener(this, 'positions', 'PostSet', @handleEnable), ...
         addlistener(this, 'segmenter', 'PostSet', @handleEnable), ...
         addlistener(this, 'tracker', 'PostSet', @handleEnable) ...
     ]);
@@ -52,23 +47,21 @@ function dm = open(this)
     
     function handleEnable(~,~)
         hasFolder = ~(isempty(this.folder) || this.folder == 0);
-        hasBF = ~(isempty(this.bfStacks));
-        hasFluo = hasBF && numel(this.bfStacks) == numel(this.fluoStacks);
+        hasPos = ~(isempty(this.positions));
+        hasFluo = hasPos && numel(this.bfStacks) == numel(this.fluoStacks);
         hasSegmenter = ~(isempty(this.segmenter));
         hasTracker = ~(isempty(this.tracker));
         
         visible(okFolder, hasFolder);
-        visible(okBF, hasBF);
-        visible(okFluo, hasFluo);
+        visible(okPos, hasPos);
         visible(okSegmenter, hasSegmenter);
         visible(okTracker, hasTracker);
         
         
-        enable(selBF, hasFolder);
-        enable(selFluo, hasFolder && hasBF);
-        enable(configureSegmenter, hasFolder && hasBF);
-        enable(configureTracker, hasFolder && hasFluo);
-        enable(track, hasFolder && hasBF && hasFluo && hasSegmenter && hasTracker);
+        enable(selPos, hasFolder);
+        enable(configureSegmenter, hasFolder && hasPos);
+        enable(configureTracker, hasFolder && hasPos);
+        enable(track, hasFolder && hasPos && hasSegmenter && hasTracker);
     end
 
     function enable(el, v)

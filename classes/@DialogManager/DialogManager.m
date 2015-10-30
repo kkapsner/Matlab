@@ -511,6 +511,9 @@ classdef DialogManager < handle
             [prop, propIndex, value] = this.parsePropName(prop, obj);
             
             a = 1;
+            if (isempty(value))
+                value = maxValue;
+            end
             if (~isscalar(value))
                 a = ones(size(value));
                 value = value(1);

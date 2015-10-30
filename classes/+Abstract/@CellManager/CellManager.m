@@ -4,6 +4,7 @@ classdef (Abstract) CellManager < handle
     properties(SetObservable)
         title
         content
+        contentName = 'Content'
         expandToFit = false
     end
     properties(Access=protected)

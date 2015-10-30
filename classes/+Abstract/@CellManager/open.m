@@ -58,7 +58,7 @@ function open(this, parent)
     this.handles.header = this.createHeader();
     [this.handles.outerContainer, this.handles.innerContainer, this.handles.innerAPI] = ...
         Gui.createScrollablePanel(this.handles.mainPanel);
-    this.handles.outerContainer.BackgroundColor = this.handles.mainPanel.BackgroundColor;
+    this.handles.outerContainer.BackgroundColor = [1, 1, 1];
     this.handles.entryPanels = {};
     
     try
@@ -79,11 +79,18 @@ function open(this, parent)
         arrangeFigure();
     end
     
+    this.handles.innerAPI.layout();
     this.handles.entryPanels = cell(size(this.content));
     for idx = 1:numel(this.content)
         this.handles.entryPanels{idx} = this.addEntryPanel(this.content{idx});
     end
     this.colorizePanels();
+    
+    if (this.expandToFit)
+        addlistener(this.handles.innerContainer, 'SizeChanged', @expand);
+        this.handles.innerAPI.setExpandInnerToMax(true);
+        expand();
+    end
     
     function arrangeFigure(~,~)
         oldUnits = this.handles.mainPanel.Units;
@@ -102,5 +109,18 @@ function open(this, parent)
             pos(4) - 10 - 10 - 30 ...
         ];
         this.handles.mainPanel.Units = oldUnits;
+    end
+    function expand(~,~)
+        if (this.expandToFit)
+            oldUnits = this.handles.mainPanel.Units;
+            this.handles.mainPanel.Units = 'pixels';
+            mainPos = get(this.handles.mainPanel, 'Position');
+            mainPos(4) = ...
+                this.handles.header.Position(4) + ...
+                30 + ... 10 for innerContainer margin and 20 for outerContainer margin
+                this.handles.innerContainer.Position(4);
+            set(this.handles.mainPanel, 'Position', mainPos);
+            this.handles.mainPanel.Units = oldUnits;
+        end
     end
 end

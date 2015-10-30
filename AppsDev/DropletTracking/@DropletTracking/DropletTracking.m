@@ -11,9 +11,12 @@ classdef DropletTracking < handle
         segmenter
         tracker
         
+        positions
+        filters
+    end
+    properties(Dependent)
         bfStacks
         fluoStacks
-        filters
     end
     properties(Access=protected)
         handles
@@ -24,8 +27,15 @@ classdef DropletTracking < handle
     
     methods
         function this = DropletTracking()
-            this.bfStacks = {};
-            this.fluoStacks = {};
+            this.positions = {};
+        end
+        
+        function bfStacks = get.bfStacks(this)
+            bfStacks = cellfun(@(p)p.stacks{1}, this.positions, 'Uniform', false);
+        end
+        
+        function fluoStacks = get.fluoStacks(this)
+            fluoStacks = cellfun(@(p)p.stacks(2:end), this.positions, 'Uniform', false);
         end
     end
 end

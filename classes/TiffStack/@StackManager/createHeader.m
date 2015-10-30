@@ -47,6 +47,9 @@ function header = createHeader(this)
         'String', '+', ...
         'Callback', @(~,~)this.addEntry(this.createEntry()) ...
     ));
+    for el = [header, text]
+        Gui.bindBackgroundColorToParent(el);
+    end
 
     function arrange(~,~)
         pos = header.Position;
