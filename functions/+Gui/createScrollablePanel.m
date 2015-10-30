@@ -13,12 +13,14 @@ function [outerContainer, innerContainer, innerAPI] = createScrollablePanel(pare
     end
 
     [innerContainer, innerAPI] = Gui.createAutofitPanel( ...
+        'margin', 0, ...
         'Parent', outerContainer, ...
         'HandleVisibility', 'off', ...
         'Units', 'pixels', ...
         'BackgroundColor', outerContainer.BackgroundColor, ...
         'BorderWidth', 0 ...
     );
+    innerAPI.setExpandInnerToMax = @setExpandInnerToMax;
     Gui.bindBackgroundColorToParent(innerContainer);
     try
         addlistener(innerContainer, 'SizeChanged', @arrange);
@@ -35,6 +37,7 @@ function [outerContainer, innerContainer, innerAPI] = createScrollablePanel(pare
         'Min', 0 ...
     ));
     inArrange = false;
+    expandInnerToMax = false;
     addlistener(scrollbar, 'Value', 'PostSet', @updateScrollPosition);
     arrange();
 
@@ -66,7 +69,7 @@ function [outerContainer, innerContainer, innerAPI] = createScrollablePanel(pare
         else
             scrollbar.Value = scrollbar.Max;
             scrollbar.Visible = 'off';
-            rightPadding = 15;
+            rightPadding = 15 * ~expandInnerToMax;
         end
         innerContainer.Position = [ ...
             5, ...
@@ -81,5 +84,8 @@ function [outerContainer, innerContainer, innerAPI] = createScrollablePanel(pare
         if ~inArrange
             arrange();
         end
+    end
+    function setExpandInnerToMax(value)
+        expandInnerToMax = value;
     end
 end

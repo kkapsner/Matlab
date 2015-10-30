@@ -3,13 +3,16 @@ function [panel, api] = createAutofitPanel(varargin)
     
     p = inputParser();
     p.KeepUnmatched = true;
-    p.addOptional('margin', 5, @(m)isnumeric(m) && isscalar(m));
+    p.addOptional('panel', [], @(p)ishandle(p) && isscalar(p));
+    p.addOptional('margin', 5, @(m)isnumeric(m) && (numel(m) <= 4));
     p.addOptional('stackSpacing', 0, @(m)isnumeric(m) && isscalar(m));
     p.addOptional('direction', 'v', @(d)any(strcmp(d, {'v', 'h'})));
     p.addOptional('pinEnd', false, @(p)islogical(p) && isscalar(p));
     p.parse(varargin{:});
     
-    margin = p.Results.margin;
+    margin = [];
+    setMargin(p.Results.margin);
+    
     stackSpacing = p.Results.stackSpacing;
     pinEnd = p.Results.pinEnd;
     switch p.Results.direction
@@ -24,11 +27,17 @@ function [panel, api] = createAutofitPanel(varargin)
             stackIndex = 1;
             measureIndex = 3;
     end
+    if (isempty(p.Results.panel))
+        panel = handle(uipanel(p.Unmatched, 'Units', 'pixels'));
+    else
+        panel = p.Results.panel;
+    end
     
-    panel = handle(uipanel(p.Unmatched, 'Units', 'pixels'));
     l = [];
     api = struct( ...
         'layout', @layout, ...
+        'setMargin', @setMargin, ...
+        'setStackSpacing', @setStackSpacing, ...
         'addPanel', @addPanel, ...
         'removePanel', @removePanel, ...
         'childrenChanged', @childrenChanged, ...
@@ -42,13 +51,12 @@ function [panel, api] = createAutofitPanel(varargin)
         if (~inLayout)
             inLayout = true;
             panelPosition = panel.Position;
-            measure = margin;
-            full = panelPosition(fullIndex) - 2 * margin;
-            children = reshape(panel.Children, 1, []);
-            for child = children
+            measure = margin(1);
+            full = panelPosition(fullIndex) - margin(2) - margin(4);
+            for child = Gui.getAllChildren(panel)
                 if (Gui.strToBoolean(child.Visible))
                     pos = zeros(1, 4);
-                    pos(zeroIndex) = margin;
+                    pos(zeroIndex) = margin(4);
                     pos(fullIndex) = full;
                     pos(stackIndex) = measure;
                     pos(measureIndex) = child.Position(measureIndex);
@@ -56,7 +64,7 @@ function [panel, api] = createAutofitPanel(varargin)
                     child.Position = pos;
                 end
             end
-            measure = measure + margin - stackSpacing;
+            measure = measure + margin(3) - stackSpacing;
             if (~pinEnd)
                 panelPosition(stackIndex) = ...
                     panelPosition(stackIndex) + ...
@@ -104,5 +112,24 @@ function [panel, api] = createAutofitPanel(varargin)
     function deleteListeners(varargin)
         delete(l);
     end
+    function setMargin(newMargin)
+        assert(isnumeric(newMargin), 'Margin has to be numeric.');
+        switch numel(newMargin)
+            case 0
+                margin = [5, 5, 5, 5];
+            case 1
+                margin = newMargin(ones(1, 4));
+            case 2
+                margin = newMargin([1 2 1 2]);
+            case 3
+                margin = newMargin([1, 2, 3, 2]);
+            case 4
+                margin = newMargin;
+            otherwise
+                margin = newMargin(1:4);
+        end
+    end
+    function setStackSpacing(newStackSpacing)
+        stackSpacing = newStackSpacing;
+    end
 end
-
