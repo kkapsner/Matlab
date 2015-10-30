@@ -1,32 +1,29 @@
-function [outerContainer, innerContainer] = createScrollablePanel(parent, innerArrangeCallback)
-    if (nargin < 2)
-        innerArrangeCallback = @()1;
-    end
+function [outerContainer, innerContainer, innerAPI] = createScrollablePanel(parent)
     outerContainer = handle(uipanel( ...
         'Parent', parent, ...
-        'HandleVisibility', 'off', ...
+        'HandleVisibility', 'callback', ...
         'Units', 'pixels', ...
         'BorderWidth', 1 ...
     ));
 
     try
-        addlistener(outerContainer, 'SizeChanged', @arrangeOuter);
+        addlistener(outerContainer, 'SizeChanged', @arrange);
     catch
-        addlistener(outerContainer, 'SizeChange', @arrangeOuter);
+        addlistener(outerContainer, 'SizeChange', @arrange);
     end
 
-    innerContainer = handle(uipanel( ...
+    [innerContainer, innerAPI] = Gui.createAutofitPanel( ...
         'Parent', outerContainer, ...
         'HandleVisibility', 'off', ...
         'Units', 'pixels', ...
         'BackgroundColor', outerContainer.BackgroundColor, ...
         'BorderWidth', 0 ...
-    ));
+    );
     Gui.bindBackgroundColorToParent(innerContainer);
     try
-        addlistener(innerContainer, 'SizeChanged', @arrangeInner);
+        addlistener(innerContainer, 'SizeChanged', @arrange);
     catch
-        addlistener(innerContainer, 'SizeChange', @arrangeInner);
+        addlistener(innerContainer, 'SizeChange', @arrange);
     end
 
     scrollbar = handle(uicontrol( ...
@@ -39,8 +36,9 @@ function [outerContainer, innerContainer] = createScrollablePanel(parent, innerA
     ));
     inArrange = false;
     addlistener(scrollbar, 'Value', 'PostSet', @updateScrollPosition);
+    arrange();
 
-    function arrangeOuter(~,~)
+    function arrange(~,~)
         inArrange = true;
         pos = outerContainer.Position;
         scrollbar.Position = [ ...
@@ -81,12 +79,7 @@ function [outerContainer, innerContainer] = createScrollablePanel(parent, innerA
 
     function updateScrollPosition(~,~)
         if ~inArrange
-            arrangeOuter();
+            arrange();
         end
-    end
-
-    function arrangeInner(~,~)
-        innerArrangeCallback();
-        arrangeOuter();
     end
 end
