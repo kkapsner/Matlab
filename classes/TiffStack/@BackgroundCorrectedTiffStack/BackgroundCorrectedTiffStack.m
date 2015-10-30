@@ -14,11 +14,13 @@ classdef BackgroundCorrectedTiffStack < TiffStackDecorator
             
             this = this@TiffStackDecorator(stack);
             if (nargin > 0)
-                if (nargin < 3)
-                    backgroundStack = CroppedTiffStack(stack);
+                for o = this
+                    if (nargin < 3)
+                        backgroundStack = CroppedTiffStack(o.stack);
+                    end
+                    o.backgroundStack = backgroundStack;
+                    addlistener(backgroundStack, 'cacheCleared', @(~,~)o.clearCache());
                 end
-                this.backgroundStack = backgroundStack;
-                addlistener(backgroundStack, 'cacheCleared', @(~,~)this.clearCache());
             end
         end
     end

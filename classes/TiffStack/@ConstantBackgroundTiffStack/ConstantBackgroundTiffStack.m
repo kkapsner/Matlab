@@ -24,8 +24,10 @@ classdef ConstantBackgroundTiffStack < TiffStackDecorator
                 if (nargin < 3)
                     backgroundValue = 0;
                 end
-                this.method = method;
-                this.backgroundValue = backgroundValue;
+                for o = this
+                    o.method = method;
+                    o.backgroundValue = backgroundValue;
+                end
             end
         end
         
