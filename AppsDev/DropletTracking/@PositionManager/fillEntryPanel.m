@@ -7,7 +7,7 @@ function fillEntryPanel(this, entry, panel)
     secondRow = api.addPanel('Position', [0, 0, 10, 100]);
     Gui.bindBackgroundColorToParent(secondRow);
     secondRow.Visible = 'off';
-    stackManager = StackManager('stacks', entry.stacks);
+    stackManager = StackManager('stacks', entry.stacks, this.preselect);
     addlistener(stackManager, 'content', 'PostSet', @copyStacks);
     stackManager.expandToFit = true;
     stackManager.open(secondRow);

@@ -1,5 +1,5 @@
 function selectPositions(this)
-    positionManager = PositionManager('select positions', this.positions);
+    positionManager = PositionManager('select positions', this.positions, this.folder);
     positionManager.open();
     positionManager.wait();
     
