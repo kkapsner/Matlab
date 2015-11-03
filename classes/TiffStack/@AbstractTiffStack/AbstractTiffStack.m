@@ -1,4 +1,4 @@
-classdef (Abstract) AbstractTiffStack  < handle & matlab.mixin.Heterogeneous
+classdef (Abstract) AbstractTiffStack  < handle & matlab.mixin.Heterogeneous & matlab.mixin.Copyable
     %TiffStack manages a file containing a tiff image stack
     
     properties

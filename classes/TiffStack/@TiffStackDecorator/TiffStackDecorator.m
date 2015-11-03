@@ -55,6 +55,13 @@ classdef (Abstract) TiffStackDecorator < AbstractTiffStack
         end
     end
     
+    methods (Access=protected)
+        function cp = copyElement(this)
+            cp = copyElement@matlab.mixin.Copyable(this);
+            cp.stack = copy(this.stack);
+        end
+    end
+    
     methods (Abstract)
         image = getUncachedImage(obj, index)
     end

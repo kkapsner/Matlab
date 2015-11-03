@@ -50,6 +50,14 @@ classdef CalculationTiffStack < AbstractTiffStack
         end
     end
     
+    
+    methods (Access=protected)
+        function cp = copyElement(this)
+            cp = copyElement@matlab.mixin.Copyable(this);
+            cp.stack1 = copy(this.stack1);
+            cp.stack2 = copy(this.stack2);
+        end
+    end
     methods(Static)
         stack = guiCalculate(stacks)
     end

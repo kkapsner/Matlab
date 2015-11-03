@@ -1,4 +1,4 @@
-classdef Position < handle
+classdef Position < handle & matlab.mixin.Copyable
     
     properties
         index
@@ -11,5 +11,11 @@ classdef Position < handle
         end
     end
     
+    methods (Access=protected)
+        function cp = copyElement(this)
+            cp = copyElement@matlab.mixin.Copyable(this);
+            cp.stacks = cellfun(@(s)copy(s), this.stacks, 'Uniform', false);
+        end
+    end
 end
 

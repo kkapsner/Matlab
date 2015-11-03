@@ -8,6 +8,7 @@ function panel = addEntryPanel(this, entry)
     contextMenu = Gui.createContextMenuIfNotExisting(panel);
     moveUpMenu = uimenu(contextMenu, 'Label', 'move up', 'Callback', @moveUp);
     moveDownMenu = uimenu(contextMenu, 'Label', 'move down', 'Callback', @moveDown);
+    uimenu(contextMenu, 'Label', 'duplicate', 'Callback', @(~,~)this.addEntry(this.copyEntry(entry)));
     uimenu(contextMenu, 'Label', 'delete', 'Callback', @(~,~)this.removeEntry(entry));
     updateContextMenu();
     l = [

@@ -63,6 +63,7 @@ classdef (Abstract) CellManager < handle
     methods (Abstract, Access=protected)
         entry = createEntry(this)
         fillEntryPanel(this, entry, panel)
+        cp = copyEntry(this, original)
     end
     
     methods (Access=protected)

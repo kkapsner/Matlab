@@ -6,6 +6,7 @@ classdef SegmentFilterManager < Abstract.CellManager
     end
     methods (Access=protected)
         entry = createEntry(this)
+        cp = copyEntry(this, original)
         fillEntryPanel(this, entry, panel)
     end
 end

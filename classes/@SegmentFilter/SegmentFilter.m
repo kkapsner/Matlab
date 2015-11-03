@@ -1,4 +1,4 @@
-classdef SegmentFilter < handle & Abstract.Filter & ConfigableProperty
+classdef SegmentFilter < handle & Abstract.Filter & ConfigableProperty & matlab.mixin.Copyable
     properties (SetObservable)
         property
     end

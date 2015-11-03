@@ -21,6 +21,7 @@ classdef PositionManager < Abstract.CellManager
     
     methods (Access=protected)
         entry = createEntry(this)
+        cp = copyEntry(this, original)
         fillEntryPanel(this, entry, panel)
     end
     
