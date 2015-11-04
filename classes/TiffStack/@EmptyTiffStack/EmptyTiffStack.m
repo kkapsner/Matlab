@@ -20,8 +20,11 @@ classdef EmptyTiffStack < AbstractTiffStack & handle
             str = 'Empty stack.';
         end
         
-        function panel = getNamePanel(this)
-            panel = [];
+        function fillNamePanel(this, dm, panel, addText)
+        end
+        
+        function text = getNamePanelText(this)
+            text = 'Empty';
         end
     end
 end

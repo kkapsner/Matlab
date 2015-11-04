@@ -24,6 +24,13 @@ classdef MatrixTiffStack < AbstractTiffStack
         function length = getSize(this)
             length = size(this.matrix, 3);
         end
+        
+        function fillNamePanel(this, dm, panel, addText)
+        end
+        
+        function text = getNamePanelText(this)
+            text = 'Matrix';
+        end
     end
 end
 

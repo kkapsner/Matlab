@@ -27,7 +27,8 @@ classdef (Abstract) AbstractTiffStack  < handle & matlab.mixin.Heterogeneous & m
         image = getUncachedImage(this, index);
         
         str = char(this);
-        panel = getNamePanel(this);
+        str = getNamePanelText(this);
+        fillNamePanel(this, dm, panel, addText);
     end
     
     methods
@@ -64,6 +65,7 @@ classdef (Abstract) AbstractTiffStack  < handle & matlab.mixin.Heterogeneous & m
         
         [panel] = getDialogPanel(this, dm, changeCallback)
         dm = dialog(this, waitForClose, segmenter)
+        panel = getNamePanel(this, dm, panel);
     end
     
     methods (Static, Access=protected)
