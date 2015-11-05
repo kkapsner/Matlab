@@ -1,7 +1,7 @@
 function filteredStack = filter(obj, cutoffs)
-%ABSTRACTTIFFSTACK.NORMALISE returns a filtered tiff stack.
+%ABSTRACTTIFFSTACK.FILTER returns a filtered tiff stack.
 %
-%   FILTEREDSTACK = STACK.NORMALISE(CUTOFFS)
+%   FILTEREDSTACK = STACK.FILTER(CUTOFFS)
 %
 % SEE ALSO: FILTEREDTIFFSTACK
     filteredStack = FilteredTiffStack(obj, cutoffs);

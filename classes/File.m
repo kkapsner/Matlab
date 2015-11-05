@@ -172,7 +172,7 @@ classdef File < handle
         end
         function file = loadobj(file)
             if (~file.exists())
-                file = File.getmappedFile(file);
+                file = File.getMappedFile(file);
             end
         end
         
