@@ -14,7 +14,7 @@ classdef Position < handle & matlab.mixin.Copyable
     methods (Access=protected)
         function cp = copyElement(this)
             cp = copyElement@matlab.mixin.Copyable(this);
-            cp.stacks = cellfun(@(s)copy(s), this.stacks, 'Uniform', false);
+            cp.stacks = AbstractTiffStack.copyStructure(this.stacks);
         end
     end
 end

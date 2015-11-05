@@ -36,6 +36,7 @@ function header = createHeader(this)
         'String', 'calculate', ...
         'Callback', @(~,~)this.addEntry(CalculationTiffStack.guiCalculate(this.stacks)) ...
     ));
+    setVisibility();
     this.handles.stackListener = [
         addlistener(this, 'content', 'PostSet', @setVisibility)
         addlistener(this, 'reset', @(~,~)delete(this.handles.stackListener))
