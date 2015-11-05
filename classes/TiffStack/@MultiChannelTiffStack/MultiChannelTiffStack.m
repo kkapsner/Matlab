@@ -46,12 +46,15 @@ classdef MultiChannelTiffStack < TiffStackDecorator
         function set.numChannel(this, numChannel)
             MultiChannelTiffStack.assertNumChannel(numChannel, this.stack);
             this.numChannel = numChannel;
+            this.clearCache();
             notify(this, 'nameChanged');
+            notify(this, 'sizeChanged');
         end
         
         function set.channel(this, channel)
             MultiChannelTiffStack.assertChannel(channel, this.numChannel);
             this.channel = channel;
+            this.clearCache();
             notify(this, 'nameChanged');
         end
         

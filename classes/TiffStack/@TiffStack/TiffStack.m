@@ -38,6 +38,26 @@ classdef TiffStack < AbstractTiffStack
             end
         end
         
+        function setFile(this, file)
+            if (isa(file, 'File'))
+                file = file.fullpath;
+            end
+            if (~strcmp(file, this.file))
+                if (~logical(exist(file, 'file')))
+                    newFile = File.getMappedFile(File(file));
+                    if (~isempty(newFile))
+                        file = newFile.fullpath;
+                    end
+                end
+                this.file = file;
+                this.info_ = imfinfo(file);
+                
+                this.clearCache();
+                notify(this, 'nameChanged');
+                notify(this, 'sizeChanged');
+            end
+        end
+        
         function height = getHeight(this)
             height = this.info(1).Height;
         end

@@ -3,21 +3,29 @@ classdef (Abstract) TiffStackDecorator < AbstractTiffStack
         stack
     end
     
+    properties(Access=private, Transient)
+        eventListeners
+    end
+    
     methods
-        function obj = TiffStackDecorator(stack)
+        function this = TiffStackDecorator(stack)
             if (nargin > 0)
                 stack = TiffStackDecorator.uniformStack(stack);
                 
                 if (numel(stack) > 1)
-                    c = class(obj);
+                    c = class(this);
                     s = num2cell(size(stack));
-                    obj(s{:}) = feval(c);
+                    this(s{:}) = feval(c);
                     for i = 1:numel(stack)
-                        obj(i) = feval(c);
-                        obj(i).stack = stack{i};
+                        this(i) = feval(c);
+                        this(i).stack = stack{i};
                     end
                 elseif (numel(stack) == 1)
-                    obj.stack = stack;
+                    this.stack = stack;
+                end
+                
+                if (numel(stack) > 0)
+                    this.renewListeners();
                 end
             end
         end
@@ -32,6 +40,20 @@ classdef (Abstract) TiffStackDecorator < AbstractTiffStack
         
         function height = getHeight(this)
             height = this.stack.height;
+        end
+        
+        function renewListeners(this, all)
+            for o = this
+                delete(o.eventListeners);
+                o.eventListeners = [
+                    addlistener(o.stack, 'cacheCleared', @(~,~)o.clearCache())
+                    addlistener(o.stack, 'nameChanged', @(~,~)notify(o, 'nameChanged'))
+                    addlistener(o.stack, 'sizeChanged', @(~,~)notify(o, 'sizeChanged'))
+                ];
+                if (nargin > 1 && all)
+                    o.stack.renewListeners(all);
+                end
+            end
         end
     end
     
@@ -58,7 +80,16 @@ classdef (Abstract) TiffStackDecorator < AbstractTiffStack
     methods (Access=protected)
         function cp = copyElement(this)
             cp = copyElement@matlab.mixin.Copyable(this);
-            cp.stack = copy(this.stack);
+            if (this.doDeepCopy)
+                cp.stack = copy(this.stack);
+            end
+            cp.renewListeners();
+        end
+        
+        function [cpStack, originalStacks, copiedStacks] = copyStructureElement(this, originalStacks, copiedStacks)
+            [cpStack, originalStacks, copiedStacks] = copyStructureElement@AbstractTiffStack(this, originalStacks, copiedStacks);
+            [cpStack.stack, originalStacks, copiedStacks] = AbstractTiffStack.getCopiedStack(this.stack, originalStacks, copiedStacks);
+            cpStack.renewListeners();
         end
     end
     

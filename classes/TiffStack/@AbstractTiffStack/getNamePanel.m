@@ -4,29 +4,39 @@ function panel = getNamePanel(this, dm, panel)
     if (nargin < 3)
         panel = dm.addPanel(1);
         panel.UserData = 0;
-        addText(text);
+        textElement = addText(text);
     else
-        updateHorizontalPosition(dm.addButton(text, [panel.UserData, 0, 1], @openSubstack));
+        textElement = dm.addButton(text, [panel.UserData, 0, 1], @openSubstack);
+        updateHorizontalPosition(textElement);
     end
+    l = [
+        addlistener(this, 'nameChanged', @updateName)
+        addlistener(textElement, 'ObjectBeingDestroyed', @removeListeners)
+    ];
     this.fillNamePanel(dm, panel, @addText);
     
-    function addText(text)
-        text = dm.addText(text, [panel.UserData, 0, 1]);
-        updateHorizontalPosition(text);
+    function element = addText(text)
+        element = dm.addText(text, [panel.UserData, 0, 1]);
+        updateHorizontalPosition(element);
     end
-    function updateHorizontalPosition(element)
+    function element = updateHorizontalPosition(element)
         element.Position(3) = element.Extent(3);
         panel.UserData = panel.UserData + element.Position(3);
     end
+    function updateName(~,~)
+        textElement.String = this.getNamePanelText();
+    end
     function openSubstack(~,~)
         subDm = this.dialog();
-        l = [
+        lSub = [
             addlistener(subDm, 'propertyChange', @(~,~)notify(dm, 'propertyChange'))
-            addlistener(panel, 'ObjectBeingDestroyed', @removeListeners)
+            addlistener(panel, 'ObjectBeingDestroyed', @removeSubListeners)
         ];
-        function removeListeners(~,~)
-            delete(l);
+        function removeSubListeners(~,~)
+            delete(lSub);
         end
     end
+    function removeListeners(~,~)
+        delete(l);
+    end
 end
-

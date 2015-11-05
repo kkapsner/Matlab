@@ -193,13 +193,37 @@ classdef TiffStackDisplay < handle
                 );
                 set(indexSlider, 'SliderStep', [1, 10]./(this.stack.size - 1));
             else
-                indexSlider = [];
+                indexSlider = dm.addSlider( ...
+                    this.currentImageIndex, ...
+                    1, ...
+                    2, ...
+                    [0 0 0 20], @indexSliderCallback ...
+                );
+                indexSlider.Visible = 'off';
             end
+            l = [
+                addlistener(this.stack, 'sizeChanged', @updateSize)
+                addlistener(indexSlider, 'ObjectBeingDestroyed', @removeListeners)
+            ];
             function indexSliderCallback(varargin)
                 index = round(get(indexSlider, 'Value'));
         %         set(handles.indexSlider, 'Value', index);
                 this.currentImageIndex = index;
                 callback(varargin{:});
+            end
+            function updateSize(~,~)
+                indexSlider.Visible = Gui.booleanToStr(this.stack.size > 1);
+                if (indexSlider.Value > this.stack.size)
+                    this.currentImageIndex = this.stack.size;
+                    indexSlider.Value = this.stack.size;
+                end
+                if (this.stack.size > 1)
+                    indexSlider.Max = this.stack.size;
+                    set(indexSlider, 'SliderStep', [1, 10]./(this.stack.size - 1));
+                end
+            end
+            function removeListeners(~,~)
+                delete(l);
             end
         end
         

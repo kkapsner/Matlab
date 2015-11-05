@@ -44,11 +44,13 @@ classdef CroppedTiffStack < TiffStackDecorator
         function set.xRange(this, xRange)
             this.setXRange(xRange);
             this.clearCache();
+            notify(this, 'nameChanged');
         end
         
         function set.yRange(this, yRange)
             this.setYRange(yRange);
             this.clearCache();
+            notify(this, 'nameChanged');
         end
         
         function setXRange(this, xRange)

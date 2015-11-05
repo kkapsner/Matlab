@@ -14,13 +14,21 @@ function fillEntryPanel(this, stack, panel)
         'String', stack.char(), ...
         'HorizontalAlignment', 'left' ...
     ));
+
+    l = [
+        addlistener(stack, 'nameChanged', @refreshName)
+        addlistener(panel, 'ObjectBeingDestroyed', @removeListener)
+    ];
+    function removeListener(~,~)
+        delete(l);
+    end
     
     inspectButton = handle(uicontrol( ...
         'Parent', panel, ...
         'Style', 'pushbutton', ...
         'HandleVisibility', 'off', ...
         'String', 'inspect', ...
-        'Callback', @(~,~)stack.dialog() ...
+        'Callback', @inspect ...
     ));
     
     decorateButton = handle(uicontrol( ...
@@ -78,5 +86,11 @@ function fillEntryPanel(this, stack, panel)
     function propagateColor(~,~)
         name.BackgroundColor = panel.BackgroundColor;
 %         removeButton.BackgroundColor = panel.BackgroundColor;
+    end
+    function refreshName(~,~)
+        name.String = stack.char();
+    end
+    function inspect(~,~)
+        stack.dialog();
     end
 end

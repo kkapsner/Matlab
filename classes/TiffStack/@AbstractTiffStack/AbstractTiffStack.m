@@ -8,8 +8,13 @@ classdef (Abstract) AbstractTiffStack  < handle & matlab.mixin.Heterogeneous & m
         cachedIndex = []
         cachedImage = []
     end
+    properties(SetAccess=private, GetAccess=protected, Transient)
+        doDeepCopy = true
+    end
     events
         cacheCleared
+        nameChanged
+        sizeChanged
     end
     
     properties(Dependent)
@@ -29,6 +34,17 @@ classdef (Abstract) AbstractTiffStack  < handle & matlab.mixin.Heterogeneous & m
         str = char(this);
         str = getNamePanelText(this);
         fillNamePanel(this, dm, panel, addText);
+    end
+    
+    methods (Access=protected)
+        function [cpStack, originalStacks, copiedStacks] = copyStructureElement(this, originalStacks, copiedStacks)
+            this.doDeepCopy = false;
+            cpStack = copy(this);
+            this.doDeepCopy = true;
+            
+            originalStacks{end + 1} = this;
+            copiedStacks{end + 1} = cpStack;
+        end
     end
     
     methods
@@ -62,16 +78,29 @@ classdef (Abstract) AbstractTiffStack  < handle & matlab.mixin.Heterogeneous & m
             this.cachedImage = [];
             this.notify('cacheCleared');
         end
+        function renewListeners(this, all)
+        end
         
         [panel] = getDialogPanel(this, dm, changeCallback)
         dm = dialog(this, waitForClose, segmenter)
         panel = getNamePanel(this, dm, panel);
     end
     
+    methods (Static)
+        cpStructure = copyStructure(structure)
+        
+        function obj = loadobj(obj)
+            for o = obj
+                o.renewListeners();
+            end
+        end
+    end
+    
     methods (Static, Access=protected)
         function el = getDefaultScalarElement()
             el = EmptyTiffStack();
         end
+        [cp, originalStacks, copiedStacks] = getCopiedStack(stack, originalStacks, copiedStacks)
     end
 end
 

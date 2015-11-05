@@ -35,12 +35,14 @@ classdef ConstantBackgroundTiffStack < TiffStackDecorator
             assert(any(strcmp(method, this.knownMethods)), 'Unknown background method.');
             this.method = method;
             this.clearCache();
+            notify(this, 'nameChanged');
         end
         function set.backgroundValue(this, value)
             assert(isnumeric(value) && isscalar(value), 'Value has to be numeric scalar.');
             this.backgroundValue = value;
             if (strcmp(this.method, 'fixed'))
                 this.clearCache();
+                notify(this, 'nameChanged');
             end
         end
     end
