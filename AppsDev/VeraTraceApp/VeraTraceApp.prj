@@ -1,0 +1,125 @@
+<deployment-project plugin="plugin.apptool" plugin-version="1.0">
+  <configuration build-checksum="272519646" file="D:\korbinian\Programmieren\Matlab\AppsDev\VeraTraceApp\VeraTraceApp.prj" location="D:\korbinian\Programmieren\Matlab\AppsDev\VeraTraceApp" name="VeraTraceApp" target="target.mlapps" target-name="Package App">
+    <param.appname>VeraTraceApp</param.appname>
+    <param.authnamewatermark>Korbinian Kapsner</param.authnamewatermark>
+    <param.email>korbinian.kapsner@ph.tum.de</param.email>
+    <param.company>TU München</param.company>
+    <param.icon />
+    <param.icons />
+    <param.summary />
+    <param.description />
+    <param.screenshot />
+    <param.version>1.3</param.version>
+    <param.products.name>
+      <item>MATLAB</item>
+      <item>Image Processing Toolbox</item>
+      <item>Statistics and Machine Learning Toolbox</item>
+    </param.products.name>
+    <param.products.id>
+      <item>1</item>
+      <item>17</item>
+      <item>19</item>
+    </param.products.id>
+    <param.products.version>
+      <item>8.6</item>
+      <item>9.3</item>
+      <item>10.1</item>
+    </param.products.version>
+    <param.platforms>
+      <item>win64</item>
+      <item>maci64</item>
+    </param.platforms>
+    <param.output>D:\korbinian\Programmieren\Matlab\AppsDev\VeraTraceApp</param.output>
+    <param.guid>dee7f5da-b776-4350-b2d5-70ee9ec03fb2</param.guid>
+    <unset>
+      <param.icon />
+      <param.icons />
+      <param.summary />
+      <param.description />
+      <param.screenshot />
+      <param.output />
+    </unset>
+    <fileset.main>
+      <file>${PROJECT_ROOT}\openVeraTraceApp.m</file>
+    </fileset.main>
+    <fileset.depfun>
+      <file>${PROJECT_ROOT}\@DomainStepData\DomainStepData.m</file>
+      <file>${PROJECT_ROOT}\@EventSettings\EventSettings.m</file>
+      <file>${PROJECT_ROOT}\@VeraTrace\VeraTrace.m</file>
+      <file>${PROJECT_ROOT}\detectEvent.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\@AutoDialog\AutoDialog.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\@DialogManager\DialogManager.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\ArbitraryEventData.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\classes\File.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\fileexchange\findjobj.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Filter\average.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Filter\median1d.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Filter\median1d_cpp.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Filter\median1d_cpp.mexw64</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\@imvline\imvline.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\@imvline\private\createLineApi.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\@imvline\private\interactivePosition.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\@imvline\private\setEvents.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\@NumericInput\NumericInput.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\addSliderContextMenu.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\arrangeFigures.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\bindBackgroundColorToParent.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\createAutofitPanel.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\createContextMenuIfNotExisting.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\createScrollablePanel.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\enableDataPointDeletion.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\enableDataPointMove.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\enableWheelZoom.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\getAllChildren.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\getGlobalPosition.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\getParentAxes.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\getParentFigure.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\isMouseOver.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\makeFullWidth.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\maximizeFigure.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Gui\strToBoolean.m</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\minmax.mexw64</file>
+    </fileset.depfun>
+    <fileset.resources>
+      <file>D:\korbinian\Programmieren\Matlab\functions\+Filter\median1d_cpp.mexmaci64</file>
+      <file>D:\korbinian\Programmieren\Matlab\functions\minmax.mexmaci64</file>
+    </fileset.resources>
+    <fileset.package />
+    <build-deliverables>
+      <file location="D:\korbinian\Programmieren\Matlab\AppsDev" name="VeraTraceApp" optional="false">D:\korbinian\Programmieren\Matlab\AppsDev\VeraTraceApp</file>
+    </build-deliverables>
+    <workflow />
+    <matlab>
+      <root>C:\Program Files\MATLAB\R2015b</root>
+      <toolboxes>
+        <toolbox name="fixedpoint" />
+        <toolbox name="matlabcoder" />
+      </toolboxes>
+      <toolbox>
+        <fixedpoint>
+          <enabled>true</enabled>
+        </fixedpoint>
+      </toolbox>
+      <toolbox>
+        <matlabcoder>
+          <enabled>true</enabled>
+        </matlabcoder>
+      </toolbox>
+    </matlab>
+    <platform>
+      <unix>false</unix>
+      <mac>false</mac>
+      <windows>true</windows>
+      <win2k>false</win2k>
+      <winxp>false</winxp>
+      <vista>false</vista>
+      <linux>false</linux>
+      <solaris>false</solaris>
+      <osver>6.1</osver>
+      <os32>false</os32>
+      <os64>true</os64>
+      <arch>win64</arch>
+      <matlab>true</matlab>
+    </platform>
+  </configuration>
+</deployment-project>
