@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="272519646" file="D:\korbinian\Programmieren\Matlab\AppsDev\VeraTraceApp\VeraTraceApp.prj" location="D:\korbinian\Programmieren\Matlab\AppsDev\VeraTraceApp" name="VeraTraceApp" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="1212899841" file="D:\korbinian\Programmieren\Matlab\AppsDev\VeraTraceApp\VeraTraceApp.prj" location="D:\korbinian\Programmieren\Matlab\AppsDev\VeraTraceApp" name="VeraTraceApp" target="target.mlapps" target-name="Package App">
     <param.appname>VeraTraceApp</param.appname>
     <param.authnamewatermark>Korbinian Kapsner</param.authnamewatermark>
     <param.email>korbinian.kapsner@ph.tum.de</param.email>

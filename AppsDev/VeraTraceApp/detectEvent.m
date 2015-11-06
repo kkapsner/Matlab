@@ -85,5 +85,6 @@ function result = detectEvent(trace, settings)
     end
     
     result.settings = copy(settings);
+    result.domainData = numel(trace);
 end
 
