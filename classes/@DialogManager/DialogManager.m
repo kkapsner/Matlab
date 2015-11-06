@@ -658,21 +658,23 @@ classdef DialogManager < handle
             function callback(~,~)
                 if (isnum)
                     newValue = input.value;
+                    if (newValue == oldValue)
+                        return;
+                    end
                 else
                     newValue = input.String;
                     if strcmp(newValue, oldValue)
                         return;
                     end
                 end
-                if (newValue ~= oldValue)
-                    userCallback(newValue);
-                    notify(this, 'propertyChange', ArbitraryEventData( ...
-                        struct('Object', input, ...
-                            'OldValue', oldValue, ...
-                            'NewValue', newValue) ...
-                    ));
-                    oldValue = newValue;
-                end
+                
+                userCallback(newValue);
+                notify(this, 'propertyChange', ArbitraryEventData( ...
+                    struct('Object', input, ...
+                        'OldValue', oldValue, ...
+                        'NewValue', newValue) ...
+                ));
+                oldValue = newValue;
             end
         end
         
