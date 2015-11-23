@@ -34,6 +34,7 @@ function panel = getDialogPanel(this, dm, handles)
                 this.fileSchema = fileSchemaInput.String;
                 this.files = files;
                 this.clearCache();
+                this.folder = firstFile.path;
                 this.setFile(firstFile);
                 notify(dm, 'propertyChange');
                 fileChangeDm.close();
