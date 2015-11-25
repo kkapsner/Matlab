@@ -72,6 +72,12 @@ classdef StatisticTrace < AbstractTraceDecorator
             switch this.operation
                 case 'mean'
                     value = this.mean;
+                case 'min'
+                    value = this.min;
+                case 'max'
+                    value = this.max;
+                case 'median'
+                    value = this.median;
                 case 'std'
                     value = this.std;
                 case 'mean + std'
