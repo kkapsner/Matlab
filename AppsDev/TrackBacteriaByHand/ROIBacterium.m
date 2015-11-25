@@ -38,13 +38,13 @@ classdef ROIBacterium < Bacterium
         end
         
         function bacteria = split(this, rois)
-            if (numel(rois) > 1)
+            if (numel(rois) > 0)
                 bacteria = ROIBacterium(this, rois(1));
                 for i = 2: numel(rois);
                     bacteria(i) = ROIBacterium(this, rois(i));
                 end
             else
-                error('Can not split with less than 2 ROIs.');
+                error('Can not split with zero ROIs.');
             end
         end
         

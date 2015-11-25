@@ -48,11 +48,13 @@ function startBac = trackByHand(stack, fluorescenceStack, segmenter, currentImag
     
     dm.checkboxHides(autoTracking, [overlapValue, growthMin, growthMax]);
     
-    dm.addToggleButton('paint mode', [300, 0, 100], @enterPaintMode, @leavePaintMode);
+    forceSplit = dm.addCheckbox('force split', 0, [300, 0, 80]);
+    
+    dm.addToggleButton('paint mode', [380, 0, 100], @enterPaintMode, @leavePaintMode);
     
     stackSelect = dm.addPopupmenu( ...
         arrayfun(@(s)s.char(), [stack, fluorescenceStack], 'UniformOutput', false), 1, ...
-        [405 0 200], ...
+        [485 0 200], ...
         @hStackSelectCallback ...
     );
     function hStackSelectCallback(~, ~)
@@ -227,7 +229,7 @@ function startBac = trackByHand(stack, fluorescenceStack, segmenter, currentImag
     end
 
     function nextImage(~,~)
-        if (~isempty(startBac) && numel(currentROI) > 2)
+        if (~isempty(startBac) && forceSplit.Value == 0 && numel(currentROI) > 2)
             msgbox('A bacterium can only divide in two bacteria.');
             return;
         end
@@ -253,7 +255,7 @@ function startBac = trackByHand(stack, fluorescenceStack, segmenter, currentImag
                 endBacIdx = Inf;
             end
         else
-            if (numel(currentROI) > 1)
+            if (numel(currentROI) > 1 || (forceSplit.Value == 1 && numel(currentROI == 1)))
                 newBacs = endBac(endBacIdx).split(currentROI);
                 endBac = [ ...
                     endBac(1:(endBacIdx - 1)), ...
@@ -275,6 +277,8 @@ function startBac = trackByHand(stack, fluorescenceStack, segmenter, currentImag
                 end
             end
         end
+        forceSplit.Value = 0;
+        
         if (endBacIdx > numel(endBac))
             if (~isempty(endBac) && currentImageIndex < stack.size)
                 currentImageIndex = currentImageIndex + 1;
