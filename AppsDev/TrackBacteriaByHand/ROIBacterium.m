@@ -172,6 +172,19 @@ classdef ROIBacterium < Bacterium
                         intensities = [this.rois.Intensity];
                     end
                     value = [intensities.(property(11:end))];
+                elseif (strcmp(property(1:min(end,10)), 'Intensity('))
+                    rest = 11;
+                    idxPos = find(property(rest:end) == ')', 1, 'first');
+                    idx = property(rest:(rest + idxPos - 2));
+                    rest = rest + idxPos + 1;
+                    idx = str2double(idx);
+                    if (getAll)
+                        intensities = [this.allRois.Intensity];
+                    else
+                        intensities = [this.rois.Intensity];
+                    end
+                    intensities = intensities(idx:numel(this.allRois(1).Intensity):end);
+                    value = [intensities.(property(rest:end))];
                 elseif (strcmp(property(1:min(end, 6)), 'Length'))
                     if (getAll)
                         value = this.allLengths;
