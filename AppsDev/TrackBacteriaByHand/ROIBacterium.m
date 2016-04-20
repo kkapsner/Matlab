@@ -165,6 +165,34 @@ classdef ROIBacterium < Bacterium
             end
         end
         
+        function divisions = getDivisions(this, offset)
+            if (nargin < 2)
+                offset = 0;
+            end
+            
+            if (numel(this) > 1)
+                divisions = this(1).getDivisions(offset);
+                for i = 2:numel(this)
+                    divisions = [divisions, this(i).getDivisions(offset)];
+                end
+            else
+                if (isempty(this.children))
+                    divisions = struct('frame', {}, 'lengthBefore', {}, 'lengthsAfter', {});
+                else
+                    divisions = struct( ...
+                        'frame', offset + this.dataSize, ...
+                        'lengthBefore', this.lengths(end), ...
+                        'lengthsAfter', [] ...
+                    );
+                    divisions.lengthsAfter = zeros(numel(this.children), 1);
+                    for i = 1:numel(this.children)
+                        divisions.lengthsAfter(i) = this.children(i).lengths(1);
+                    end
+                end
+            end
+            
+        end
+        
         function value = getValue(this, property, getAll)
             if (nargin < 3)
                 getAll = true;
