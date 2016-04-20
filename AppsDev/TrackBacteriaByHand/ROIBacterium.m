@@ -10,6 +10,8 @@ classdef ROIBacterium < Bacterium
     properties (Dependent)
         allRois
         allLengths
+        elongations
+        allElongations
     end
     
     methods
@@ -137,6 +139,31 @@ classdef ROIBacterium < Bacterium
             end
         end
         
+        function elongation = get.elongations(this)
+            elongation = this.getElongations();
+        end
+        function elongations = getElongations(this)
+            lastPoint = NaN;
+            if (~isempty(this.children))
+                lastPoint = 0;
+                for child = this.children
+                    lastPoint = lastPoint + child.lengths(1);
+                end
+            end
+            combinedLengths = [this.lengths, lastPoint];
+            elongations = diff(combinedLengths);
+        end
+        
+        function allElongations = get.allElongations(this)
+            allElongations = this.getAllElongations();
+        end
+        function allElongations = getAllElongations(this)
+            if (~isempty(this.parent))
+                allElongations = [this.parent.allElongations, this.elongations];
+            else
+                allElongations = this.elongations;
+            end
+        end
         
         function value = getValue(this, property, getAll)
             if (nargin < 3)
@@ -185,11 +212,17 @@ classdef ROIBacterium < Bacterium
                     end
                     intensities = intensities(idx:numel(this.allRois(1).Intensity):end);
                     value = [intensities.(property(rest:end))];
-                elseif (strcmp(property(1:min(end, 6)), 'Length'))
+                elseif (strcmp(property, 'Length'))
                     if (getAll)
                         value = this.allLengths;
                     else
                         value = this.lengths;
+                    end
+                elseif (strcmp(property, 'Elongation'))
+                    if (getAll)
+                        value = this.allElongations;
+                    else
+                        value = this.elongations;
                     end
                 else
                     if (getAll)
